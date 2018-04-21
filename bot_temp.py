@@ -34,3 +34,40 @@ def echo(bot, update):
 
 echo_handler = MessageHandler(Filters.text, echo)
 dispatcher.add_handler(echo_handler)
+
+
+# PRUEBA PYCAMP
+def vote(bot, update):
+    project = 'JUEGO CON ESPADAS'
+    keyboard = [[InlineKeyboardButton("Si!", callback_data="si"),
+                 InlineKeyboardButton("Nop", callback_data="no")]]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.message.reply_text(
+        'Te interesa el proyecto: {}?'.format(project),
+        reply_markup=reply_markup
+    )
+
+
+def button(bot, update):
+    query = update.callback_query
+    if query.data == "si":
+        result = 'Te interesa el proyecto'
+    else:
+        result = 'No te interesa el proyecto'
+
+    bot.edit_message_text(text=result,
+                          chat_id=query.message.chat_id,
+                          message_id=query.message.message_id)
+
+updater.dispatcher.add_handler(CommandHandler('vote', vote))
+updater.dispatcher.add_handler(CallbackQueryHandler(button))
+
+
+def error(bot, update, error):
+    """Log Errors caused by Updates."""
+    logger.warning('Update "%s" caused error "%s"', update, error)
+
+
+updater.dispatcher.add_error_handler(error)
