@@ -24,7 +24,6 @@ def start(bot, update):
         chat_id=update.message.chat_id,
         text='Hello world! I want to talk with you')
 
-
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
 
@@ -32,7 +31,6 @@ dispatcher.add_handler(start_handler)
 # repeat all messages user send to bot
 def echo(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text=update.message.text)
-
 
 echo_handler = MessageHandler(Filters.text, echo)
 dispatcher.add_handler(echo_handler)
