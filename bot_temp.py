@@ -1,7 +1,7 @@
 import logging
 
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
-     CallbackQueryHandler)
+                          CallbackQueryHandler)
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 
