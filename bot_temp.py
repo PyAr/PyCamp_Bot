@@ -9,7 +9,9 @@ updater = Updater(token='448602941:AAHXrYB7Yj67dzNwsco6-L-fJbdFBz9g7zI')
 dispatcher = updater.dispatcher
 
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -18,7 +20,9 @@ updater.start_polling()
 
 # command /start give usear a message
 def start(bot, update):
-    bot.send_message(chat_id=update.message.chat_id, text='Hello world! I want to talk with you')
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text='Hello world! I want to talk with you')
 
 
 start_handler = CommandHandler('start', start)
