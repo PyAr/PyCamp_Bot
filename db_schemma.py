@@ -16,7 +16,9 @@ def tables_maker(cursor):
     # pycampistas table
     c.execute('''CREATE TABLE IF NOT EXISTS pycampistas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT
+        name TEXT,
+        arrive DATETIME,
+        leave DATETIME
     );''')
 
     # slots table
