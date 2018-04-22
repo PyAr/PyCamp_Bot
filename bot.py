@@ -3,7 +3,6 @@ import logging
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           CallbackQueryHandler)
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-import vote
 
 updater = Updater(token='357811653:AAFaLB_tXns3LchYECBNyy-Swa6h4FbGEDc')
 dispatcher = updater.dispatcher
@@ -24,6 +23,23 @@ def start(bot, update):
         chat_id=update.message.chat_id,
         text='Hello world! I want to talk with you')
 
+start_handler = CommandHandler('start', start)
+dispatcher.add_handler(start_handler)
+
+
+# Pycamp vote
+def vote(bot, update):
+    project = 'JUEGO CON ESPADAS'
+    keyboard = [[InlineKeyboardButton("Si!", callback_data="si"),
+                 InlineKeyboardButton("Nop", callback_data="no")]]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.message.reply_text(
+        'Te interesa el proyecto: {}?'.format(project),
+        reply_markup=reply_markup
+    )
+
 
 def button(bot, update):
     query = update.callback_query
@@ -35,8 +51,8 @@ def button(bot, update):
                           chat_id=query.message.chat_id,
                           message_id=query.message.message_id)
 
-start_handler = CommandHandler('start', start)
-dispatcher.add_handler(start_handler)
+updater.dispatcher.add_handler(CommandHandler('vote', vote))
+updater.dispatcher.add_handler(CallbackQueryHandler(button))
 
 
 # repeat all messages user send to bot
@@ -46,10 +62,6 @@ def echo(bot, update):
 
 echo_handler = MessageHandler(Filters.text, echo)
 dispatcher.add_handler(echo_handler)
-
-updater.dispatcher.add_handler(CommandHandler('vote', vote.vote))
-updater.dispatcher.add_handler(CallbackQueryHandler(button))
-
 
 
 def error(bot, update, error):
