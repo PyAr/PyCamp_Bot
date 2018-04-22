@@ -6,24 +6,7 @@ DATA = json.load(open('data.json'))
 
 
 interested_projects = []
-def vote(bot, update):
-    for project_name, project in DATA['projects'].items():
-    
-        keyboard = [[InlineKeyboardButton("Si!", callback_data="si"),
-                     InlineKeyboardButton("Nop", callback_data="no")]]
-        
-        reply_markup = InlineKeyboardMarkup(keyboard)
 
-        update.message.reply_text(
-        'Te interesa el proyecto: {}?'.format(project_name),
-         reply_markup=reply_markup
-                                )
-
-        # query = update.callback_query
-        # if query.data == "si":
-        #     result = 'Te interesa el proyecto'
-        # else:
-        #     result = 'No te interesa el proyecto'
 
     # while vote != 'Y' and vote != 'N':
     #     print('\nI will ask you again')
