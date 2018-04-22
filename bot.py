@@ -25,7 +25,7 @@ def start(bot, update):
         text='Hello world! I want to talk with you')
 
 
-def button(bot,update):
+def button(bot, update):
     query = update.callback_query
     if query.data == "si":
         result = 'Te interesa el proyecto'
