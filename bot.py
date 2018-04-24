@@ -37,7 +37,7 @@ dispatcher.add_handler(start_handler)
 
 # repeat all messages user send to bot
 def echo(bot, update):
-    bot.send_message(chat_id=update.message.chat_id, text=update.message.text)
+  #  bot.send_message(chat_id=update.message.chat_id, text=update.message.text)
     print ("---------------------------------------------------------------")
     print ("usuario: " + update.message.from_user.username)
     print ("texto: " + update.message.text )
@@ -47,7 +47,11 @@ echo_handler = MessageHandler(Filters.text, echo)
 dispatcher.add_handler(echo_handler)
 
 
-
+def cargar_projectos(bot,update):
+    bot.send_message(chat_id=update.message.chat_id, text="Usuario: " + update.message.from_user.username)
+    reply_markup = ForceReply()
+    bot.send_message(chat_id=update.message.chat_id, text="Ingresá el Nombre del Proyecto a proponer",reply_markup=reply_markup)
+    
 
 def empezar_votacion(bot, update):
     global vote_auth
@@ -89,7 +93,7 @@ def bardo(bot, update):
         Marduk esta decepcionado.
         Marduk usa este Docstring para desquitarse."""
     def checkYesNo(question):
-        update.message.reply_text(question + "  ".lower())
+        bot.send_message(chat_id=update.message.chat_id, text=question)
         resp = str(update.message.text).lower
         while resp != "si" and resp != "no":
             update.message.reply_text("Por favor responde con 'Si' o 'No'  ")
@@ -171,6 +175,7 @@ def error(bot, update, error):
 updater.dispatcher.add_handler(CommandHandler('empezar_votacion', empezar_votacion))
 updater.dispatcher.add_handler(CommandHandler('vote', vote))
 updater.dispatcher.add_handler(CommandHandler('terminar_votacion', terminar_votacion))
+updater.dispatcher.add_handler(CommandHandler('cargar_projectos', cargar_projectos))
 updater.dispatcher.add_handler(CommandHandler('bardo', bardo))
 updater.dispatcher.add_handler(CallbackQueryHandler(button))
 updater.dispatcher.add_error_handler(error)
