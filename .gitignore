@@ -1,6 +1,9 @@
 # slots data
 data.json
 
+# telegram token
+token_secure.py
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
