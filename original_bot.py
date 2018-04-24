@@ -97,8 +97,8 @@ def bardo(bot, update):
         return resp
 
     update.message.reply_text("Marduk tiene un pequeño juego. Si ganás, te doy un meme")
-    resp = checkYesNo("¿Querés jugar?")
-    if resp == si:
+    respuesta = checkYesNo("¿Querés jugar?")
+    if respuesta == si:
         update.message.reply_text('Elegí un número del 1 al 5')
         ejercicio = str(update.message.text)
         while ejercicio not in range(1, 6):
