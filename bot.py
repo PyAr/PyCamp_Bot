@@ -21,6 +21,7 @@ updater.start_polling()
 
 #Global info
 vote_auth = False
+project_auth = False
 DATA = json.load(open('data.json'))
 autorizados = ["WinnaZ","sofide", "ArthurMarduk"]
 
@@ -51,7 +52,7 @@ def cargar_projectos(bot,update):
     bot.send_message(chat_id=update.message.chat_id, text="Usuario: " + update.message.from_user.username)
     reply_markup = ForceReply()
     bot.send_message(chat_id=update.message.chat_id, text="Ingresá el Nombre del Proyecto a proponer",reply_markup=reply_markup)
-    
+
 
 def empezar_votacion(bot, update):
     global vote_auth
@@ -64,7 +65,6 @@ def empezar_votacion(bot, update):
             update.message.reply_text("No estas Autorizadx para hacer esta acción")
     else:
         update.message.reply_text("La votacion ya estaba abierta")
-
 
 
 def vote(bot, update):
@@ -167,6 +167,30 @@ def terminar_votacion(bot, update):
         update.message.reply_text("No estas Autorizadx para hacer esta ación")
 
 
+def empezar_carga_proyectos(bot, update):
+    global project_auth
+    if not project_auth:
+        if update.message.from_user.username in autorizados:
+            update.message.reply_text("Autorizado")
+            update.message.reply_text("Carga de proyectos Abierta")
+            vote_auth = True
+        else:
+            update.message.reply_text("No estas Autorizadx para hacer esta acción")
+    else:
+        update.message.reply_text("La carga de proyectos ya estaba abierta")
+
+
+def terminar_carga_proyectos(bot, update):
+    if update.message.from_user.username in autorizados:
+        with open('data.json', 'w') as f:
+            json.dump(DATA, f, indent=2)
+        update.message.reply_text("Autorizado")
+        update.message.reply_text("Información Cargada, carga de proyectos cerrada")
+        vote_auth = False
+    else:
+        update.message.reply_text("No estas Autorizadx para hacer esta ación")
+
+
 def error(bot, update, error):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, error)
@@ -176,6 +200,8 @@ updater.dispatcher.add_handler(CommandHandler('empezar_votacion', empezar_votaci
 updater.dispatcher.add_handler(CommandHandler('vote', vote))
 updater.dispatcher.add_handler(CommandHandler('terminar_votacion', terminar_votacion))
 updater.dispatcher.add_handler(CommandHandler('cargar_projectos', cargar_projectos))
+updater.dispatcher.add_handler(CommandHandler('empezar_carga_proyectos', empezar_carga_proyectos))
+updater.dispatcher.add_handler(CommandHandler('terminar_carga_proyectos', terminar_carga_proyectos))
 updater.dispatcher.add_handler(CommandHandler('bardo', bardo))
 updater.dispatcher.add_handler(CallbackQueryHandler(button))
 updater.dispatcher.add_error_handler(error)
