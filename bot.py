@@ -168,6 +168,7 @@ def terminar_votacion(bot, update):
 
 
 def empezar_carga_proyectos(bot, update):
+    """Allow people to upload projects"""
     global project_auth
     if not project_auth:
         if update.message.from_user.username in autorizados:
@@ -181,6 +182,7 @@ def empezar_carga_proyectos(bot, update):
 
 
 def terminar_carga_proyectos(bot, update):
+    """Prevent people for keep uploading projects"""
     if update.message.from_user.username in autorizados:
         with open('data.json', 'w') as f:
             json.dump(DATA, f, indent=2)
