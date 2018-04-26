@@ -48,10 +48,19 @@ echo_handler = MessageHandler(Filters.text, echo)
 dispatcher.add_handler(echo_handler)
 
 
-def cargar_projectos(bot,update):
-    bot.send_message(chat_id=update.message.chat_id, text="Usuario: " + update.message.from_user.username)
-    reply_markup = ForceReply()
-    bot.send_message(chat_id=update.message.chat_id, text="Ingresá el Nombre del Proyecto a proponer",reply_markup=reply_markup)
+def cargar_projectos(bot, update):
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text="Usuario: " + update.message.from_user.username
+    )
+
+    # reply_markup = ForceReply()
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text="Ingresá el Nombre del Proyecto a proponer",
+        reply_markup=reply_markup
+    )
+
 
 
 def empezar_votacion(bot, update):
