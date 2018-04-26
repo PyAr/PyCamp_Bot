@@ -3,6 +3,8 @@ import json
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           CallbackQueryHandler)
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from enum import Enum
+
 import token_secure
 
 
@@ -23,6 +25,16 @@ vote_auth = False
 project_auth = False
 DATA = json.load(open('data.json'))
 autorizados = ["WinnaZ","sofide", "ArthurMarduk"]
+users_status = {}
+
+
+class UserStatus(Enum):
+    NAMING_PROJECT = 1
+    ASSIGNING_PROJECT_TOPIC = 2
+    ASSIGNING_PROJECT_LEVEL = 3
+
+
+
 
 # command /start give user a message
 def start(bot, update):
@@ -35,30 +47,105 @@ start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
 
 
-# repeat all messages user send to bot
-def echo(bot, update):
-  #  bot.send_message(chat_id=update.message.chat_id, text=update.message.text)
+def text_input(bot, update):
+    '''This function handle text send by user'''
+    username = update.message.from_user.username
+    status = users_status.get(username, None)
+
     print ("---------------------------------------------------------------")
     print ("usuario: " + update.message.from_user.username)
     print ("texto: " + update.message.text )
+    if status:
+        print ("status:", status)
+    else:
+        print("User without status")
+
+    action = status_reference.get(status, None)
+
+    if action:
+        action(bot, update)
 
 
-echo_handler = MessageHandler(Filters.text, echo)
-dispatcher.add_handler(echo_handler)
+def cargar_proyectos(bot, update):
+    '''Command to start cargar_proyectos dialog'''
+    username = update.message.from_user.username
 
-
-def cargar_projectos(bot, update):
     bot.send_message(
         chat_id=update.message.chat_id,
-        text="Usuario: " + update.message.from_user.username
+        text="Usuario: " + username
     )
 
-    # reply_markup = ForceReply()
     bot.send_message(
         chat_id=update.message.chat_id,
         text="Ingresá el Nombre del Proyecto a proponer",
-        reply_markup=reply_markup
     )
+    users_status[username] = UserStatus.NAMING_PROJECT
+
+
+def naming_project(bot, update):
+    '''Dialog to set project name'''
+    username = update.message.from_user.username
+    text = update.message.text
+
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text="Estamos cargando tu proyecto {}!".format(username)
+    )
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text="Tu proyecto se llama: {}".format(text)
+    )
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text="""Cual es el nivel de dificultad?
+            1 = newbie friendly
+            2 = intermedio
+            3 = python avanzado"""
+    )
+    users_status[username] = UserStatus.ASSIGNING_PROJECT_LEVEL
+
+
+def project_level(bot, update):
+    '''Dialog to set project level'''
+    username = update.message.from_user.username
+    text = update.message.text
+
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text="Ok! Tu proyecto es nivel {}".format(text)
+    )
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text="""Ahora necesitamos que nos digas la temática de tu proyecto.
+        Algunos ejemplos pueden ser:
+        - flask
+        - django
+        - telegram
+        - inteligencia artificial
+        - recreativo"""
+    )
+    users_status[username] = UserStatus.ASSIGNING_PROJECT_TOPIC
+
+
+def project_topic(bot, update):
+    '''Dialog to set project topic'''
+    username = update.message.from_user.username
+    text = update.message.text
+
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text="Excelente {}! La temática de tu proyecto es {}".format(username, text)
+    )
+
+    users_status.pop(username, None)
+
+
+# asociate functions with user status
+status_reference = {
+    UserStatus.NAMING_PROJECT: naming_project,
+    UserStatus.ASSIGNING_PROJECT_TOPIC: project_topic,
+    UserStatus.ASSIGNING_PROJECT_LEVEL: project_level,
+}
 
 
 
@@ -209,9 +296,10 @@ def error(bot, update, error):
 updater.dispatcher.add_handler(CommandHandler('empezar_votacion', empezar_votacion))
 updater.dispatcher.add_handler(CommandHandler('vote', vote))
 updater.dispatcher.add_handler(CommandHandler('terminar_votacion', terminar_votacion))
-updater.dispatcher.add_handler(CommandHandler('cargar_projectos', cargar_projectos))
+updater.dispatcher.add_handler(CommandHandler('cargar_proyectos', cargar_proyectos))
 updater.dispatcher.add_handler(CommandHandler('empezar_carga_proyectos', empezar_carga_proyectos))
 updater.dispatcher.add_handler(CommandHandler('terminar_carga_proyectos', terminar_carga_proyectos))
 updater.dispatcher.add_handler(CommandHandler('bardo', bardo))
 updater.dispatcher.add_handler(CallbackQueryHandler(button))
 updater.dispatcher.add_error_handler(error)
+dispatcher.add_handler(MessageHandler(Filters.text, text_input))
