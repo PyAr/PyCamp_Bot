@@ -25,7 +25,7 @@ project_auth = False
 DATA = json.load(open('data.json'))
 autorizados = ["WinnaZ","sofide", "ArthurMarduk"]
 
-# command /start give usear a message
+# command /start give user a message
 def start(bot, update):
     bot.send_message(
         chat_id=update.message.chat_id,
