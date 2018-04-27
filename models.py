@@ -1,7 +1,7 @@
 import peewee as pw
 
 
-db = pw.SqliteDatabase('people.db')
+db = pw.SqliteDatabase('pycamp_projects.db')
 
 
 class Pycampista(pw.Model):
@@ -47,3 +47,7 @@ class Vote(pw.Model):
 
     class Meta:
         database = db
+
+
+db.connect()
+db.create_tables([Pycampista, Project, Slot, ProjectOwner, Vote])
