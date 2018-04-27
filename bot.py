@@ -4,7 +4,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           CallbackQueryHandler)
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from enum import Enum
-
+import time
 import token_secure
 from models import Pycampista, Project, ProjectOwner, Slot, Vote
 
@@ -33,6 +33,8 @@ class UserStatus(Enum):
     NAMING_PROJECT = 1
     ASSIGNING_PROJECT_TOPIC = 2
     ASSIGNING_PROJECT_LEVEL = 3
+    ASSINGNING_PROJECT_RESPONSABLES = 4
+    
 
 
 
@@ -49,7 +51,7 @@ dispatcher.add_handler(start_handler)
 
 
 def text_input(bot, update):
-    '''This function handle text send by user'''
+    '''This function handles text sent by the user'''
     username = update.message.from_user.username
     status = users_status.get(username, None)
 
@@ -68,7 +70,7 @@ def text_input(bot, update):
 
 
 def cargar_proyectos(bot, update):
-    '''Command to start cargar_proyectos dialog'''
+    '''Command to start the cargar_proyectos dialog'''
     username = update.message.from_user.username
 
     bot.send_message(
@@ -110,6 +112,23 @@ def project_level(bot, update):
     '''Dialog to set project level'''
     username = update.message.from_user.username
     text = update.message.text
+    bien = 0
+    while bien == 0:
+        print (text)
+        print (type(text))
+        print (text == "2")
+        if text != "1" and text != "2" and text != "3":
+            bot.send_message(
+                    chat_id=update.message.chat_id,
+                    text="""La respuesta es invalida:
+                    1 = newbie friendly
+                    2 = intermedio
+                    3 = python avanzado"""
+                            ) 
+            time.sleep(10)
+            users_status[username] = UserStatus.ASSIGNING_PROJECT_LEVEL     
+        else:
+            bien=1
 
     bot.send_message(
         chat_id=update.message.chat_id,
@@ -138,7 +157,26 @@ def project_topic(bot, update):
         text="Excelente {}! La temática de tu proyecto es {}".format(username, text)
     )
 
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text="Finalmente, escribí los nombres de los usuario que van a ser responsables de este projecto"
+    )
+    users_status[username] = UserStatus.ASSINGNING_PROJECT_RESPONSABLES
+    
+
+def project_responsables(bot, update):
+    '''Dialog to set project responsable'''
+    username = update.message.from_user.username
+    text = update.message.text
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text="Perfecto {}! Los responsables de tu projecto son: {}".format(username, text)
+    )
+    
+    
+
     users_status.pop(username, None)
+    
 
 
 # asociate functions with user status
@@ -146,6 +184,7 @@ status_reference = {
     UserStatus.NAMING_PROJECT: naming_project,
     UserStatus.ASSIGNING_PROJECT_TOPIC: project_topic,
     UserStatus.ASSIGNING_PROJECT_LEVEL: project_level,
+    UserStatus.ASSINGNING_PROJECT_RESPONSABLES: project_responsables
 }
 
 
