@@ -6,6 +6,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from enum import Enum
 
 import token_secure
+from models import Pycampista, Project, ProjectOwner, Slot, Vote
 
 
 updater = Updater(token=token_secure.TOKEN)
@@ -235,17 +236,27 @@ def bardo(bot, update):
 
 
 def button(bot, update):
+    '''Save user vote on database'''
     query = update.callback_query
-    print (query)
-    if query.data == "si":
-        project = query.message['text']
-        user = query.message['chat']['username']
-        result = 'Interesadx en: ' + project
-        print (project,user)
-        DATA['projects'][project]['votes'].append(user)
-    else:
-        result = 'No te interesa el proyecto'
+    username = query.message['chat']['username']
+    user = Pycampista.get_or_create(username=username)[0]
+    project_name = query.message['text']
 
+    # Get project from database
+    project = Project.get(Project.name == project_name)
+
+    # create a new vote object
+    new_vote = Vote(pycampista=user, project=project)
+
+    # Save vote in database and send a message
+    if query.data == "si":
+        result = 'Interesadx en: ' + project_name + ' 👍'
+        new_vote.interest = True
+        new_vote.save()
+    else:
+        new_vote.interest = False
+        new_vote.save()
+        result = 'No te interesa el proyecto ' + project_name
 
     bot.edit_message_text(text=result,
                           chat_id=query.message.chat_id,
