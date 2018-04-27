@@ -236,19 +236,19 @@ def bardo(bot, update):
 
 
 def button(bot, update):
-    '''Save user vote on database'''
+    '''Save user vote in the database'''
     query = update.callback_query
     username = query.message['chat']['username']
     user = Pycampista.get_or_create(username=username)[0]
     project_name = query.message['text']
 
-    # Get project from database
+    # Get project from the database
     project = Project.get(Project.name == project_name)
 
     # create a new vote object
     new_vote = Vote(pycampista=user, project=project)
 
-    # Save vote in database and send a message
+    # Save vote in the database and send a message
     if query.data == "si":
         result = 'Interesadx en: ' + project_name + ' 👍'
         new_vote.interest = True
