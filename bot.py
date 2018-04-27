@@ -169,19 +169,24 @@ def vote(bot, update):
         update.message.reply_text(
             'Te interesa el proyecto:'
         )
-        for project_name, project in DATA['projects'].items():
+
+        # if there is not project in the database, create a new project
+        if not Project.select().exists():
+            Project.create(name='PROYECTO DE PRUEBA')
+
+        # ask user for each project in the database
+        for project in Project.select():
             keyboard = [[InlineKeyboardButton("Si!" , callback_data="si"),
                         InlineKeyboardButton("Nop", callback_data="no")]]
 
             reply_markup = InlineKeyboardMarkup(keyboard)
 
             update.message.reply_text(
-                text= project_name,
+                text=project.name,
                 reply_markup=reply_markup
             )
     else:
         update.message.reply_text("Votación Cerrada")
-
 
 
 def bardo(bot, update):
