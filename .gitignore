@@ -1,5 +1,6 @@
 # slots data
 data.json
+pycamp_projects.db
 
 # telegram token
 token_secure.py
