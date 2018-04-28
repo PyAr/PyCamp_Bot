@@ -34,7 +34,7 @@ class UserStatus(Enum):
     NAMING_PROJECT = 1
     ASSIGNING_PROJECT_TOPIC = 2
     ASSIGNING_PROJECT_LEVEL = 3
-    ASSINGNING_PROJECT_RESPONSABLES = 4
+    OWNEAR = 4
 
 
 
@@ -165,7 +165,7 @@ def project_topic(bot, update):
     )
 
 
-def project_responsables(bot, update):
+def ownear(bot, update):
     '''Dialog to set project responsable'''
     username = update.message.from_user.username
     text = update.message.text
