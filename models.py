@@ -6,6 +6,7 @@ db = pw.SqliteDatabase('pycamp_projects.db')
 
 class Pycampista(pw.Model):
     username = pw.CharField(unique=True)
+    chat_id = pw.CharField(unique=True)
     arrive = pw.DateTimeField(null=True)
     leave = pw.DateTimeField(null=True)
 
