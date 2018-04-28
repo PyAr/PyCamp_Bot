@@ -27,6 +27,7 @@ project_auth = False
 DATA = json.load(open('data.json'))
 autorizados = ["WinnaZ","sofide", "ArthurMarduk"]
 users_status = {}
+current_projects = {}
 
 
 class UserStatus(Enum):
@@ -90,6 +91,9 @@ def naming_project(bot, update):
     username = update.message.from_user.username
     text = update.message.text
 
+    new_project = Project(name=text)
+    current_projects[username] = new_project
+
     bot.send_message(
         chat_id=update.message.chat_id,
         text="Estamos cargando tu proyecto {}!".format(username)
@@ -112,7 +116,11 @@ def project_level(bot, update):
     '''Dialog to set project level'''
     username = update.message.from_user.username
     text = update.message.text
+
     if text in ["1", "2", "3"]:
+        new_project = current_projects[username]
+        new_project.level = text
+
         bot.send_message(
             chat_id=update.message.chat_id,
             text="Ok! Tu proyecto es nivel {}".format(text)
@@ -140,23 +148,30 @@ def project_topic(bot, update):
     '''Dialog to set project topic'''
     username = update.message.from_user.username
     text = update.message.text
+    chat_id = update.message.chat_id
+
+    new_project = current_projects[username]
+    new_project.topic = text
+
+    new_project.save()
+
+    user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
+
+    project_owner = ProjectOwner(project=new_project, owner=user)
 
     bot.send_message(
         chat_id=update.message.chat_id,
         text="Excelente {}! La temática de tu proyecto es {}".format(username, text)
     )
 
-    bot.send_message(
-        chat_id=update.message.chat_id,
-        text="Finalmente, escribí los nombres de los usuario qe van a ser responsables de este projecto"
-    )
-    users_status[username] = UserStatus.ASSINGNING_PROJECT_RESPONSABLES
-
 
 def project_responsables(bot, update):
     '''Dialog to set project responsable'''
     username = update.message.from_user.username
     text = update.message.text
+    chat_id = update.message.chat_id
+
+    user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
     bot.send_message(
         chat_id=update.message.chat_id,
         text="Perfecto {}! Los responsables de tu projecto son: {}".format(username, text)
@@ -173,7 +188,6 @@ status_reference = {
     UserStatus.NAMING_PROJECT: naming_project,
     UserStatus.ASSIGNING_PROJECT_TOPIC: project_topic,
     UserStatus.ASSIGNING_PROJECT_LEVEL: project_level,
-    UserStatus.ASSINGNING_PROJECT_RESPONSABLES: project_responsables
 }
 
 
@@ -220,7 +234,8 @@ def button(bot, update):
     '''Save user vote in the database'''
     query = update.callback_query
     username = query.message['chat']['username']
-    user = Pycampista.get_or_create(username=username)[0]
+    chat_id = query.message.chat_id
+    user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
     project_name = query.message['text']
 
     # Get project from the database
