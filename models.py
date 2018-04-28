@@ -25,7 +25,7 @@ class Slot(pw.Model):
 class Project(pw.Model):
     name = pw.CharField()
     difficult_level = pw.IntegerField(default=1)  # From 1 to 3
-    theme = pw.CharField(null=True)
+    topic = pw.CharField(null=True)
     slot = pw.ForeignKeyField(Slot, null=True)
 
     class Meta:
