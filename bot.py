@@ -319,9 +319,9 @@ def error(bot, update, error):
 
 
 updater.dispatcher.add_handler(CommandHandler('empezar_votacion', empezar_votacion))
-updater.dispatcher.add_handler(CommandHandler('vote', vote))
+updater.dispatcher.add_handler(CommandHandler('votar', vote))
 updater.dispatcher.add_handler(CommandHandler('terminar_votacion', terminar_votacion))
-updater.dispatcher.add_handler(CommandHandler('cargar_proyectos', cargar_proyectos))
+updater.dispatcher.add_handler(CommandHandler('cargar_proyecto', cargar_proyectos))
 updater.dispatcher.add_handler(CommandHandler('empezar_carga_proyectos', empezar_carga_proyectos))
 updater.dispatcher.add_handler(CommandHandler('terminar_carga_proyectos', terminar_carga_proyectos))
 updater.dispatcher.add_handler(CommandHandler('ownear', ownear))
