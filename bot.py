@@ -112,39 +112,28 @@ def project_level(bot, update):
     '''Dialog to set project level'''
     username = update.message.from_user.username
     text = update.message.text
-    bien = 0
-    while bien == 0:
-        print (text)
-        print (type(text))
-        print (text == "2")
-        if text != "1" and text != "2" and text != "3":
-            bot.send_message(
-                    chat_id=update.message.chat_id,
-                    text="""La respuesta es invalida:
-                    1 = newbie friendly
-                    2 = intermedio
-                    3 = python avanzado"""
-                            ) 
-            time.sleep(10)
-            users_status[username] = UserStatus.ASSIGNING_PROJECT_LEVEL     
-        else:
-            bien=1
+    if text in ["1", "2", "3"]:
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Ok! Tu proyecto es nivel {}".format(text)
+        )
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="""Ahora necesitamos que nos digas la temática de tu proyecto.
+            Algunos ejemplos pueden ser:
+            - flask
+            - django
+            - telegram
+            - inteligencia artificial
+            - recreativo"""
+        )
+        users_status[username] = UserStatus.ASSIGNING_PROJECT_TOPIC
 
-    bot.send_message(
-        chat_id=update.message.chat_id,
-        text="Ok! Tu proyecto es nivel {}".format(text)
-    )
-    bot.send_message(
-        chat_id=update.message.chat_id,
-        text="""Ahora necesitamos que nos digas la temática de tu proyecto.
-        Algunos ejemplos pueden ser:
-        - flask
-        - django
-        - telegram
-        - inteligencia artificial
-        - recreativo"""
-    )
-    users_status[username] = UserStatus.ASSIGNING_PROJECT_TOPIC
+    else:
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Nooooooo input no válido, por favor ingresá 1, 2 o 3".format(text)
+        )
 
 
 def project_topic(bot, update):
@@ -159,10 +148,10 @@ def project_topic(bot, update):
 
     bot.send_message(
         chat_id=update.message.chat_id,
-        text="Finalmente, escribí los nombres de los usuario que van a ser responsables de este projecto"
+        text="Finalmente, escribí los nombres de los usuario qe van a ser responsables de este projecto"
     )
     users_status[username] = UserStatus.ASSINGNING_PROJECT_RESPONSABLES
-    
+
 
 def project_responsables(bot, update):
     '''Dialog to set project responsable'''
@@ -172,11 +161,11 @@ def project_responsables(bot, update):
         chat_id=update.message.chat_id,
         text="Perfecto {}! Los responsables de tu projecto son: {}".format(username, text)
     )
-    
-    
+
+
 
     users_status.pop(username, None)
-    
+
 
 
 # asociate functions with user status
@@ -186,7 +175,6 @@ status_reference = {
     UserStatus.ASSIGNING_PROJECT_LEVEL: project_level,
     UserStatus.ASSINGNING_PROJECT_RESPONSABLES: project_responsables
 }
-
 
 
 def empezar_votacion(bot, update):
