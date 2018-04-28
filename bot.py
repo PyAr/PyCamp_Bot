@@ -280,6 +280,24 @@ def terminar_carga_proyectos(bot, update):
         update.message.reply_text("No estas Autorizadx para hacer esta ación")
 
 
+def projects(bot, update):
+    """Prevent people for keep uploading projects"""
+    projects = Project.select()
+    text = []
+    for project in projects:
+        project_text = "{} \n owner:  \n topic: {} \n level: {}".format(
+            project.name,
+            # project.owner,
+            project.topic,
+            project.difficult_level
+        )
+        text.append(project_text)
+
+    text = "\n\n".join(text)
+
+    update.message.reply_text(text)
+
+
 def error(bot, update, error):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, error)
@@ -291,6 +309,8 @@ updater.dispatcher.add_handler(CommandHandler('terminar_votacion', terminar_vota
 updater.dispatcher.add_handler(CommandHandler('cargar_proyectos', cargar_proyectos))
 updater.dispatcher.add_handler(CommandHandler('empezar_carga_proyectos', empezar_carga_proyectos))
 updater.dispatcher.add_handler(CommandHandler('terminar_carga_proyectos', terminar_carga_proyectos))
+updater.dispatcher.add_handler(CommandHandler('ownear', ownear))
+updater.dispatcher.add_handler(CommandHandler('proyectos', projects))
 updater.dispatcher.add_handler(CallbackQueryHandler(button))
 updater.dispatcher.add_error_handler(error)
 dispatcher.add_handler(MessageHandler(Filters.text, text_input))
