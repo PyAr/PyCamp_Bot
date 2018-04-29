@@ -241,7 +241,7 @@ status_reference = {
 }
 
 
-def empezar_votacion(bot, update):
+def start_voting(bot, update):
     global vote_auth
     if vote_auth == False:
         if update.message.from_user.username in autorizados:
@@ -256,6 +256,9 @@ def empezar_votacion(bot, update):
 
 def vote(bot, update):
     """"""
+    username = update.message.from_user.username
+
+
     if vote_auth:
         update.message.reply_text(
             'Te interesa el proyecto:'
@@ -308,7 +311,7 @@ def button(bot, update):
                           chat_id=query.message.chat_id,
                           message_id=query.message.message_id)
 
-def terminar_votacion(bot, update):
+def end_voting(bot, update):
     if update.message.from_user.username in autorizados:
         with open('data.json', 'w') as f:
             json.dump(DATA, f, indent=2)
@@ -380,10 +383,10 @@ load_project_handler = ConversationHandler(
    )
 
 updater.dispatcher.add_handler(load_project_handler)
-updater.dispatcher.add_handler(CommandHandler('empezar_votacion', empezar_votacion))
+updater.dispatcher.add_handler(CommandHandler('empezar_votacion', start_voting))
 updater.dispatcher.add_handler(CommandHandler('ayuda', ayuda))
 updater.dispatcher.add_handler(CommandHandler('votar', vote))
-updater.dispatcher.add_handler(CommandHandler('terminar_votacion', terminar_votacion))
+updater.dispatcher.add_handler(CommandHandler('terminar_votacion', end_voting))
 updater.dispatcher.add_handler(CommandHandler('empezar_carga_proyectos', empezar_carga_proyectos))
 updater.dispatcher.add_handler(CommandHandler('terminar_carga_proyectos', terminar_carga_proyectos))
 updater.dispatcher.add_handler(CommandHandler('ownear', ownear))
