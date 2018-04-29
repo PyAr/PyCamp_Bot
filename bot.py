@@ -68,14 +68,13 @@ def text_input(bot, update):
         action(bot, update)
 
 def ayuda(bot, update):
-    username = update.message.from_user.username
-
-    bot.send_message(
+    bot.send_message(chat_id= update.message.chat_id,
+        text=
         '''Este bot facilita la carga, administración y procesamiento de proyectos y votos durante el PyCamp
         
         El proceso se divide en 3 etapas:
         
-        Primera etapa: Los responsables de los proyectos cargan sus proyectos mediante el comando /cargar_proyecto. Solo un responsable carga el proyecto, y luego si hay un responsable adicional, puede agregarse con el comando /ownear.
+        Primera etapa: Lxs responsables de los proyectos cargan sus proyectos mediante el comando /cargar_proyecto. Solo un responsable carga el proyecto, y luego si hay otrxs responsables adicionales, pueden agregarse con el comando /ownear.
         
         Segunda etapa: Mediante el comando /votar todxs lxs participantes votan los proyectos que se expongan. Esto se puede hacer a medida que se expone, o al haber finalizado todas las exposiciones.
         
@@ -169,6 +168,7 @@ def project_topic(bot, update):
 
     project_owner = ProjectOwner.get_or_create(project=new_project, owner=user)
 
+
     bot.send_message(
         chat_id=update.message.chat_id,
         text="Excelente {}! La temática de tu proyecto es {}.".format(username, text)
@@ -202,6 +202,11 @@ def ownear(bot, update):
             text = "{}: {}".format(k,v)
 
         )
+    bot.send_message(
+        chat_id = update.message.chat_id,
+        text = "------------------------------------------------------------------------------"
+
+    )
     users_status[username] = UserStatus.OWNEO
 
 def owneo(bot, update):
@@ -209,11 +214,18 @@ def owneo(bot, update):
     username = update.message.from_user.username
     text = update.message.text
     chat_id = update.message.chat_id
+
     lista_proyectos = [p.name for p in Project.select()]
     dic_proyectos = dict(enumerate(lista_proyectos))
+    # proyecto_usado = dic_proyectos.values(text|)
+
+    project_name =dic_proyectos[int(text)]
+    new_project = Project.get(Project.name == project_name)
+    
     user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
-    project_owner = ProjectOwner(project=dic_proyectos[int(text)], owner=user)
-    project_owner.save()
+    project_owner = ProjectOwner.get_or_create(project=new_project, owner=user)
+
+    
     bot.send_message(
         chat_id=update.message.chat_id,
         text="Perfecto. Chauchi"
