@@ -34,7 +34,7 @@ class UserStatus(Enum):
     NAMING_PROJECT = 1
     ASSIGNING_PROJECT_TOPIC = 2
     ASSIGNING_PROJECT_LEVEL = 3
-    OWNEAR = 4
+    OWNEO = 4
 
 
 
@@ -69,6 +69,19 @@ def text_input(bot, update):
     if action:
         action(bot, update)
 
+def ayuda(bot, update):
+    username = update.message.from_username
+
+    bot.send_message(
+        '''Este bot facilita la carga, administración y procesamiento de proyectos y votos durante el PyCamp
+        
+        El proceso se divide en 3 etapas:
+        
+        Primera etapa: Los responsables de los proyectos cargan sus proyectos mediante el comando /cargar_proyecto. Solo un responsable carga el proyecto, y luego si hay un responsable adicional, puede agregarse con el comando /ownear.
+        
+        Segunda etapa: Mediante el comando /votar todxs lxs participantes votan los proyectos que se expongan. Esto se puede hacer a medida que se expone, o al haber finalizado todas las exposiciones.
+        
+        Tercera etapa: Lxs admins mergean los proyectos que se haya decidido mergear durante las exposiciones (Por tematica similar, u otros motivos), y luego se procesan los datos para obtener el cronograma final.''')
 
 def cargar_proyectos(bot, update):
     '''Command to start the cargar_proyectos dialog'''
@@ -158,28 +171,47 @@ def project_topic(bot, update):
     user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
 
     project_owner = ProjectOwner(project=new_project, owner=user)
+    project_owner.save()
 
     bot.send_message(
         chat_id=update.message.chat_id,
         text="Excelente {}! La temática de tu proyecto es {}".format(username, text)
     )
-
+    users_status.pop(username, None)
 
 def ownear(bot, update):
+
+    username = update.message.from_username
+    lista_proyectos = [p.name for p in Project.select()]
+    dic_proyectos = dict(enumerate(lista_proyectos))
+    bot.send_message(
+        chat_id = update.message.chat_id,
+        text="¿A qué proyecto querés agregarte como responsable? (Dar número)" 
+    )
+    bot.send_message(
+        chat_id = update.message.chat_id,
+        text = dic_proyectos
+    )
+    users_status[username] = UserStatus.OWNEAR
+
+def owneo(bot, update):
     '''Dialog to set project responsable'''
     username = update.message.from_user.username
     text = update.message.text
     chat_id = update.message.chat_id
-
+    lista_proyectos = [p.name for p in Project.select()]
+    dic_proyectos = dict(enumerate(lista_proyectos))
     user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
+    project_owner = ProjectOwner(project=dic_proyectos[text], owner=user)
+    project_owner.save()
     bot.send_message(
         chat_id=update.message.chat_id,
-        text="Perfecto {}! Los responsables de tu projecto son: {}".format(username, text)
+        text="Perfecto. Chauchi"
     )
 
 
 
-    users_status.pop(username, None)
+    
 
 
 
@@ -188,6 +220,7 @@ status_reference = {
     UserStatus.NAMING_PROJECT: naming_project,
     UserStatus.ASSIGNING_PROJECT_TOPIC: project_topic,
     UserStatus.ASSIGNING_PROJECT_LEVEL: project_level,
+    UserStatus.OWNEO: owneo,
 }
 
 
@@ -319,6 +352,7 @@ def error(bot, update, error):
 
 
 updater.dispatcher.add_handler(CommandHandler('empezar_votacion', empezar_votacion))
+updater.dispatcher.add_handler(CommandHandler('ayuda', ayuda))
 updater.dispatcher.add_handler(CommandHandler('votar', vote))
 updater.dispatcher.add_handler(CommandHandler('terminar_votacion', terminar_votacion))
 updater.dispatcher.add_handler(CommandHandler('cargar_proyecto', cargar_proyectos))
