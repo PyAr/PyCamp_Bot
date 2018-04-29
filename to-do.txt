@@ -1,0 +1,13 @@
+1)que el bot pingee a la gente cuando a va a empezar el proyecto
+2)/chonograma que se vea lindo
+3)/ownerar los projectos
+4)level siempre 1 
+5)owner bug en cargar_projectos
+6)no poder votar 2 veces 
+7)extra info by admins: slots, slots_By_Owner, 
+8)no repetir votos o limpiar repetidos
+9)revisar db_to_js 
+10)/mago
+11)geringoso
+
+
