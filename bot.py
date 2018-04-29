@@ -6,6 +6,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from enum import Enum
 import time
 import token_secure
+import itertools
 from models import Pycampista, Project, ProjectOwner, Slot, Vote
 
 
@@ -181,17 +182,19 @@ def project_topic(bot, update):
 
 def ownear(bot, update):
 
-    username = update.message.from_username
+    username = update.message.from_user.username
     lista_proyectos = [p.name for p in Project.select()]
     dic_proyectos = dict(enumerate(lista_proyectos))
     bot.send_message(
         chat_id = update.message.chat_id,
         text="¿A qué proyecto querés agregarte como responsable? (Dar número)" 
     )
-    bot.send_message(
-        chat_id = update.message.chat_id,
-        text = dic_proyectos
-    )
+    for k,v in dic_proyectos.items():
+        bot.send_message(
+            chat_id = update.message.chat_id,
+            text = "{}: {}".format(k,v)
+
+        )
     users_status[username] = UserStatus.OWNEO
 
 def owneo(bot, update):
@@ -202,7 +205,7 @@ def owneo(bot, update):
     lista_proyectos = [p.name for p in Project.select()]
     dic_proyectos = dict(enumerate(lista_proyectos))
     user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
-    project_owner = ProjectOwner(project=dic_proyectos[text], owner=user)
+    project_owner = ProjectOwner(project=dic_proyectos[int(text)], owner=user)
     project_owner.save()
     bot.send_message(
         chat_id=update.message.chat_id,
