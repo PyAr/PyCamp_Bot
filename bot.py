@@ -70,7 +70,7 @@ def text_input(bot, update):
         action(bot, update)
 
 def ayuda(bot, update):
-    username = update.message.from_username
+    username = update.message.from_user.username
 
     bot.send_message(
         '''Este bot facilita la carga, administración y procesamiento de proyectos y votos durante el PyCamp
@@ -192,7 +192,7 @@ def ownear(bot, update):
         chat_id = update.message.chat_id,
         text = dic_proyectos
     )
-    users_status[username] = UserStatus.OWNEAR
+    users_status[username] = UserStatus.OWNEO
 
 def owneo(bot, update):
     '''Dialog to set project responsable'''
