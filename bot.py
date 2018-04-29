@@ -1,7 +1,7 @@
 import logging
 import json
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
-                          CallbackQueryHandler)
+                          CallbackQueryHandler, ConversationHandler)
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from enum import Enum
 import time
@@ -30,15 +30,13 @@ autorizados = ["WinnaZ","sofide", "ArthurMarduk"]
 users_status = {}
 current_projects = {}
 
+NOMBRE, DIFICULTAD, TOPIC = range(3)
 
 class UserStatus(Enum):
     NAMING_PROJECT = 1
     ASSIGNING_PROJECT_TOPIC = 2
     ASSIGNING_PROJECT_LEVEL = 3
     OWNEO = 4
-
-
-
 
 
 # command /start give user a message
@@ -64,7 +62,6 @@ def text_input(bot, update):
         print ("status:", status)
     else:
         print("User without status")
-
     action = status_reference.get(status, None)
 
     if action:
@@ -84,7 +81,7 @@ def ayuda(bot, update):
         
         Tercera etapa: Lxs admins mergean los proyectos que se haya decidido mergear durante las exposiciones (Por tematica similar, u otros motivos), y luego se procesan los datos para obtener el cronograma final.''')
 
-def cargar_proyectos(bot, update):
+def load_project(bot, update):
     '''Command to start the cargar_proyectos dialog'''
     username = update.message.from_user.username
 
@@ -97,7 +94,7 @@ def cargar_proyectos(bot, update):
         chat_id=update.message.chat_id,
         text="Ingresá el Nombre del Proyecto a proponer",
     )
-    users_status[username] = UserStatus.NAMING_PROJECT
+    return NOMBRE
 
 
 def naming_project(bot, update):
@@ -123,8 +120,7 @@ def naming_project(bot, update):
             2 = intermedio
             3 = python avanzado"""
     )
-    users_status[username] = UserStatus.ASSIGNING_PROJECT_LEVEL
-
+    return DIFICULTAD
 
 def project_level(bot, update):
     '''Dialog to set project level'''
@@ -133,7 +129,7 @@ def project_level(bot, update):
 
     if text in ["1", "2", "3"]:
         new_project = current_projects[username]
-        new_project.level = text
+        new_project.difficult_level = text
 
         bot.send_message(
             chat_id=update.message.chat_id,
@@ -149,13 +145,13 @@ def project_level(bot, update):
             - inteligencia artificial
             - recreativo"""
         )
-        users_status[username] = UserStatus.ASSIGNING_PROJECT_TOPIC
-
+        return TOPIC
     else:
         bot.send_message(
             chat_id=update.message.chat_id,
             text="Nooooooo input no válido, por favor ingresá 1, 2 o 3".format(text)
         )
+        return DIFICULTAD
 
 
 def project_topic(bot, update):
@@ -171,14 +167,25 @@ def project_topic(bot, update):
 
     user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
 
-    project_owner = ProjectOwner(project=new_project, owner=user)
-    project_owner.save()
+    project_owner = ProjectOwner.get_or_create(project=new_project, owner=user)
 
     bot.send_message(
         chat_id=update.message.chat_id,
-        text="Excelente {}! La temática de tu proyecto es {}".format(username, text)
+        text="Excelente {}! La temática de tu proyecto es {}.".format(username, text)
     )
-    users_status.pop(username, None)
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text="Tu proyecto ha sido cargado".format(username, text)
+    )
+    return ConversationHandler.END
+
+def cancel(bot, update):
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text="Has cancelado la carga del proyecto".format(username, text)
+        )
+    return ConversationHandler.END
+
 
 def ownear(bot, update):
 
@@ -211,11 +218,6 @@ def owneo(bot, update):
         chat_id=update.message.chat_id,
         text="Perfecto. Chauchi"
     )
-
-
-
-    
-
 
 
 # asociate functions with user status
@@ -263,7 +265,7 @@ def vote(bot, update):
                 reply_markup=reply_markup
             )
     else:
-        update.message.reply_text("Votación Cerrada")
+            update.message.reply_text("Votación Cerrada")
 
 
 def button(bot, update):
@@ -336,9 +338,10 @@ def projects(bot, update):
     projects = Project.select()
     text = []
     for project in projects:
-        project_text = "{} \n owner:  \n topic: {} \n level: {}".format(
+        owners = map(lambda po: po.owner.username, project.projectowner_set.iterator())
+        project_text = "{} \n owner: {} \n topic: {} \n level: {}".format(
             project.name,
-            # project.owner,
+            ', '.join(owners),
             project.topic,
             project.difficult_level
         )
@@ -354,11 +357,21 @@ def error(bot, update, error):
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 
+load_project_handler = ConversationHandler(
+       entry_points=[CommandHandler('cargar_proyecto', load_project)],
+       states={
+           NOMBRE: [MessageHandler(Filters.text, naming_project)],
+           DIFICULTAD : [MessageHandler(Filters.text, project_level)],
+           TOPIC: [MessageHandler(Filters.text, project_topic )],
+       },
+       fallbacks=[CommandHandler('cancel', cancel)]
+   )
+
+updater.dispatcher.add_handler(load_project_handler)
 updater.dispatcher.add_handler(CommandHandler('empezar_votacion', empezar_votacion))
 updater.dispatcher.add_handler(CommandHandler('ayuda', ayuda))
 updater.dispatcher.add_handler(CommandHandler('votar', vote))
 updater.dispatcher.add_handler(CommandHandler('terminar_votacion', terminar_votacion))
-updater.dispatcher.add_handler(CommandHandler('cargar_proyecto', cargar_proyectos))
 updater.dispatcher.add_handler(CommandHandler('empezar_carga_proyectos', empezar_carga_proyectos))
 updater.dispatcher.add_handler(CommandHandler('terminar_carga_proyectos', terminar_carga_proyectos))
 updater.dispatcher.add_handler(CommandHandler('ownear', ownear))
