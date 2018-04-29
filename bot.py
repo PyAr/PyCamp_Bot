@@ -322,7 +322,7 @@ def end_voting(bot, update):
         update.message.reply_text("No estas Autorizadx para hacer esta ación")
 
 
-def empezar_carga_proyectos(bot, update):
+def start_project_load(bot, update):
     """Allow people to upload projects"""
     global project_auth
     if not project_auth:
@@ -336,7 +336,7 @@ def empezar_carga_proyectos(bot, update):
         update.message.reply_text("La carga de proyectos ya estaba abierta")
 
 
-def terminar_carga_proyectos(bot, update):
+def end_project_load(bot, update):
     """Prevent people for keep uploading projects"""
     if update.message.from_user.username in autorizados:
         with open('data.json', 'w') as f:
@@ -383,12 +383,12 @@ load_project_handler = ConversationHandler(
    )
 
 updater.dispatcher.add_handler(load_project_handler)
-updater.dispatcher.add_handler(CommandHandler('empezar_votacion', start_voting))
+updater.dispatcher.add_handler(CommandHandler('empezar_votacion', start_voting  ))
 updater.dispatcher.add_handler(CommandHandler('ayuda', ayuda))
 updater.dispatcher.add_handler(CommandHandler('votar', vote))
 updater.dispatcher.add_handler(CommandHandler('terminar_votacion', end_voting))
-updater.dispatcher.add_handler(CommandHandler('empezar_carga_proyectos', empezar_carga_proyectos))
-updater.dispatcher.add_handler(CommandHandler('terminar_carga_proyectos', terminar_carga_proyectos))
+updater.dispatcher.add_handler(CommandHandler('empezar_carga_proyectos', start_project_load))
+updater.dispatcher.add_handler(CommandHandler('terminar_carga_proyectos', end_project_load))
 updater.dispatcher.add_handler(CommandHandler('ownear', ownear))
 updater.dispatcher.add_handler(CommandHandler('proyectos', projects))
 updater.dispatcher.add_handler(CallbackQueryHandler(button))
