@@ -49,6 +49,14 @@ class Vote(pw.Model):
     class Meta:
         database = db
 
+class Wizard(pw.Model):
+    username = pw.CharField(unique=True)
+    chat_id = pw.CharField(unique=True)
+    current = pw.BooleanField()
+
+    class Meta:
+        database = db
+
 
 db.connect()
-db.create_tables([Pycampista, Project, Slot, ProjectOwner, Vote])
+db.create_tables([Pycampista, Project, Slot, ProjectOwner, Vote, Wizard])
