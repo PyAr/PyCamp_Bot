@@ -25,7 +25,7 @@ result["available_slots"] = [
 
 
 for n, p in enumerate(projects):
-    votes = list(Vote.select().where(Vote.project_id == p.id & Vote.interest))
+    votes = list(Vote.select().where(Vote.project == p, Vote.interest == True))
     votes_users = set([v.pycampista.username for v in votes])
     result["projects"][p.name] = {
         "priority_slots": [],
