@@ -29,8 +29,9 @@ DATA = json.load(open('data.json'))
 autorizados = ["WinnaZ","sofide", "ArthurMarduk"]
 users_status = {}
 current_projects = {}
-
+merge_projects = []
 NOMBRE, DIFICULTAD, TOPIC = range(3)
+PRIMER_PROYECTO, SEGUNDO_PROYECTO = range(2)
 
 class UserStatus(Enum):
     NAMING_PROJECT = 1
@@ -171,6 +172,105 @@ def project_level(bot, update):
             text="Nooooooo input no válido, por favor ingresá 1, 2 o 3".format(text)
         )
         return DIFICULTAD
+
+def merge(bot, update):
+    if update.message.from_user.username in autorizados:
+        lista_proyectos = [p.name for p in Project.select()]
+        dic_proyectos = dict(enumerate(lista_proyectos))
+        bot.send_message(
+            chat_id = update.message.chat_id,
+            text = "Decime el primer proyecto que querés combinar (En número)"
+        )
+        for k,v in dic_proyectos.items():
+            bot.send_message(
+                chat_id = update.message.chat_id,
+                text = "{}: {}".format(k,v)
+
+            )
+        bot.send_message(
+            chat_id = update.message.chat_id,
+            text = "------------------------------------------------------------------------------")
+        return PRIMER_PROYECTO
+
+    else:
+        bot.send_message(
+            chat_id = update.message.chat_id,
+            text= 'No estás autorizadx para llevar a cabo esta acción. Este comando solo puede ser utilizado por Admins'
+        )
+
+def primer_proyecto(bot, update):
+    username = update.message.from_user.username
+    text = update.message.text
+    chat_id = update.message.chat_id
+    lista_proyectos = [p.name for p in Project.select()]
+    dic_proyectos = dict(enumerate(lista_proyectos))
+    proyecto_principal = dic_proyectos[int(text)]
+    merge_projects.append(proyecto_principal)
+    bot.send_message(
+        chat_id = update.message.chat_id,
+        text = "Decime el segundo proyecto que querés combinar (En número)"
+    )
+    for k,v in dic_proyectos.items():
+        bot.send_message(
+            chat_id = update.message.chat_id,
+            text = "{}: {}".format(k,v)
+
+        )
+    bot.send_message(
+        chat_id = update.message.chat_id,
+        text = "------------------------------------------------------------------------------")
+    return SEGUNDO_PROYECTO
+
+def segundo_proyecto(bot,update):
+    username = update.message.from_user.username
+    text = update.message.text
+    chat_id = update.message.chat_id
+
+    lista_proyectos = [p.name for p in Project.select()]
+    dic_proyectos = dict(enumerate(lista_proyectos))
+    proyecto_secundario = dic_proyectos[int(text)]
+    merge_projects.append(proyecto_secundario)
+
+    proyecto_primario_query = Project.get(Project.name==merge_projects[0])
+    proyecto_secundario_query = Project.get(Project.name==merge_projects[1])
+
+    query_votos_primario = Vote.select().where(Vote.project==proyecto_primario_query, Vote.interest==1)
+    query_votos_secundario = Vote.select().where(Vote.project==proyecto_secundario_query, Vote.interest==1)
+
+    lista_votos_primario = [voto.pycampista_id for voto in query_votos_primario]
+    lista_votos_secundario = [voto.pycampista_id for voto in query_votos_secundario]
+    lista_unica = lista_votos_primario.copy()
+    lista_unica.extend(lista_2)
+    lista_unica = set(lista_unica)
+
+    for i in lista_unica:
+        if i not in lista_votos_primario:
+            Vote.get_or_create(project_id=proyecto_primario_query.id, pycampista_id=i,interest=1)
+
+    project_owner_id_primario = ProjectOwner.select().where(ProjectOwner.project_id==proyecto_primario_query)
+    project_owner_id_secundario = ProjectOwner.select().where(ProjectOwner.project_id==proyecto_secundario_query)
+
+    lista_owner_primario = [proyecto.owner_id for proyecto in project_owner_id_primario]
+    lista_owner_secundario = [proyecto.owner_id for proyecto in project_owner_id_secundario]
+
+    lista_unica_owner = lista_owner_primario.copy()
+    lista_unica_owner.extend(lista_owner_secundario)
+    lista_unica_owner = set(lista_unica_owner)
+
+    for i in lista_unica_owner:
+        if i not in lista_owner_primario:
+            ProjectOwner.get_or_create(project_id=proyecto_primario_query.id, owner_id=i)
+
+    nombre_primario=proyecto_primario_query.name
+    nombre_secundario=proyecto_secundario_query.name
+    nuevo_nombre_proyecto=nombre_primario + " / " + nombre_secundario
+    proyecto_primario_query.name = nuevo_nombre_proyecto
+    proyecto_primario_query.save()
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text= "Los proyectos ya se encuentran combinados."
+    )
+
 
 
 def project_topic(bot, update):
@@ -425,7 +525,18 @@ load_project_handler = ConversationHandler(
        fallbacks=[CommandHandler('cancel', cancel)]
    )
 
+merge_project_handler = ConversationHandler(
+       entry_points=[CommandHandler('merge', merge)],
+       states={
+           PRIMER_PROYECTO: [MessageHandler(Filters.text, primer_proyecto)],
+           SEGUNDO_PROYECTO : [MessageHandler(Filters.text, segundo_proyecto)],
+       },
+       fallbacks=[CommandHandler('cancel', cancel)]
+   )
+
 updater.dispatcher.add_handler(load_project_handler)
+updater.dispatcher.add_handler(merge_project_handler)
+updater.dispatcher.add_handler(CommandHandler('merge', merge  ))
 updater.dispatcher.add_handler(CommandHandler('empezar_votacion', start_voting  ))
 updater.dispatcher.add_handler(CommandHandler('ayuda', ayuda))
 updater.dispatcher.add_handler(CommandHandler('votar', vote))
