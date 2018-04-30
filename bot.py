@@ -7,7 +7,7 @@ from enum import Enum
 import time
 import token_secure
 import itertools
-from models import Pycampista, Project, ProjectOwner, Slot, Vote
+from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
 
 
 updater = Updater(token=token_secure.TOKEN)
@@ -49,6 +49,14 @@ def start(bot, update):
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
 
+def conver_to_piglatin(words):
+    words = str(words).split()
+    print (words)
+    for word in words:
+        print(word[1:] + word[0] + "ay", end = " ")
+    
+
+
 
 def text_input(bot, update):
     '''This function handles text sent by the user'''
@@ -58,6 +66,12 @@ def text_input(bot, update):
     print ("---------------------------------------------------------------")
     print ("usuario: " + update.message.from_user.username)
     print ("texto: " + update.message.text )
+    
+    bot.send_message(chat_id= update.message.chat_id,
+        text=conver_to_piglatin(str(update.message.chat_id))
+        )
+    
+    
     if status:
         print ("status:", status)
     else:
@@ -83,18 +97,22 @@ def ayuda(bot, update):
 def load_project(bot, update):
     '''Command to start the cargar_proyectos dialog'''
     username = update.message.from_user.username
+    if project_auth:    
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Usuario: " + username
+        )
 
-    bot.send_message(
-        chat_id=update.message.chat_id,
-        text="Usuario: " + username
-    )
-
-    bot.send_message(
-        chat_id=update.message.chat_id,
-        text="Ingresá el Nombre del Proyecto a proponer",
-    )
-    return NOMBRE
-
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Ingresá el Nombre del Proyecto a proponer",
+        )
+        return NOMBRE
+    else:
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Carga de projectos Cerrada"
+        )
 
 def naming_project(bot, update):
     '''Dialog to set project name'''
@@ -182,7 +200,7 @@ def project_topic(bot, update):
 def cancel(bot, update):
     bot.send_message(
         chat_id=update.message.chat_id,
-        text="Has cancelado la carga del proyecto".format(username, text)
+        text="Has cancelado la carga del proyecto"
         )
     return ConversationHandler.END
 
@@ -230,6 +248,29 @@ def owneo(bot, update):
         chat_id=update.message.chat_id,
         text="Perfecto. Chauchi"
     )
+
+def become_wizard(bot , update):
+
+    username = update.message.from_user.username
+    chat_id = update.message.chat_id
+    Wizard.get_or_create(username=username, chat_id=chat_id, current=True)[0]
+    
+    bot.send_message(
+        chat_id = update.message.chat_id,
+        text="Felicidades! Eres el Magx de turno" 
+    )
+
+def summon_wizard(bot , update):
+    username = update.message.from_user.username
+    chat_id = update.message.chat_id
+    wizard = Wizard.get(Wizard.current == True)
+    bot.send_message(
+        chat_id = wizard.chat_id,
+        text="PING PING PING MAGX! @{} te necesesita!".format(username)
+    )
+    
+
+
 
 
 # asociate functions with user status
@@ -329,7 +370,7 @@ def start_project_load(bot, update):
         if update.message.from_user.username in autorizados:
             update.message.reply_text("Autorizado")
             update.message.reply_text("Carga de proyectos Abierta")
-            vote_auth = True
+            project_auth = True
         else:
             update.message.reply_text("No estas Autorizadx para hacer esta acción")
     else:
@@ -343,7 +384,7 @@ def end_project_load(bot, update):
             json.dump(DATA, f, indent=2)
         update.message.reply_text("Autorizado")
         update.message.reply_text("Información Cargada, carga de proyectos cerrada")
-        vote_auth = False
+        project_auth = False
     else:
         update.message.reply_text("No estas Autorizadx para hacer esta ación")
 
@@ -386,6 +427,8 @@ updater.dispatcher.add_handler(load_project_handler)
 updater.dispatcher.add_handler(CommandHandler('empezar_votacion', start_voting  ))
 updater.dispatcher.add_handler(CommandHandler('ayuda', ayuda))
 updater.dispatcher.add_handler(CommandHandler('votar', vote))
+updater.dispatcher.add_handler(CommandHandler('evocar_magx', summon_wizard))
+updater.dispatcher.add_handler(CommandHandler('ser_magx', become_wizard))
 updater.dispatcher.add_handler(CommandHandler('terminar_votacion', end_voting))
 updater.dispatcher.add_handler(CommandHandler('empezar_carga_proyectos', start_project_load))
 updater.dispatcher.add_handler(CommandHandler('terminar_carga_proyectos', end_project_load))
