@@ -1,13 +1,13 @@
 import logging
 import json
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
-                          CallbackQueryHandler)
+                          CallbackQueryHandler, ConversationHandler)
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from enum import Enum
 import time
 import token_secure
 import itertools
-from models import Pycampista, Project, ProjectOwner, Slot, Vote
+from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
 
 
 updater = Updater(token=token_secure.TOKEN)
@@ -30,15 +30,13 @@ autorizados = ["WinnaZ","sofide", "ArthurMarduk"]
 users_status = {}
 current_projects = {}
 
+NOMBRE, DIFICULTAD, TOPIC = range(3)
 
 class UserStatus(Enum):
     NAMING_PROJECT = 1
     ASSIGNING_PROJECT_TOPIC = 2
     ASSIGNING_PROJECT_LEVEL = 3
     OWNEO = 4
-
-
-
 
 
 # command /start give user a message
@@ -51,6 +49,14 @@ def start(bot, update):
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
 
+def conver_to_piglatin(words):
+    words = str(words).split()
+    print (words)
+    for word in words:
+        print(word[1:] + word[0] + "ay", end = " ")
+    
+
+
 
 def text_input(bot, update):
     '''This function handles text sent by the user'''
@@ -60,45 +66,55 @@ def text_input(bot, update):
     print ("---------------------------------------------------------------")
     print ("usuario: " + update.message.from_user.username)
     print ("texto: " + update.message.text )
+    
+    bot.send_message(chat_id= update.message.chat_id,
+        text=conver_to_piglatin(str(update.message.chat_id))
+        )
+    
+    
     if status:
         print ("status:", status)
     else:
         print("User without status")
-
     action = status_reference.get(status, None)
 
     if action:
         action(bot, update)
 
 def ayuda(bot, update):
-    username = update.message.from_user.username
-
-    bot.send_message(
+    bot.send_message(chat_id= update.message.chat_id,
+        text=
         '''Este bot facilita la carga, administración y procesamiento de proyectos y votos durante el PyCamp
         
         El proceso se divide en 3 etapas:
         
-        Primera etapa: Los responsables de los proyectos cargan sus proyectos mediante el comando /cargar_proyecto. Solo un responsable carga el proyecto, y luego si hay un responsable adicional, puede agregarse con el comando /ownear.
+        Primera etapa: Lxs responsables de los proyectos cargan sus proyectos mediante el comando /cargar_proyecto. Solo un responsable carga el proyecto, y luego si hay otrxs responsables adicionales, pueden agregarse con el comando /ownear.
         
-        Segunda etapa: Mediante el comando /votar todxs lxs participantes votan los proyectos que se expongan. Esto se puede hacer a medida que se expone, o al haber finalizado todas las exposiciones.
+        Segunda etapa: Mediante el comando /votar todxs lxs participantes votan los proyectos que se expongan. Esto se puede hacer a medida que se expone, o al haber finalizado todas las exposiciones. Si no se está segurx de un proyecto, conviene no votar nada, ya que luego podés volver a ejecutar el comando y votar aquellas cosas que no votaste. NO SE PUEDE CAMBIAR TU VOTO UNA VEZ HECHO.
         
-        Tercera etapa: Lxs admins mergean los proyectos que se haya decidido mergear durante las exposiciones (Por tematica similar, u otros motivos), y luego se procesan los datos para obtener el cronograma final.''')
+        Tercera etapa: Lxs admins mergean los proyectos que se haya decidido mergear durante las exposiciones (Por tematica similar, u otros motivos), y luego se procesan los datos para obtener el cronograma final.
+        
+        Comandos adicionales: /ser_magx te transforma en el/la Magx de turno. /evocar_magx pingea a la/el Magx de turno que necesitas su ayuda. Con un gran poder, viene una gran responsabilidad''')
 
-def cargar_proyectos(bot, update):
+def load_project(bot, update):
     '''Command to start the cargar_proyectos dialog'''
     username = update.message.from_user.username
+    if project_auth:    
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Usuario: " + username
+        )
 
-    bot.send_message(
-        chat_id=update.message.chat_id,
-        text="Usuario: " + username
-    )
-
-    bot.send_message(
-        chat_id=update.message.chat_id,
-        text="Ingresá el Nombre del Proyecto a proponer",
-    )
-    users_status[username] = UserStatus.NAMING_PROJECT
-
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Ingresá el Nombre del Proyecto a proponer",
+        )
+        return NOMBRE
+    else:
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Carga de projectos Cerrada"
+        )
 
 def naming_project(bot, update):
     '''Dialog to set project name'''
@@ -123,8 +139,7 @@ def naming_project(bot, update):
             2 = intermedio
             3 = python avanzado"""
     )
-    users_status[username] = UserStatus.ASSIGNING_PROJECT_LEVEL
-
+    return DIFICULTAD
 
 def project_level(bot, update):
     '''Dialog to set project level'''
@@ -133,7 +148,7 @@ def project_level(bot, update):
 
     if text in ["1", "2", "3"]:
         new_project = current_projects[username]
-        new_project.level = text
+        new_project.difficult_level = text
 
         bot.send_message(
             chat_id=update.message.chat_id,
@@ -149,13 +164,13 @@ def project_level(bot, update):
             - inteligencia artificial
             - recreativo"""
         )
-        users_status[username] = UserStatus.ASSIGNING_PROJECT_TOPIC
-
+        return TOPIC
     else:
         bot.send_message(
             chat_id=update.message.chat_id,
             text="Nooooooo input no válido, por favor ingresá 1, 2 o 3".format(text)
         )
+        return DIFICULTAD
 
 
 def project_topic(bot, update):
@@ -171,14 +186,26 @@ def project_topic(bot, update):
 
     user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
 
-    project_owner = ProjectOwner(project=new_project, owner=user)
-    project_owner.save()
+    project_owner = ProjectOwner.get_or_create(project=new_project, owner=user)
+
 
     bot.send_message(
         chat_id=update.message.chat_id,
-        text="Excelente {}! La temática de tu proyecto es {}".format(username, text)
+        text="Excelente {}! La temática de tu proyecto es {}.".format(username, text)
     )
-    users_status.pop(username, None)
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text="Tu proyecto ha sido cargado".format(username, text)
+    )
+    return ConversationHandler.END
+
+def cancel(bot, update):
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text="Has cancelado la carga del proyecto"
+        )
+    return ConversationHandler.END
+
 
 def ownear(bot, update):
 
@@ -195,6 +222,11 @@ def ownear(bot, update):
             text = "{}: {}".format(k,v)
 
         )
+    bot.send_message(
+        chat_id = update.message.chat_id,
+        text = "------------------------------------------------------------------------------"
+
+    )
     users_status[username] = UserStatus.OWNEO
 
 def owneo(bot, update):
@@ -202,19 +234,44 @@ def owneo(bot, update):
     username = update.message.from_user.username
     text = update.message.text
     chat_id = update.message.chat_id
+
     lista_proyectos = [p.name for p in Project.select()]
     dic_proyectos = dict(enumerate(lista_proyectos))
+    # proyecto_usado = dic_proyectos.values(text|)
+
+    project_name =dic_proyectos[int(text)]
+    new_project = Project.get(Project.name == project_name)
+    
     user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
-    project_owner = ProjectOwner(project=dic_proyectos[int(text)], owner=user)
-    project_owner.save()
+    project_owner = ProjectOwner.get_or_create(project=new_project, owner=user)
+
+    
     bot.send_message(
         chat_id=update.message.chat_id,
         text="Perfecto. Chauchi"
     )
 
+def become_wizard(bot , update):
 
-
+    username = update.message.from_user.username
+    chat_id = update.message.chat_id
+    Wizard.get_or_create(username=username, chat_id=chat_id, current=True)[0]
     
+    bot.send_message(
+        chat_id = update.message.chat_id,
+        text="Felicidades! Eres el Magx de turno" 
+    )
+
+def summon_wizard(bot , update):
+    username = update.message.from_user.username
+    chat_id = update.message.chat_id
+    wizard = Wizard.get(Wizard.current == True)
+    bot.send_message(
+        chat_id = wizard.chat_id,
+        text="PING PING PING MAGX! @{} te necesesita!".format(username)
+    )
+    
+
 
 
 
@@ -227,7 +284,7 @@ status_reference = {
 }
 
 
-def empezar_votacion(bot, update):
+def start_voting(bot, update):
     global vote_auth
     if vote_auth == False:
         if update.message.from_user.username in autorizados:
@@ -242,6 +299,9 @@ def empezar_votacion(bot, update):
 
 def vote(bot, update):
     """"""
+    username = update.message.from_user.username
+
+
     if vote_auth:
         update.message.reply_text(
             'Te interesa el proyecto:'
@@ -263,7 +323,7 @@ def vote(bot, update):
                 reply_markup=reply_markup
             )
     else:
-        update.message.reply_text("Votación Cerrada")
+            update.message.reply_text("Votación Cerrada")
 
 
 def button(bot, update):
@@ -294,7 +354,7 @@ def button(bot, update):
                           chat_id=query.message.chat_id,
                           message_id=query.message.message_id)
 
-def terminar_votacion(bot, update):
+def end_voting(bot, update):
     if update.message.from_user.username in autorizados:
         with open('data.json', 'w') as f:
             json.dump(DATA, f, indent=2)
@@ -305,28 +365,28 @@ def terminar_votacion(bot, update):
         update.message.reply_text("No estas Autorizadx para hacer esta ación")
 
 
-def empezar_carga_proyectos(bot, update):
+def start_project_load(bot, update):
     """Allow people to upload projects"""
     global project_auth
     if not project_auth:
         if update.message.from_user.username in autorizados:
             update.message.reply_text("Autorizado")
             update.message.reply_text("Carga de proyectos Abierta")
-            vote_auth = True
+            project_auth = True
         else:
             update.message.reply_text("No estas Autorizadx para hacer esta acción")
     else:
         update.message.reply_text("La carga de proyectos ya estaba abierta")
 
 
-def terminar_carga_proyectos(bot, update):
+def end_project_load(bot, update):
     """Prevent people for keep uploading projects"""
     if update.message.from_user.username in autorizados:
         with open('data.json', 'w') as f:
             json.dump(DATA, f, indent=2)
         update.message.reply_text("Autorizado")
         update.message.reply_text("Información Cargada, carga de proyectos cerrada")
-        vote_auth = False
+        project_auth = False
     else:
         update.message.reply_text("No estas Autorizadx para hacer esta ación")
 
@@ -336,9 +396,10 @@ def projects(bot, update):
     projects = Project.select()
     text = []
     for project in projects:
-        project_text = "{} \n owner:  \n topic: {} \n level: {}".format(
+        owners = map(lambda po: po.owner.username, project.projectowner_set.iterator())
+        project_text = "{} \n owner: {} \n topic: {} \n level: {}".format(
             project.name,
-            # project.owner,
+            ', '.join(owners),
             project.topic,
             project.difficult_level
         )
@@ -354,13 +415,25 @@ def error(bot, update, error):
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 
-updater.dispatcher.add_handler(CommandHandler('empezar_votacion', empezar_votacion))
+load_project_handler = ConversationHandler(
+       entry_points=[CommandHandler('cargar_proyecto', load_project)],
+       states={
+           NOMBRE: [MessageHandler(Filters.text, naming_project)],
+           DIFICULTAD : [MessageHandler(Filters.text, project_level)],
+           TOPIC: [MessageHandler(Filters.text, project_topic )],
+       },
+       fallbacks=[CommandHandler('cancel', cancel)]
+   )
+
+updater.dispatcher.add_handler(load_project_handler)
+updater.dispatcher.add_handler(CommandHandler('empezar_votacion', start_voting  ))
 updater.dispatcher.add_handler(CommandHandler('ayuda', ayuda))
 updater.dispatcher.add_handler(CommandHandler('votar', vote))
-updater.dispatcher.add_handler(CommandHandler('terminar_votacion', terminar_votacion))
-updater.dispatcher.add_handler(CommandHandler('cargar_proyecto', cargar_proyectos))
-updater.dispatcher.add_handler(CommandHandler('empezar_carga_proyectos', empezar_carga_proyectos))
-updater.dispatcher.add_handler(CommandHandler('terminar_carga_proyectos', terminar_carga_proyectos))
+updater.dispatcher.add_handler(CommandHandler('evocar_magx', summon_wizard))
+updater.dispatcher.add_handler(CommandHandler('ser_magx', become_wizard))
+updater.dispatcher.add_handler(CommandHandler('terminar_votacion', end_voting))
+updater.dispatcher.add_handler(CommandHandler('empezar_carga_proyectos', start_project_load))
+updater.dispatcher.add_handler(CommandHandler('terminar_carga_proyectos', end_project_load))
 updater.dispatcher.add_handler(CommandHandler('ownear', ownear))
 updater.dispatcher.add_handler(CommandHandler('proyectos', projects))
 updater.dispatcher.add_handler(CallbackQueryHandler(button))
