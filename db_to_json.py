@@ -3,37 +3,29 @@ import json
 
 
 projects = Project.select()
+project_owners = ProjectOwner.select()
 
 result = {"projects": {}, "responsable_available_slots":{}}
 
-result["available_slots"] = [
-    "A1",
-    "A2",
-    "B1",
-    "B2",
-    "B3",
-    "B4",
-    "B5",
-    "C1",
-    "C2",
-    "C3",
-    "C4",
-    "C5",
-    "D1",
-    "D2"
-]
+available_slots = [slot.code for slot in Slot.select()]
 
+result["available_slots"] = available_slots
 
-for n, p in enumerate(projects):
-    votes = list(Vote.select().where(Vote.project == p, Vote.interest == True))
+for project in projects:
+    votes = list(Vote.select().where(Vote.project == project & Vote.interest))
+    responsables = list(ProjectOwner.select().where(ProjectOwner.project == project))
+    responsables = [responsable.username for responsable in responsables]
     votes_users = set([v.pycampista.username for v in votes])
-    result["projects"][p.name] = {
+    result["projects"][project.name] = {
         "priority_slots": [],
-        "difficult_level": p.difficult_level,
-        "responsable": [n],
+        "difficult_level": project.difficult_level,
+        "responsables": responsables,
         "votes": list(votes_users),
     }
-    result["responsable_available_slots"][n] = result["available_slots"]
+
+all_responsables = set([owner.username for owner in project_owners])
+for responsable in all_responsables:
+    result["responsable_available_slots"][responsable] = available_slots
 
 with open('cualquiera.json', 'w') as fjson:
     json.dump(result, fjson, indent=2)
