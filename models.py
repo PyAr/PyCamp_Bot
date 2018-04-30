@@ -48,6 +48,8 @@ class Vote(pw.Model):
 
     class Meta:
         database = db
+        primary_key = pw.CompositeKey('project', 'pycampista')
+        
 
 class Wizard(pw.Model):
     username = pw.CharField(unique=True)
