@@ -33,25 +33,15 @@ def start(bot, update):
         text='Hola ' + update.message.from_user.first_name + '! Bienvenidx')
 
 
-# def text_input(bot, update):
-#     '''This function handles text sent by the user'''
-#     username = update.message.from_user.username
-#     status = users_status.get(username, None)
+def text_input(bot, update):
+    '''This function handles text sent by the user'''
+    username = update.message.from_user.username
+    status = users_status.get(username, None)
 
-#     print ("---------------------------------------------------------------")
-#     print ("usuario: " + update.message.from_user.username)
-#     print ("texto: " + update.message.text )
+    print ("---------------------------------------------------------------")
+    print ("usuario: " + update.message.from_user.username)
+    print ("texto: " + update.message.text )
     
-#     if status:
-#         print ("status:", status)
-#     else:
-#         print("User without status")
-    
-#     action = status_reference.get(status, None)
-
-#     if action:
-#         action(bot, update)
-
 
 def ayuda(bot, update):
     bot.send_message(chat_id= update.message.chat_id,
@@ -66,16 +56,11 @@ def ayuda(bot, update):
         
         Tercera etapa: Lxs admins mergean los proyectos que se haya decidido mergear durante las exposiciones (Por tematica similar, u otros motivos), y luego se procesan los datos para obtener el cronograma final.
         
-        Comandos adicionales: /ser_magx te transforma en el/la Magx de turno. /evocar_magx pingea a la/el Magx de turno que necesitas su ayuda. Con un gran poder, viene una gran responsabilidad''')
-
-
-#asociate functions with user status
-# status_reference = {
-#     UserStatus.NAMING_PROJECT: naming_project,
-#     UserStatus.ASSIGNING_PROJECT_TOPIC: project_topic,
-#     UserStatus.ASSIGNING_PROJECT_LEVEL: project_level,
-#     UserStatus.OWNEO: owneo,
-# }
+        Comandos adicionales: 
+        /proyectos te muestra la informacion de todos los proyectos y sus responsables.
+        /ser_magx te transforma en el/la Magx de turno. 
+        /evocar_magx pingea a la/el Magx de turno, informando que necesitas su ayuda. Con un gran poder, viene una gran responsabilidad
+        /sorteo realiza un sorteo entre todxs lxs Pycampistas.''')
 
 
 def error(bot, update, error):
@@ -87,7 +72,7 @@ def error(bot, update, error):
 updater.dispatcher.add_error_handler(error)
 
 #handler that processes text imputs
-#dispatcher.add_handler(MessageHandler(Filters.text, text_input))
+dispatcher.add_handler(MessageHandler(Filters.text, text_input))
 
 #Thread handlers 
 updater.dispatcher.add_handler(load_project_handler)
@@ -95,7 +80,7 @@ updater.dispatcher.add_handler(merge_project_handler)
 updater.dispatcher.add_handler(own_project_handler)
 
 #Handlers that get activated using / 
-updater.dispatcher.add_handler(CommandHandler('merge', merge  ))
+updater.dispatcher.add_handler(CommandHandler('mergear', merge  ))
 
 
 dispatcher.add_handler(CommandHandler('start', start))
@@ -116,4 +101,7 @@ updater.dispatcher.add_handler(CommandHandler('terminar_carga_proyectos', end_pr
 updater.dispatcher.add_handler(CommandHandler('ownear', own))
 
 updater.dispatcher.add_handler(CommandHandler('proyectos', projects))
+
+updater.dispatcher.add_handler(CommandHandler('sorteo', raffle))
+
 updater.dispatcher.add_handler(CallbackQueryHandler(button))

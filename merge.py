@@ -7,12 +7,7 @@ PRIMER_PROYECTO, SEGUNDO_PROYECTO = range(2)
 
 def merge(bot, update):
     if not is_auth(bot, update.message.from_user.username):
-        bot.send_message(
-            chat_id = update.message.chat_id,
-            text= 'No estás autorizadx para llevar a cabo esta acción. Este comando solo puede ser utilizado por Admins'
-        )
-        return CommandHandler.END
-
+        return
     lista_proyectos = [p.name for p in Project.select()]
     dic_proyectos = dict(enumerate(lista_proyectos))
     #Asks for user input regarding first project
