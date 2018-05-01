@@ -1,4 +1,8 @@
-from bot import bot, update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from manage_pycamp import ping_PyCamp_group, is_auth
+from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
+
+vote_auth = False
 
 def start_voting(bot, update):
     global vote_auth
@@ -42,8 +46,6 @@ def button(bot, update):
     bot.edit_message_text(text=result,
                           chat_id=query.message.chat_id,
                           message_id=query.message.message_id)
-
-
 
 
 def vote(bot, update):

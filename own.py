@@ -1,6 +1,10 @@
-from bot import bot, update
+from telegram.ext import (ConversationHandler, CommandHandler, MessageHandler, Filters)
+from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
 
-def ownear(bot, update):
+OWNING = range(1)
+
+
+def own(bot, update):
 
     username = update.message.from_user.username
     lista_proyectos = [p.name for p in Project.select()]
@@ -20,9 +24,10 @@ def ownear(bot, update):
         text = "------------------------------------------------------------------------------"
 
     )
-    users_status[username] = UserStatus.OWNEO
+    return OWNING
+    
 
-def owneo(bot, update):
+def owning(bot, update):
     '''Dialog to set project responsable'''
     username = update.message.from_user.username
     text = update.message.text
@@ -43,3 +48,18 @@ def owneo(bot, update):
         chat_id=update.message.chat_id,
         text="Perfecto. Chauchi"
     )
+
+def cancel(bot, update):
+    bot.send_message(
+    chat_id=update.message.chat_id,
+    text="Has cancelado la carga del proyecto"
+    )
+    return ConversationHandler.END
+
+own_project_handler = ConversationHandler(
+       entry_points=[CommandHandler('ownear', own)],
+       states={
+           OWNING: [MessageHandler(Filters.text, owning)],
+       },
+       fallbacks=[CommandHandler('cancel', cancel)]
+   )

@@ -1,14 +1,22 @@
 import logging
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           CallbackQueryHandler, ConversationHandler)
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import token_secure
 from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
 
+#Handlers
+from merge import merge, merge_project_handler
+from voting import vote, start_voting, end_voting, button
+from load_project import load_project, start_project_load, end_project_load, load_project_handler
+from wizard import become_wizard, summon_wizard
+from own import own, own_project_handler
+from utils import projects
 
 updater = Updater(token=token_secure.TOKEN)
 dispatcher = updater.dispatcher
 
+users_status = {}
+current_projects = {}
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -25,27 +33,24 @@ def start(bot, update):
         text='Hola ' + update.message.from_user.first_name + '! Bienvenidx')
 
 
-start_handler = CommandHandler('start', start)
-dispatcher.add_handler(start_handler)
+# def text_input(bot, update):
+#     '''This function handles text sent by the user'''
+#     username = update.message.from_user.username
+#     status = users_status.get(username, None)
 
-
-def text_input(bot, update):
-    '''This function handles text sent by the user'''
-    username = update.message.from_user.username
-    status = users_status.get(username, None)
-
-    print ("---------------------------------------------------------------")
-    print ("usuario: " + update.message.from_user.username)
-    print ("texto: " + update.message.text )
+#     print ("---------------------------------------------------------------")
+#     print ("usuario: " + update.message.from_user.username)
+#     print ("texto: " + update.message.text )
     
-    if status:
-        print ("status:", status)
-    else:
-        print("User without status")
-    action = status_reference.get(status, None)
+#     if status:
+#         print ("status:", status)
+#     else:
+#         print("User without status")
+    
+#     action = status_reference.get(status, None)
 
-    if action:
-        action(bot, update)
+#     if action:
+#         action(bot, update)
 
 
 def ayuda(bot, update):
@@ -64,33 +69,51 @@ def ayuda(bot, update):
         Comandos adicionales: /ser_magx te transforma en el/la Magx de turno. /evocar_magx pingea a la/el Magx de turno que necesitas su ayuda. Con un gran poder, viene una gran responsabilidad''')
 
 
-# asociate functions with user status
-status_reference = {
-    UserStatus.NAMING_PROJECT: naming_project,
-    UserStatus.ASSIGNING_PROJECT_TOPIC: project_topic,
-    UserStatus.ASSIGNING_PROJECT_LEVEL: project_level,
-    UserStatus.OWNEO: owneo,
-}
+#asociate functions with user status
+# status_reference = {
+#     UserStatus.NAMING_PROJECT: naming_project,
+#     UserStatus.ASSIGNING_PROJECT_TOPIC: project_topic,
+#     UserStatus.ASSIGNING_PROJECT_LEVEL: project_level,
+#     UserStatus.OWNEO: owneo,
+# }
 
 
 def error(bot, update, error):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, error)
 
+#HANDLERS
+#handler that processes erros
+updater.dispatcher.add_error_handler(error)
 
+#handler that processes text imputs
+#dispatcher.add_handler(MessageHandler(Filters.text, text_input))
+
+#Thread handlers 
 updater.dispatcher.add_handler(load_project_handler)
 updater.dispatcher.add_handler(merge_project_handler)
+updater.dispatcher.add_handler(own_project_handler)
+
+#Handlers that get activated using / 
 updater.dispatcher.add_handler(CommandHandler('merge', merge  ))
-updater.dispatcher.add_handler(CommandHandler('empezar_votacion', start_voting  ))
+
+
+dispatcher.add_handler(CommandHandler('start', start))
+
 updater.dispatcher.add_handler(CommandHandler('ayuda', ayuda))
-updater.dispatcher.add_handler(CommandHandler('votar', vote))
+
 updater.dispatcher.add_handler(CommandHandler('evocar_magx', summon_wizard))
 updater.dispatcher.add_handler(CommandHandler('ser_magx', become_wizard))
+
+updater.dispatcher.add_handler(CommandHandler('empezar_votacion', start_voting))
+updater.dispatcher.add_handler(CommandHandler('votar', vote))
 updater.dispatcher.add_handler(CommandHandler('terminar_votacion', end_voting))
+
 updater.dispatcher.add_handler(CommandHandler('empezar_carga_proyectos', start_project_load))
+updater.dispatcher.add_handler(CommandHandler('cargar_projectos', start_project_load))
 updater.dispatcher.add_handler(CommandHandler('terminar_carga_proyectos', end_project_load))
-updater.dispatcher.add_handler(CommandHandler('ownear', ownear))
+
+updater.dispatcher.add_handler(CommandHandler('ownear', own))
+
 updater.dispatcher.add_handler(CommandHandler('proyectos', projects))
 updater.dispatcher.add_handler(CallbackQueryHandler(button))
-updater.dispatcher.add_error_handler(error)
-dispatcher.add_handler(MessageHandler(Filters.text, text_input))

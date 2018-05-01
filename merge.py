@@ -1,33 +1,37 @@
-from bot import bot, update
+from telegram.ext import (ConversationHandler, CommandHandler, MessageHandler, Filters)
 from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
+from manage_pycamp import is_auth
 
 merge_projects = []
+PRIMER_PROYECTO, SEGUNDO_PROYECTO = range(2)
 
 def merge(bot, update):
-    if update.message.from_user.username in autorizados:
-        lista_proyectos = [p.name for p in Project.select()]
-        dic_proyectos = dict(enumerate(lista_proyectos))
-        #Asks for user input regarding first project
-        bot.send_message(
-            chat_id = update.message.chat_id,
-            text = "Decime el primer proyecto que querés combinar (En número)"
-        )
-        for k,v in dic_proyectos.items():
-            bot.send_message(
-                chat_id = update.message.chat_id,
-                text = "{}: {}".format(k,v)
-
-            )
-        bot.send_message(
-            chat_id = update.message.chat_id,
-            text = "------------------------------------------------------------------------------")
-        return PRIMER_PROYECTO
-
-    else:
+    if not is_auth(bot, update.message.from_user.username):
         bot.send_message(
             chat_id = update.message.chat_id,
             text= 'No estás autorizadx para llevar a cabo esta acción. Este comando solo puede ser utilizado por Admins'
         )
+        return CommandHandler.END
+
+    lista_proyectos = [p.name for p in Project.select()]
+    dic_proyectos = dict(enumerate(lista_proyectos))
+    #Asks for user input regarding first project
+    bot.send_message(
+        chat_id = update.message.chat_id,
+        text = "Decime el primer proyecto que querés combinar (En número)"
+    )
+    for k,v in dic_proyectos.items():
+        bot.send_message(
+            chat_id = update.message.chat_id,
+            text = "{}: {}".format(k,v)
+
+        )
+    bot.send_message(
+        chat_id = update.message.chat_id,
+        text = "------------------------------------------------------------------------------")
+    
+    return PRIMER_PROYECTO
+        
 
 def primer_proyecto(bot, update):
     #Grabs first response and asks for the second one
@@ -112,6 +116,13 @@ def segundo_proyecto(bot,update):
         chat_id=update.message.chat_id,
         text= "Los proyectos han sido combinados."
     )
+
+def cancel(bot, update):
+    bot.send_message(
+    chat_id=update.message.chat_id,
+    text="Has cancelado la carga del proyecto"
+    )
+    return ConversationHandler.END
 
 
 merge_project_handler = ConversationHandler(

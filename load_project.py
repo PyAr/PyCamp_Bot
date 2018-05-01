@@ -1,22 +1,11 @@
-from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
-                          CallbackQueryHandler, ConversationHandler)
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from enum import Enum
-from bot import bot, update
+from telegram.ext import (ConversationHandler, CommandHandler, MessageHandler, Filters)
 from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
+from manage_pycamp import ping_PyCamp_group, is_auth
 
 project_auth = False
-
 users_status = {}
 current_projects = {}
-
 NOMBRE, DIFICULTAD, TOPIC = range(3)
-
-class UserStatus(Enum):
-    NAMING_PROJECT = 1
-    ASSIGNING_PROJECT_TOPIC = 2
-    ASSIGNING_PROJECT_LEVEL = 3
-    OWNEO = 4
 
 def load_project(bot, update):
     '''Command to start the cargar_proyectos dialog'''
@@ -38,6 +27,7 @@ def load_project(bot, update):
             chat_id=update.message.chat_id,
             text="Carga de projectos Cerrada"
         )
+        return ConversationHandler.END
 
 def naming_project(bot, update):
     '''Dialog to set project name'''
@@ -130,17 +120,9 @@ def cancel(bot, update):
         )
     return ConversationHandler.END
 
-# asociate functions with user status
-status_reference = {
-    UserStatus.NAMING_PROJECT: naming_project,
-    UserStatus.ASSIGNING_PROJECT_TOPIC: project_topic,
-    UserStatus.ASSIGNING_PROJECT_LEVEL: project_level,
-}
-
-
-
 def start_project_load(bot, update):
     """Allow people to upload projects"""
+    global project_auth
     if not is_auth(bot, update.message.from_user.username):
         return
     

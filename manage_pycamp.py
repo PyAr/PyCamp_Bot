@@ -1,4 +1,4 @@
-from bot import bot, update
+from datetime import date, datetime
 
 
 date_start_pycamp = None
