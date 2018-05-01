@@ -19,5 +19,5 @@ def raffle(bot,update):
     persona_ganadora = random.choice(lista_pycampistas)
     bot.send_message(
         chat_id = update.message.chat_id,
-        text= persona_ganadora 
+        text= "@{}".format(persona_ganadora)
     )

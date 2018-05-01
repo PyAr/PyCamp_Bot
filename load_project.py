@@ -11,7 +11,6 @@ def load_project(bot, update):
     '''Command to start the cargar_proyectos dialog'''
     username = update.message.from_user.username
     if project_auth:
-        ping_PyCamp_group(bot,"la carga de projectos esta abierta")
         bot.send_message(
             chat_id=update.message.chat_id,
             text="Usuario: " + username
@@ -39,7 +38,7 @@ def naming_project(bot, update):
 
     bot.send_message(
         chat_id=update.message.chat_id,
-        text="Estamos cargando tu proyecto {}!".format(username)
+        text="Estamos cargando tu proyecto: {}!".format(username)
     )
     bot.send_message(
         chat_id=update.message.chat_id,
@@ -65,7 +64,7 @@ def project_level(bot, update):
 
         bot.send_message(
             chat_id=update.message.chat_id,
-            text="Ok! Tu proyecto es nivel {}".format(text)
+            text="Ok! Tu proyecto es nivel: {}".format(text)
         )
         bot.send_message(
             chat_id=update.message.chat_id,
@@ -104,7 +103,7 @@ def project_topic(bot, update):
 
     bot.send_message(
         chat_id=update.message.chat_id,
-        text="Excelente {}! La temática de tu proyecto es {}.".format(username, text)
+        text="Excelente {}! La temática de tu proyecto es: {}.".format(username, text)
     )
     bot.send_message(
         chat_id=update.message.chat_id,

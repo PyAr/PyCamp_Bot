@@ -8,8 +8,10 @@ PRIMER_PROYECTO, SEGUNDO_PROYECTO = range(2)
 def merge(bot, update):
     if not is_auth(bot, update.message.from_user.username):
         return
+    
     lista_proyectos = [p.name for p in Project.select()]
     dic_proyectos = dict(enumerate(lista_proyectos))
+  
     #Asks for user input regarding first project
     bot.send_message(
         chat_id = update.message.chat_id,
@@ -121,7 +123,7 @@ def cancel(bot, update):
 
 
 merge_project_handler = ConversationHandler(
-       entry_points=[CommandHandler('merge', merge)],
+       entry_points=[CommandHandler('mergear', merge)],
        states={
            PRIMER_PROYECTO: [MessageHandler(Filters.text, primer_proyecto)],
            SEGUNDO_PROYECTO : [MessageHandler(Filters.text, segundo_proyecto)],

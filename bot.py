@@ -11,6 +11,7 @@ from load_project import load_project, start_project_load, end_project_load, loa
 from wizard import become_wizard, summon_wizard
 from own import own, own_project_handler
 from utils import projects
+from raffle import raffle
 
 updater = Updater(token=token_secure.TOKEN)
 dispatcher = updater.dispatcher
@@ -33,17 +34,17 @@ def start(bot, update):
         text='Hola ' + update.message.from_user.first_name + '! Bienvenidx')
 
 
-def text_input(bot, update):
-    '''This function handles text sent by the user'''
-    username = update.message.from_user.username
-    status = users_status.get(username, None)
+# def text_input(bot, update):
+#     '''This function handles text sent by the user'''
+#     username = update.message.from_user.username
+#     status = users_status.get(username, None)
 
-    print ("---------------------------------------------------------------")
-    print ("usuario: " + update.message.from_user.username)
-    print ("texto: " + update.message.text )
+#     print ("---------------------------------------------------------------")
+#     print ("usuario: " + update.message.from_user.username)
+#     print ("texto: " + update.message.text )
     
 
-def ayuda(bot, update):
+def help(bot, update):
     bot.send_message(chat_id= update.message.chat_id,
         text=
         '''Este bot facilita la carga, administración y procesamiento de proyectos y votos durante el PyCamp
@@ -71,21 +72,18 @@ def error(bot, update, error):
 #handler that processes erros
 updater.dispatcher.add_error_handler(error)
 
-#handler that processes text imputs
-dispatcher.add_handler(MessageHandler(Filters.text, text_input))
-
 #Thread handlers 
 updater.dispatcher.add_handler(load_project_handler)
 updater.dispatcher.add_handler(merge_project_handler)
 updater.dispatcher.add_handler(own_project_handler)
 
 #Handlers that get activated using / 
-updater.dispatcher.add_handler(CommandHandler('mergear', merge  ))
+updater.dispatcher.add_handler(CommandHandler('mergear', merge))
 
 
 dispatcher.add_handler(CommandHandler('start', start))
 
-updater.dispatcher.add_handler(CommandHandler('ayuda', ayuda))
+updater.dispatcher.add_handler(CommandHandler('ayuda', help))
 
 updater.dispatcher.add_handler(CommandHandler('evocar_magx', summon_wizard))
 updater.dispatcher.add_handler(CommandHandler('ser_magx', become_wizard))

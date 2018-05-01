@@ -61,4 +61,4 @@ class Wizard(pw.Model):
 
 
 db.connect()
-db.create_tables([Pycampista, Project, Slot, ProjectOwner, Vote, Wizard])
+#db.create_tables([Pycampista, Project, Slot, ProjectOwner, Vote, Wizard])
