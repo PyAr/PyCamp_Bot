@@ -29,19 +29,24 @@ updater.start_polling()
 
 # command /start give user a message
 def start(bot, update):
+    username = update.message.from_user.username
+    chat_id = update.message.chat_id
+    user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
     bot.send_message(
-        chat_id=update.message.chat_id,
+        chat_id=chat_id,
         text='Hola ' + update.message.from_user.first_name + '! Bienvenidx')
 
 
-# def text_input(bot, update):
-#     '''This function handles text sent by the user'''
-#     username = update.message.from_user.username
-#     status = users_status.get(username, None)
+def text_input(bot, update):
+    '''This function handles text sent by the user'''
+    username = update.message.from_user.username
+    status = users_status.get(username, None)
+    bot.send_message(chat_id=update.message.chat_id,
+    chat="gabi gato")
 
-#     print ("---------------------------------------------------------------")
-#     print ("usuario: " + update.message.from_user.username)
-#     print ("texto: " + update.message.text )
+    print ("---------------------------------------------------------------")
+    print ("usuario: " + update.message.from_user.username)
+    print ("texto: " + update.message.text )
     
 
 def help(bot, update):
