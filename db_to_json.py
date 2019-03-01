@@ -12,7 +12,7 @@ available_slots = [slot.code for slot in Slot.select()]
 result["available_slots"] = available_slots
 
 for project in projects:
-    votes = list(Vote.select().where(Vote.project == project & Vote.interest))
+    votes = list(Vote.select().where(Vote.project == project, Vote.interest))
     responsables = list(ProjectOwner.select().where(ProjectOwner.project == project))
     responsables = [responsable.username for responsable in responsables]
     votes_users = set([v.pycampista.username for v in votes])
