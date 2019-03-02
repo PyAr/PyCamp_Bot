@@ -1,6 +1,7 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from manage_pycamp import ping_PyCamp_group, is_auth
-from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
+
+from pycamp_bot.manage_pycamp import ping_PyCamp_group, is_auth
+from pycamp_bot.models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
 
 import logging
 
@@ -68,7 +69,7 @@ def vote(bot, update):
 
         # ask user for each project in the database
         for project in Project.select():
-            keyboard = [[InlineKeyboardButton("Si!" , callback_data="si"),
+            keyboard = [[InlineKeyboardButton("Si!", callback_data="si"),
                         InlineKeyboardButton("Nop", callback_data="no")]]
 
             reply_markup = InlineKeyboardMarkup(keyboard)
