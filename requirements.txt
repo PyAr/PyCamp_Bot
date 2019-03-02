@@ -1,2 +1,0 @@
-python-telegram-bot==10.0.2
-peewee
