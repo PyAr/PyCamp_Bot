@@ -1,6 +1,5 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from manage_pycamp import ping_PyCamp_group, is_auth
-from load_project import project_auth
 from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
 
 vote_auth = False
@@ -10,11 +9,7 @@ def start_voting(bot, update):
     
     if not is_auth(bot, update.message.from_user.username):
         return
-
-    if project_auth == True:
-        update.message.reply_text("No se puede empezar una votacion si la carga de projectos sigue abierta ;)")
-        return
-
+        
     if vote_auth == False:
         
             ping_PyCamp_group(bot,"La Votación esta abierta")
