@@ -1,4 +1,5 @@
-from telegram.ext import (ConversationHandler, CommandHandler, MessageHandler, Filters)
+from telegram.ext import (ConversationHandler, CommandHandler,
+                          MessageHandler, Filters)
 from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
 from manage_pycamp import ping_PyCamp_group, is_auth
 
@@ -6,6 +7,7 @@ project_auth = False
 users_status = {}
 current_projects = {}
 NOMBRE, DIFICULTAD, TOPIC = range(3)
+
 
 def load_project(bot, update):
     '''Command to start the cargar_proyectos dialog'''
@@ -27,6 +29,7 @@ def load_project(bot, update):
             text="Carga de projectos Cerrada"
         )
         return ConversationHandler.END
+
 
 def naming_project(bot, update):
     '''Dialog to set project name'''
@@ -52,6 +55,7 @@ def naming_project(bot, update):
             3 = python avanzado"""
     )
     return DIFICULTAD
+
 
 def project_level(bot, update):
     '''Dialog to set project level'''
@@ -89,21 +93,16 @@ def project_topic(bot, update):
     '''Dialog to set project topic'''
     username = update.message.from_user.username
     text = update.message.text
-    chat_id = update.message.chat_id
 
     new_project = current_projects[username]
     new_project.topic = text
 
     new_project.save()
 
-    user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
-
-    project_owner = ProjectOwner.get_or_create(project=new_project, owner=user)
-
-
     bot.send_message(
         chat_id=update.message.chat_id,
-        text="Excelente {}! La temática de tu proyecto es: {}.".format(username, text)
+        text="Excelente {}! La temática de tu proyecto es: {}.".format(
+                                                            username, text)
     )
     bot.send_message(
         chat_id=update.message.chat_id,
@@ -119,15 +118,16 @@ def cancel(bot, update):
         )
     return ConversationHandler.END
 
+
 def start_project_load(bot, update):
     """Allow people to upload projects"""
     global project_auth
     if not is_auth(bot, update.message.from_user.username):
         return
-    
+
     if not project_auth:
         update.message.reply_text("Autorizadx \nCarga de proyectos Abierta")
-        ping_PyCamp_group(bot,"Carga de proyectos Abierta")
+        ping_PyCamp_group(bot, "Carga de proyectos Abierta")
         project_auth = True
     else:
         update.message.reply_text("La carga de proyectos ya estaba abierta")
@@ -137,19 +137,18 @@ def end_project_load(bot, update):
     """Prevent people for keep uploading projects"""
     if not is_auth(bot, update.message.from_user.username):
         return
-    
-    project_auth = False
-    ping_PyCamp_group(bot,"La carga de projectos esta Cerrada")
-    update.message.reply_text("Autorizadx \nInformación Cargada, carga de proyectos cerrada")
-    
+
+    ping_PyCamp_group(bot, "La carga de projectos esta Cerrada")
+    update.message.reply_text(
+            "Autorizadx \nInformación Cargada, carga de proyectos cerrada")
+
 
 load_project_handler = ConversationHandler(
        entry_points=[CommandHandler('cargar_proyecto', load_project)],
        states={
            NOMBRE: [MessageHandler(Filters.text, naming_project)],
-           DIFICULTAD : [MessageHandler(Filters.text, project_level)],
-           TOPIC: [MessageHandler(Filters.text, project_topic )],
+           DIFICULTAD: [MessageHandler(Filters.text, project_level)],
+           TOPIC: [MessageHandler(Filters.text, project_topic)],
        },
        fallbacks=[CommandHandler('cancel', cancel)]
    )
-

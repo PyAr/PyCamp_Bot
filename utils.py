@@ -1,5 +1,6 @@
 from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
 
+
 def projects(bot, update):
     """Prevent people for keep uploading projects"""
     projects = Project.select()
