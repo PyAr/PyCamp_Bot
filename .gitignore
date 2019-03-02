@@ -2,10 +2,6 @@
 data.json
 pycamp_projects.db
 
-# telegram token
-token_secure.py
-
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
