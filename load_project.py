@@ -5,7 +5,7 @@ from manage_pycamp import ping_PyCamp_group, is_auth
 
 import logging
 
-project_auth = True 
+project_auth = True
 users_status = {}
 current_projects = {}
 NOMBRE, DIFICULTAD, TOPIC = range(3)

@@ -64,4 +64,5 @@ class Wizard(pw.Model):
 def models_db_connection(initialize=False):
     db.connect()
     if initialize:
-        db.create_tables([Pycampista, Project, Slot, ProjectOwner, Vote, Wizard])
+        db.create_tables([Pycampista, Project, Slot, ProjectOwner, Vote,
+                          Wizard])

@@ -1,4 +1,5 @@
-from telegram.ext import (ConversationHandler, CommandHandler, MessageHandler, Filters)
+from telegram.ext import (ConversationHandler, CommandHandler, MessageHandler,
+                          Filters)
 from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
 from manage_pycamp import is_auth
 
@@ -96,7 +97,7 @@ def segundo_proyecto(bot, update):
     lista_unica_owner = set(lista_unica_owner)
 
     # Iterates through the unique list and any owner that is not present in the
-    # first project, gets its user ID loaded as an owner of the first project.    
+    # first project, gets its user ID loaded as an owner of the first project.
     for i in lista_unica_owner:
         if i not in lista_owner_primario:
             ProjectOwner.get_or_create(
