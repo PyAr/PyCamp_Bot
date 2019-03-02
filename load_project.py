@@ -3,16 +3,21 @@ from telegram.ext import (ConversationHandler, CommandHandler,
 from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
 from manage_pycamp import ping_PyCamp_group, is_auth
 
-project_auth = False
+import logging
+
+project_auth = True 
 users_status = {}
 current_projects = {}
 NOMBRE, DIFICULTAD, TOPIC = range(3)
 
+logger = logging.getLogger(__name__)
+
 
 def load_project(bot, update):
     '''Command to start the cargar_proyectos dialog'''
+    logger.info("Adding project")
     username = update.message.from_user.username
-    if project_auth:
+    if True:
         bot.send_message(
             chat_id=update.message.chat_id,
             text="Usuario: " + username
@@ -33,6 +38,7 @@ def load_project(bot, update):
 
 def naming_project(bot, update):
     '''Dialog to set project name'''
+    logger.info("Nombrando el proyecto")
     username = update.message.from_user.username
     text = update.message.text
 
@@ -96,6 +102,13 @@ def project_topic(bot, update):
 
     new_project = current_projects[username]
     new_project.topic = text
+
+    # Getting project owner
+    username = update.message['chat']['username']
+    chat_id = update.message.chat_id
+    user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
+
+    new_project.owner = user
 
     new_project.save()
 

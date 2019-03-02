@@ -2,19 +2,25 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from manage_pycamp import ping_PyCamp_group, is_auth
 from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
 
+import logging
+
+
+logger = logging.getLogger(__name__)
 vote_auth = False
 
+
 def start_voting(bot, update):
+    logger.info("Empezando la votacion")
     global vote_auth
-    
+
     if not is_auth(bot, update.message.from_user.username):
+        logging.info("Usuario no autorizado")
         return
-        
-    if vote_auth == False:
-        
-            ping_PyCamp_group(bot,"La Votación esta abierta")
-            update.message.reply_text("Autorizadx \nVotación Abierta")
-            vote_auth = True  
+
+    if not vote_auth:
+        # ping_PyCamp_group(bot, "La Votación esta abierta")
+        update.message.reply_text("Autorizadx \nVotación Abierta")
+        vote_auth = True
     else:
         update.message.reply_text("La votacion ya estaba abierta")
 
@@ -37,10 +43,10 @@ def button(bot, update):
     if query.data == "si":
         result = 'Interesadx en: ' + project_name + ' 👍'
         new_vote.interest = True
-        new_vote.save()
+        new_vote.save(force_insert=True)
     else:
         new_vote.interest = False
-        new_vote.save()
+        new_vote.save(force_insert=True)
         result = 'No te interesa el proyecto ' + project_name
 
     bot.edit_message_text(text=result,
@@ -49,9 +55,7 @@ def button(bot, update):
 
 
 def vote(bot, update):
-    """"""
-    username = update.message.from_user.username
-
+    logger.info("Vote message")
 
     if vote_auth:
         update.message.reply_text(
@@ -74,12 +78,20 @@ def vote(bot, update):
                 reply_markup=reply_markup
             )
     else:
-            update.message.reply_text("Votación Cerrada")
+        update.message.reply_text("Votación Cerrada")
+
 
 def end_voting(bot, update):
     """Ends voting mode, sets variable vote_auth to False"""
+
     if not is_auth(bot, update.message.from_user.username):
         return
-    vote_auth = False
-    ping_PyCamp_group(bot,"La Votación esta cerrada")
-    update.message.reply_text("Autorizadx \nVotación cerrada")
+
+    global vote_auth
+
+    if vote_auth:
+        vote_auth = False
+        # ping_PyCamp_group(bot,"La Votación esta cerrada")
+        update.message.reply_text("Autorizadx \nVotación cerrada")
+    else:
+        update.message.reply_text("La votación ya estaba cerrada")

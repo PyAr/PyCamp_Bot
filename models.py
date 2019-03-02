@@ -27,6 +27,7 @@ class Project(pw.Model):
     difficult_level = pw.IntegerField(default=1)  # From 1 to 3
     topic = pw.CharField(null=True)
     slot = pw.ForeignKeyField(Slot, null=True)
+    owner = pw.ForeignKeyField(Pycampista)
 
     class Meta:
         database = db
@@ -49,7 +50,7 @@ class Vote(pw.Model):
     class Meta:
         database = db
         primary_key = pw.CompositeKey('project', 'pycampista')
-        
+
 
 class Wizard(pw.Model):
     username = pw.CharField(unique=True)

@@ -1,8 +1,9 @@
 import logging
+import sys
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           CallbackQueryHandler, ConversationHandler)
 import token_secure
-from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
+from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard, models_db_connection
 
 # Handlers
 from merge import merge, merge_project_handler
@@ -104,3 +105,5 @@ if __name__ == '__main__':
     updater.start_polling()
 
     set_handlers(updater, dispatcher)
+    print(sys.argv)
+    models_db_connection(eval(sys.argv[1]))

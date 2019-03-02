@@ -6,10 +6,11 @@ def projects(bot, update):
     projects = Project.select()
     text = []
     for project in projects:
-        owners = map(lambda po: po.owner.username, project.projectowner_set.iterator())
+        # owners = map(lambda po: po.owner.username, project.projectowner_set.iterator())
+
         project_text = "{} \n owner: {} \n topic: {} \n level: {}".format(
             project.name,
-            ', '.join(owners),
+            project.owner.username,
             project.topic,
             project.difficult_level
         )
