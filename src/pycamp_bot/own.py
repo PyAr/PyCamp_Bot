@@ -10,7 +10,7 @@ def own(bot, update):
     dic_proyectos = dict(enumerate(lista_proyectos))
     bot.send_message(
         chat_id=update.message.chat_id,
-        text="¿A qué proyecto querés agregarte como responsable? (Dar número)" 
+        text="¿A qué proyecto querés agregarte como responsable? (Dar número)"
     )
     for k, v in dic_proyectos.items():
         bot.send_message(

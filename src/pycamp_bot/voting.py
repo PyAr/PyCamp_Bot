@@ -68,7 +68,7 @@ def vote(bot, update):
 
         # ask user for each project in the database
         for project in Project.select():
-            keyboard = [[InlineKeyboardButton("Si!" , callback_data="si"),
+            keyboard = [[InlineKeyboardButton("Si!", callback_data="si"),
                         InlineKeyboardButton("Nop", callback_data="no")]]
 
             reply_markup = InlineKeyboardMarkup(keyboard)
