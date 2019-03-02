@@ -1,4 +1,4 @@
-from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
+from pycamp_bot.models import Project
 
 
 def projects(bot, update):

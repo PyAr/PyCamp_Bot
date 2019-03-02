@@ -1,6 +1,8 @@
 from telegram.ext import (ConversationHandler, CommandHandler, MessageHandler,
                           Filters)
-from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
+
+from pycamp_bot.models import (Pycampista, Project, ProjectOwner, Slot, Vote,
+                               Wizard)
 
 OWNING = range(1)
 

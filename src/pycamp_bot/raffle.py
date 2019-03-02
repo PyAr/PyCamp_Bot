@@ -1,7 +1,7 @@
 import random
-from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
-from manage_pycamp import is_auth
 
+from pycamp_bot.models import Pycampista
+from pycamp_bot.manage_pycamp import is_auth
 
 
 def raffle(bot, update):

@@ -1,7 +1,8 @@
 from telegram.ext import (ConversationHandler, CommandHandler, MessageHandler,
                           Filters)
-from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
-from manage_pycamp import is_auth
+
+from pycamp_bot.models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
+from pycamp_bot.manage_pycamp import is_auth
 
 merge_projects = []
 PRIMER_PROYECTO, SEGUNDO_PROYECTO = range(2)

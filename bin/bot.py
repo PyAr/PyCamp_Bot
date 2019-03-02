@@ -1,20 +1,21 @@
 import logging
 import sys
+import os
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           CallbackQueryHandler, ConversationHandler)
-import token_secure
-from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard, models_db_connection
 
-# Handlers
-from merge import merge, merge_project_handler
-from voting import vote, start_voting, end_voting, button
-from load_project import (load_project, start_project_load,
-                          end_project_load, load_project_handler)
-from wizard import become_wizard, summon_wizard
-from own import own, own_project_handler
-from utils import projects
-from raffle import raffle
-from help_msg import HELP_MESSAGE
+
+from pycamp_bot.models import (Pycampista, Project, ProjectOwner, Slot, Vote,
+                               Wizard, models_db_connection)
+from pycamp_bot.merge import merge, merge_project_handler
+from pycamp_bot.voting import vote, start_voting, end_voting, button
+from pycamp_bot.load_project import (load_project, start_project_load,
+                                     end_project_load, load_project_handler)
+from pycamp_bot.wizard import become_wizard, summon_wizard
+from pycamp_bot.own import own, own_project_handler
+from pycamp_bot.utils import projects
+from pycamp_bot.raffle import raffle
+from pycamp_bot.help_msg import HELP_MESSAGE
 
 
 logging.basicConfig(
@@ -96,14 +97,17 @@ def set_handlers(updater, dispatcher):
 
 if __name__ == '__main__':
     logger.info('Starting PyCamp Bot')
-    updater = Updater(token=token_secure.TOKEN)
-    dispatcher = updater.dispatcher
 
-    users_status = {}
-    current_projects = {}
+    if 'TOKEN' in os.environ.keys():
+        updater = Updater(token=os.environ['TOKEN'])
+        dispatcher = updater.dispatcher
 
-    updater.start_polling()
+        users_status = {}
+        current_projects = {}
 
-    set_handlers(updater, dispatcher)
-    print(sys.argv)
-    models_db_connection(eval(sys.argv[1]))
+        updater.start_polling()
+
+        set_handlers(updater, dispatcher)
+        models_db_connection(eval(sys.argv[1]))
+    else:
+        logger.info('Token not defined. Exiting.')

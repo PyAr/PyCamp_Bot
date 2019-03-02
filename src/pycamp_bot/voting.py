@@ -1,6 +1,7 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from manage_pycamp import ping_PyCamp_group, is_auth
-from models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
+
+from pycamp_bot.manage_pycamp import ping_PyCamp_group, is_auth
+from pycamp_bot.models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
 
 import logging
 
