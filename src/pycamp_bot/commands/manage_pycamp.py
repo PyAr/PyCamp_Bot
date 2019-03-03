@@ -2,19 +2,9 @@ from datetime import date, datetime
 
 from telegram.ext import CommandHandler
 
+from pycamp_bot.commands.auth import admin_needed
 
 date_start_pycamp = None
-
-
-def is_auth(bot, username):
-    """Checks if the user is authorized"""
-    authorized = ["WinnaZ", "sofide", "ArthurMarduk", "xcancerberox"]
-
-    if username not in authorized:
-        bot.send_message("No estas Autorizadx para hacer esta acción")
-        return False
-    else:
-        return True
 
 
 def is_pycamp_started(update):
@@ -35,10 +25,9 @@ def ping_PyCamp_group(bot, text):
                     )
 
 
+@admin_needed
 def start_pycamp(bot, update):
     global date_start_pycamp
-    if not is_auth(bot, update.message.from_user.username):
-        return
 
     if is_pycamp_started:
         bot.send_message(
@@ -54,10 +43,8 @@ def start_pycamp(bot, update):
         )
 
 
+@admin_needed
 def end_pycamp(bot, update):
-    if not is_auth(bot, update.message.from_user.username):
-        return
-
     bot.send_message(
             chat_id=update.message.chat_id,
             text="Terminó Pycamp :( !"

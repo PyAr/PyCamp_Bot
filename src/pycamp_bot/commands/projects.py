@@ -3,7 +3,8 @@ from telegram.ext import (ConversationHandler, CommandHandler,
                           MessageHandler, Filters)
 
 from pycamp_bot.models import Pycampista, Project
-from pycamp_bot.commands.manage_pycamp import ping_PyCamp_group, is_auth
+from pycamp_bot.commands.manage_pycamp import ping_PyCamp_group
+from pycamp_bot.commands.auth import admin_needed
 
 
 project_auth = True
@@ -132,11 +133,10 @@ def cancel(bot, update):
     return ConversationHandler.END
 
 
+@admin_needed
 def start_project_load(bot, update):
     """Allow people to upload projects"""
     global project_auth
-    if not is_auth(bot, update.message.from_user.username):
-        return
 
     if not project_auth:
         update.message.reply_text("Autorizadx \nCarga de proyectos Abierta")
@@ -146,10 +146,9 @@ def start_project_load(bot, update):
         update.message.reply_text("La carga de proyectos ya estaba abierta")
 
 
+@admin_needed
 def end_project_load(bot, update):
     """Prevent people for keep uploading projects"""
-    if not is_auth(bot, update.message.from_user.username):
-        return
 
     ping_PyCamp_group(bot, "La carga de projectos esta Cerrada")
     update.message.reply_text(
