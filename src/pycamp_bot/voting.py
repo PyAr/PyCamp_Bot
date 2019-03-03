@@ -1,12 +1,13 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from pycamp_bot.manage_pycamp import ping_PyCamp_group, is_auth
-from pycamp_bot.models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
+from pycamp_bot.models import Pycampista, Project, Vote
 
 import logging
 
 
 logger = logging.getLogger(__name__)
+
 vote_auth = False
 
 

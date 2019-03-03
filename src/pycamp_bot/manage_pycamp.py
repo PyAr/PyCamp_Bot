@@ -20,7 +20,7 @@ def is_pycamp_started(update):
     if date_start_pycamp:
         return True
     else:
-        update.message.reply_text(text= "PyCamp no ha comenzado")
+        update.message.reply_text(text="PyCamp no ha comenzado")
         return False
 
 
