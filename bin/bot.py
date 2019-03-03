@@ -36,7 +36,6 @@ def start(bot, update):
                         \nCreate uno siguiendo esta guia: https://ewtnet.com/technology/how-to/how-to-add-a-username-on-telegram-android-app.
                         Y despues dame /start the nuevo :) """)
       
-
     elif update.message.from_user.username:
         bot.send_message(
                 chat_id=chat_id,
