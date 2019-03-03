@@ -8,9 +8,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
 from pycamp_bot import voting
 from pycamp_bot import manage_pycamp
 from pycamp_bot.models import models_db_connection
-from pycamp_bot.projects import (load_project, start_project_load,
-                                 end_project_load, load_project_handler,
-                                 show_projects)
+from pycamp_bot import projects
 from pycamp_bot.wizard import become_wizard, summon_wizard
 from pycamp_bot.raffle import raffle
 from pycamp_bot.help_msg import HELP_MESSAGE
@@ -56,7 +54,6 @@ def set_handlers(updater, dispatcher):
     updater.dispatcher.add_error_handler(error)
 
     # Thread handlers
-    updater.dispatcher.add_handler(load_project_handler)
 
     dispatcher.add_handler(CommandHandler('start', start))
 
@@ -67,18 +64,9 @@ def set_handlers(updater, dispatcher):
     updater.dispatcher.add_handler(CommandHandler('ser_magx', become_wizard))
     voting.set_handlers(updater)
     manage_pycamp.set_handlers(updater)
-
-    updater.dispatcher.add_handler(
-            CommandHandler('empezar_carga_proyectos', start_project_load))
-    updater.dispatcher.add_handler(
-            CommandHandler('cargar_projectos', start_project_load))
-    updater.dispatcher.add_handler(
-            CommandHandler('terminar_carga_proyectos', end_project_load))
-
-    updater.dispatcher.add_handler(CommandHandler('proyectos', show_projects))
+    projects.set_handlers(updater)
 
     updater.dispatcher.add_handler(CommandHandler('sorteo', raffle))
-
 
 
 if __name__ == '__main__':

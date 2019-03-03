@@ -184,3 +184,15 @@ def show_projects(bot, update):
     text = "\n\n".join(text)
 
     update.message.reply_text(text)
+
+
+def set_handlers(updater):
+    updater.dispatcher.add_handler(load_project_handler)
+    updater.dispatcher.add_handler(
+            CommandHandler('empezar_carga_proyectos', start_project_load))
+    updater.dispatcher.add_handler(
+            CommandHandler('cargar_projectos', start_project_load))
+    updater.dispatcher.add_handler(
+            CommandHandler('terminar_carga_proyectos', end_project_load))
+    updater.dispatcher.add_handler(
+            CommandHandler('proyectos', show_projects))
