@@ -3,7 +3,7 @@ from telegram.ext import (ConversationHandler, CommandHandler,
                           MessageHandler, Filters)
 
 from pycamp_bot.models import Pycampista, Project
-from pycamp_bot.manage_pycamp import ping_PyCamp_group, is_auth
+from pycamp_bot.commands.manage_pycamp import ping_PyCamp_group, is_auth
 
 
 project_auth = True

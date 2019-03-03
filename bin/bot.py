@@ -4,12 +4,12 @@ import os
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           CallbackQueryHandler, ConversationHandler)
 
-from pycamp_bot import voting
-from pycamp_bot import manage_pycamp
-from pycamp_bot import projects
-from pycamp_bot import wizard
-from pycamp_bot import base_commands
-from pycamp_bot import raffle
+from pycamp_bot.commands import voting
+from pycamp_bot.commands import manage_pycamp
+from pycamp_bot.commands import projects
+from pycamp_bot.commands import wizard
+from pycamp_bot.commands import base
+from pycamp_bot.commands import raffle
 
 from pycamp_bot.models import models_db_connection
 
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 def set_handlers(updater):
-    base_commands.set_handlers(updater)
+    base.set_handlers(updater)
     wizard.set_handlers(updater)
     voting.set_handlers(updater)
     manage_pycamp.set_handlers(updater)

@@ -2,7 +2,7 @@ import logging
 
 from telegram.ext import CommandHandler
 
-from pycamp_bot.help_msg import HELP_MESSAGE
+from pycamp_bot.commands.help_msg import HELP_MESSAGE
 
 
 logger = logging.getLogger(__name__)

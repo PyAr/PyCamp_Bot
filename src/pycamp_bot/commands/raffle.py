@@ -3,7 +3,7 @@ import random
 from telegram.ext import CommandHandler
 
 from pycamp_bot.models import Pycampista
-from pycamp_bot.manage_pycamp import is_auth
+from pycamp_bot.commands.manage_pycamp import is_auth
 
 
 def raffle(bot, update):

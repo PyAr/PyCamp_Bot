@@ -1,7 +1,7 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CommandHandler, CallbackQueryHandler
 
-from pycamp_bot.manage_pycamp import ping_PyCamp_group, is_auth
+from pycamp_bot.commands.manage_pycamp import ping_PyCamp_group, is_auth
 from pycamp_bot.models import Pycampista, Project, Vote
 
 import logging
