@@ -19,9 +19,9 @@ def start_voting(bot, update):
     global vote_auth
 
     if not vote_auth:
-        msg_to_active_pycamp_chat(bot, "La Votación esta abierta")
-        update.message.reply_text("Autorizadx \nVotación Abierta")
         vote_auth = True
+        update.message.reply_text("Autorizadx \nVotación Abierta")
+        msg_to_active_pycamp_chat(bot, "La Votación esta abierta")
     else:
         update.message.reply_text("La votacion ya estaba abierta")
 
@@ -90,8 +90,8 @@ def end_voting(bot, update):
 
     if vote_auth:
         vote_auth = False
-        msg_to_active_pycamp_chat(bot,"La Votación esta cerrada")
         update.message.reply_text("Autorizadx \nVotación cerrada")
+        msg_to_active_pycamp_chat(bot, "La Votación esta cerrada")
     else:
         update.message.reply_text("La votación ya estaba cerrada")
 
