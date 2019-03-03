@@ -9,10 +9,10 @@ from pycamp_bot import voting
 from pycamp_bot import manage_pycamp
 from pycamp_bot import projects
 from pycamp_bot import wizard
+from pycamp_bot import base_commands
 
 from pycamp_bot.models import models_db_connection
 from pycamp_bot.raffle import raffle
-from pycamp_bot.help_msg import HELP_MESSAGE
 
 
 logging.basicConfig(
@@ -21,44 +21,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-# command /start give user a message
-def start(bot, update):
-    logger.info('Start command')
-    chat_id = update.message.chat_id
-
-    if update.message.from_user.username is None:
-        bot.send_message(
-                chat_id=chat_id,
-                text="""Hola! Necesitas tener un username primero.
-                        \nCreate uno siguiendo esta guia: https://ewtnet.com/technology/how-to/how-to-add-a-username-on-telegram-android-app.
-                        Y despues dame /start the nuevo :) """)
-
-    elif update.message.from_user.username:
-        bot.send_message(
-                chat_id=chat_id,
-                text='Hola ' + update.message.from_user.username + '! Bienvenidx')
-
-
-def help(bot, update):
-    logger.info('Returning help message')
-    bot.send_message(chat_id=update.message.chat_id, text=HELP_MESSAGE)
-
-
-def error(bot, update, error):
-    '''Log Errors caused by Updates.'''
-    logger.warning('Update {} caused error {}'.format(update, error))
-
-
-def set_handlers(updater, dispatcher):
-    # HANDLERS
-    # handler that processes erros
-    updater.dispatcher.add_error_handler(error)
-
-    # Thread handlers
-
-    dispatcher.add_handler(CommandHandler('start', start))
-
-    updater.dispatcher.add_handler(CommandHandler('ayuda', help))
+def set_handlers(updater):
+    base_commands.set_handlers(updater)
     wizard.set_handlers(updater)
     voting.set_handlers(updater)
     manage_pycamp.set_handlers(updater)
