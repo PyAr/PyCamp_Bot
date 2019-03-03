@@ -1,4 +1,5 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import CommandHandler, CallbackQueryHandler
 
 from pycamp_bot.manage_pycamp import ping_PyCamp_group, is_auth
 from pycamp_bot.models import Pycampista, Project, Vote
@@ -97,3 +98,12 @@ def end_voting(bot, update):
         update.message.reply_text("Autorizadx \nVotación cerrada")
     else:
         update.message.reply_text("La votación ya estaba cerrada")
+
+
+def set_voting_handlers(updater):
+    updater.dispatcher.add_handler(CallbackQueryHandler(button))
+    updater.dispatcher.add_handler(
+            CommandHandler('empezar_votacion', start_voting))
+    updater.dispatcher.add_handler(CommandHandler('votar', vote))
+    updater.dispatcher.add_handler(
+            CommandHandler('terminar_votacion', end_voting))

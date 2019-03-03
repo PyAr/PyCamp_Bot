@@ -5,11 +5,11 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           CallbackQueryHandler, ConversationHandler)
 
 
+from pycamp_bot.voting import set_voting_handlers
 from pycamp_bot.models import models_db_connection
-from pycamp_bot.voting import vote, start_voting, end_voting, button
 from pycamp_bot.projects import (load_project, start_project_load,
-                                     end_project_load, load_project_handler,
-                                     show_projects)
+                                 end_project_load, load_project_handler,
+                                 show_projects)
 from pycamp_bot.wizard import become_wizard, summon_wizard
 from pycamp_bot.raffle import raffle
 from pycamp_bot.help_msg import HELP_MESSAGE
@@ -64,12 +64,7 @@ def set_handlers(updater, dispatcher):
     updater.dispatcher.add_handler(
             CommandHandler('evocar_magx', summon_wizard))
     updater.dispatcher.add_handler(CommandHandler('ser_magx', become_wizard))
-
-    updater.dispatcher.add_handler(
-            CommandHandler('empezar_votacion', start_voting))
-    updater.dispatcher.add_handler(CommandHandler('votar', vote))
-    updater.dispatcher.add_handler(
-            CommandHandler('terminar_votacion', end_voting))
+    set_voting_handlers(updater)
 
     updater.dispatcher.add_handler(
             CommandHandler('empezar_carga_proyectos', start_project_load))
@@ -82,7 +77,6 @@ def set_handlers(updater, dispatcher):
 
     updater.dispatcher.add_handler(CommandHandler('sorteo', raffle))
 
-    updater.dispatcher.add_handler(CallbackQueryHandler(button))
 
 
 if __name__ == '__main__':
