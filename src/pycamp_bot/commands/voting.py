@@ -1,7 +1,8 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CommandHandler, CallbackQueryHandler
 
-from pycamp_bot.commands.manage_pycamp import ping_PyCamp_group, is_auth
+from pycamp_bot.commands.base import msg_to_active_pycamp_chat
+from pycamp_bot.commands.auth import admin_needed
 from pycamp_bot.models import Pycampista, Project, Vote
 
 import logging
@@ -12,18 +13,15 @@ logger = logging.getLogger(__name__)
 vote_auth = False
 
 
+@admin_needed
 def start_voting(bot, update):
     logger.info("Empezando la votacion")
     global vote_auth
 
-    if not is_auth(bot, update.message.from_user.username):
-        logging.info("Usuario no autorizado")
-        return
-
     if not vote_auth:
-        # ping_PyCamp_group(bot, "La Votación esta abierta")
-        update.message.reply_text("Autorizadx \nVotación Abierta")
         vote_auth = True
+        update.message.reply_text("Autorizadx \nVotación Abierta")
+        msg_to_active_pycamp_chat(bot, "La Votación esta abierta")
     else:
         update.message.reply_text("La votacion ya estaba abierta")
 
@@ -84,18 +82,16 @@ def vote(bot, update):
         update.message.reply_text("Votación Cerrada")
 
 
+@admin_needed
 def end_voting(bot, update):
     """Ends voting mode, sets variable vote_auth to False"""
-
-    if not is_auth(bot, update.message.from_user.username):
-        return
 
     global vote_auth
 
     if vote_auth:
         vote_auth = False
-        # ping_PyCamp_group(bot,"La Votación esta cerrada")
         update.message.reply_text("Autorizadx \nVotación cerrada")
+        msg_to_active_pycamp_chat(bot, "La Votación esta cerrada")
     else:
         update.message.reply_text("La votación ya estaba cerrada")
 

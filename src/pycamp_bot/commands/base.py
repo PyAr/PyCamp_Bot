@@ -8,6 +8,14 @@ from pycamp_bot.commands.help_msg import HELP_MESSAGE
 logger = logging.getLogger(__name__)
 
 
+def msg_to_active_pycamp_chat(bot, text):
+    chat_id = -220368252  # Prueba
+    bot.send_message(
+        chat_id=chat_id,
+        text=text
+        )
+
+
 def start(bot, update):
     logger.info('Start command')
     chat_id = update.message.chat_id

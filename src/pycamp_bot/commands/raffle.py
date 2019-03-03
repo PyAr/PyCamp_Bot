@@ -3,12 +3,11 @@ import random
 from telegram.ext import CommandHandler
 
 from pycamp_bot.models import Pycampista
-from pycamp_bot.commands.manage_pycamp import is_auth
+from pycamp_bot.commands.auth import admin_needed
 
 
+@admin_needed
 def raffle(bot, update):
-    if not is_auth(bot, update.message.from_user.username):
-        return
     bot.send_message(
         chat_id=update.message.chat_id,
         text="Voy a sortear algo entre todxs lxs Pycampistas!"
