@@ -100,10 +100,12 @@ def end_voting(bot, update):
         update.message.reply_text("La votación ya estaba cerrada")
 
 
-def set_voting_handlers(updater):
-    updater.dispatcher.add_handler(CallbackQueryHandler(button))
+def set_handlers(updater):
+    updater.dispatcher.add_handler(
+            CallbackQueryHandler(button))
     updater.dispatcher.add_handler(
             CommandHandler('empezar_votacion', start_voting))
-    updater.dispatcher.add_handler(CommandHandler('votar', vote))
+    updater.dispatcher.add_handler(
+            CommandHandler('votar', vote))
     updater.dispatcher.add_handler(
             CommandHandler('terminar_votacion', end_voting))

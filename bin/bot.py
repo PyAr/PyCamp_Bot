@@ -4,7 +4,6 @@ import os
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           CallbackQueryHandler, ConversationHandler)
 
-
 from pycamp_bot import voting
 from pycamp_bot import manage_pycamp
 from pycamp_bot import projects
@@ -35,14 +34,13 @@ if __name__ == '__main__':
 
     if 'TOKEN' in os.environ.keys():
         updater = Updater(token=os.environ['TOKEN'])
-        dispatcher = updater.dispatcher
 
         users_status = {}
         current_projects = {}
 
         updater.start_polling()
 
-        set_handlers(updater, dispatcher)
+        set_handlers(updater)
         models_db_connection(eval(sys.argv[1]))
     else:
         logger.info('Token not defined. Exiting.')
