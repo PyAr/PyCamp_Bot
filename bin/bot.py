@@ -97,8 +97,6 @@ def set_handlers(updater, dispatcher):
     updater.dispatcher.add_handler(
             CommandHandler('terminar_carga_proyectos', end_project_load))
 
-    updater.dispatcher.add_handler(CommandHandler('ownear', own))
-
     updater.dispatcher.add_handler(CommandHandler('proyectos', projects))
 
     updater.dispatcher.add_handler(CommandHandler('sorteo', raffle))
