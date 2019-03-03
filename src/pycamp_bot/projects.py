@@ -105,8 +105,6 @@ def project_topic(bot, update):
     new_project = current_projects[username]
     new_project.topic = text
 
-    # Getting project owner
-    username = update.message['chat']['username']
     chat_id = update.message.chat_id
     user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
 

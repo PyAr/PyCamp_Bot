@@ -1,9 +1,8 @@
 import json
 
-from pycamp_bot.models import Project, ProjectOwner, Slot, Vote
+from pycamp_bot.models import Project, Slot, Vote
 
 projects = Project.select()
-project_owners = ProjectOwner.select()
 
 result = {"projects": {}, "responsable_available_slots": {}}
 

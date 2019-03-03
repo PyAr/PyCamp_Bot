@@ -3,6 +3,7 @@ import peewee as pw
 
 db = pw.SqliteDatabase('pycamp_projects.db')
 
+
 class Pycampista(pw.Model):
     '''
     Representation of the pycamp user
@@ -16,7 +17,7 @@ class Pycampista(pw.Model):
     chat_id = pw.CharField(unique=True)
     arrive = pw.DateTimeField(null=True)
     leave = pw.DateTimeField(null=True)
-    wizard = pw.BooleanField()
+    wizard = pw.BooleanField(null=True)
 
     class Meta:
         database = db

@@ -6,13 +6,11 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
 
 
 from pycamp_bot.models import models_db_connection
-from pycamp_bot.merge import merge, merge_project_handler
 from pycamp_bot.voting import vote, start_voting, end_voting, button
-from pycamp_bot.load_project import (load_project, start_project_load,
+from pycamp_bot.projects import (load_project, start_project_load,
                                      end_project_load, load_project_handler,
                                      show_projects)
 from pycamp_bot.wizard import become_wizard, summon_wizard
-from pycamp_bot.own import own, own_project_handler
 from pycamp_bot.raffle import raffle
 from pycamp_bot.help_msg import HELP_MESSAGE
 
@@ -58,8 +56,6 @@ def set_handlers(updater, dispatcher):
 
     # Thread handlers
     updater.dispatcher.add_handler(load_project_handler)
-    updater.dispatcher.add_handler(merge_project_handler)
-    updater.dispatcher.add_handler(own_project_handler)
 
     dispatcher.add_handler(CommandHandler('start', start))
 
