@@ -5,15 +5,14 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           CallbackQueryHandler, ConversationHandler)
 
 
-from pycamp_bot.models import (Pycampista, Project, ProjectOwner, Slot, Vote,
-                               Wizard, models_db_connection)
+from pycamp_bot.models import models_db_connection
 from pycamp_bot.merge import merge, merge_project_handler
 from pycamp_bot.voting import vote, start_voting, end_voting, button
 from pycamp_bot.load_project import (load_project, start_project_load,
-                                     end_project_load, load_project_handler)
+                                     end_project_load, load_project_handler,
+                                     show_projects)
 from pycamp_bot.wizard import become_wizard, summon_wizard
 from pycamp_bot.own import own, own_project_handler
-from pycamp_bot.utils import projects
 from pycamp_bot.raffle import raffle
 from pycamp_bot.help_msg import HELP_MESSAGE
 
@@ -97,7 +96,7 @@ def set_handlers(updater, dispatcher):
     updater.dispatcher.add_handler(
             CommandHandler('terminar_carga_proyectos', end_project_load))
 
-    updater.dispatcher.add_handler(CommandHandler('proyectos', projects))
+    updater.dispatcher.add_handler(CommandHandler('proyectos', show_projects))
 
     updater.dispatcher.add_handler(CommandHandler('sorteo', raffle))
 
