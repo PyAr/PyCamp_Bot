@@ -1,7 +1,7 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CommandHandler, CallbackQueryHandler
 
-from pycamp_bot.commands.manage_pycamp import ping_PyCamp_group
+from pycamp_bot.commands.base import msg_to_active_pycamp_chat
 from pycamp_bot.commands.auth import admin_needed
 from pycamp_bot.models import Pycampista, Project, Vote
 
@@ -19,7 +19,7 @@ def start_voting(bot, update):
     global vote_auth
 
     if not vote_auth:
-        # ping_PyCamp_group(bot, "La Votación esta abierta")
+        msg_to_active_pycamp_chat(bot, "La Votación esta abierta")
         update.message.reply_text("Autorizadx \nVotación Abierta")
         vote_auth = True
     else:
@@ -90,7 +90,7 @@ def end_voting(bot, update):
 
     if vote_auth:
         vote_auth = False
-        # ping_PyCamp_group(bot,"La Votación esta cerrada")
+        msg_to_active_pycamp_chat(bot,"La Votación esta cerrada")
         update.message.reply_text("Autorizadx \nVotación cerrada")
     else:
         update.message.reply_text("La votación ya estaba cerrada")

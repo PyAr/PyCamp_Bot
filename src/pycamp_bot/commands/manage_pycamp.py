@@ -16,15 +16,6 @@ def is_pycamp_started(update):
         return False
 
 
-def ping_PyCamp_group(bot, text):
-    chat_id = -220368252  # Prueba
-    # chat_id = -1001326267611 #Posta
-    bot.send_message(
-        chat_id=chat_id,
-        text=text
-                    )
-
-
 @admin_needed
 def start_pycamp(bot, update):
     global date_start_pycamp
