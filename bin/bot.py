@@ -5,7 +5,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           CallbackQueryHandler, ConversationHandler)
 
 
-from pycamp_bot.voting import set_voting_handlers
+from pycamp_bot import voting
 from pycamp_bot.models import models_db_connection
 from pycamp_bot.projects import (load_project, start_project_load,
                                  end_project_load, load_project_handler,
@@ -64,7 +64,7 @@ def set_handlers(updater, dispatcher):
     updater.dispatcher.add_handler(
             CommandHandler('evocar_magx', summon_wizard))
     updater.dispatcher.add_handler(CommandHandler('ser_magx', become_wizard))
-    set_voting_handlers(updater)
+    voting.set_handlers(updater)
 
     updater.dispatcher.add_handler(
             CommandHandler('empezar_carga_proyectos', start_project_load))
