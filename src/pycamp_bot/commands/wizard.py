@@ -1,3 +1,5 @@
+from telegram.ext import CommandHandler
+
 from pycamp_bot.models import Pycampista
 
 
@@ -35,3 +37,9 @@ def summon_wizard(bot, update):
             text="Hubo un accidente, el mago esta en otro plano.".format(username)
         )
 
+
+def set_handlers(updater):
+    updater.dispatcher.add_handler(
+            CommandHandler('evocar_magx', summon_wizard))
+    updater.dispatcher.add_handler(
+            CommandHandler('ser_magx', become_wizard))

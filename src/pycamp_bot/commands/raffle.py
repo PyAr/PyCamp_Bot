@@ -1,7 +1,9 @@
 import random
 
+from telegram.ext import CommandHandler
+
 from pycamp_bot.models import Pycampista
-from pycamp_bot.manage_pycamp import is_auth
+from pycamp_bot.commands.manage_pycamp import is_auth
 
 
 def raffle(bot, update):
@@ -22,3 +24,8 @@ def raffle(bot, update):
         chat_id=update.message.chat_id,
         text="@{}".format(persona_ganadora)
         )
+
+
+def set_handlers(updater):
+    updater.dispatcher.add_handler(
+            CommandHandler('sorteo', raffle))

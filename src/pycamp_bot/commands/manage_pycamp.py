@@ -1,5 +1,7 @@
 from datetime import date, datetime
 
+from telegram.ext import CommandHandler
+
 
 date_start_pycamp = None
 
@@ -60,3 +62,10 @@ def end_pycamp(bot, update):
             chat_id=update.message.chat_id,
             text="Terminó Pycamp :( !"
         )
+
+
+def set_handlers(updater):
+    updater.dispatcher.add_handler(
+            CommandHandler('empezar_pycamp', start_pycamp))
+    updater.dispatcher.add_handler(
+            CommandHandler('terminar_pycamp', end_pycamp))
