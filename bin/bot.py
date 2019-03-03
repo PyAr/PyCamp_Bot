@@ -10,9 +10,9 @@ from pycamp_bot import manage_pycamp
 from pycamp_bot import projects
 from pycamp_bot import wizard
 from pycamp_bot import base_commands
+from pycamp_bot import raffle
 
 from pycamp_bot.models import models_db_connection
-from pycamp_bot.raffle import raffle
 
 
 logging.basicConfig(
@@ -27,8 +27,7 @@ def set_handlers(updater):
     voting.set_handlers(updater)
     manage_pycamp.set_handlers(updater)
     projects.set_handlers(updater)
-
-    updater.dispatcher.add_handler(CommandHandler('sorteo', raffle))
+    raffle.set_handlers(updater)
 
 
 if __name__ == '__main__':
