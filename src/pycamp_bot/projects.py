@@ -2,7 +2,7 @@ import logging
 from telegram.ext import (ConversationHandler, CommandHandler,
                           MessageHandler, Filters)
 
-from pycamp_bot.models import Pycampista, Project, ProjectOwner, Slot, Vote, Wizard
+from pycamp_bot.models import Pycampista, Project
 from pycamp_bot.manage_pycamp import ping_PyCamp_group, is_auth
 
 
@@ -91,7 +91,8 @@ def project_level(bot, update):
     else:
         bot.send_message(
             chat_id=update.message.chat_id,
-            text="Nooooooo input no válido, por favor ingresá 1, 2 o 3".format(text)
+            text="Nooooooo input no válido, por favor "
+                 "ingresá 1, 2 o 3".format(text)
         )
         return DIFICULTAD
 
@@ -104,8 +105,6 @@ def project_topic(bot, update):
     new_project = current_projects[username]
     new_project.topic = text
 
-    # Getting project owner
-    username = update.message['chat']['username']
     chat_id = update.message.chat_id
     user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
 
@@ -166,3 +165,22 @@ load_project_handler = ConversationHandler(
        },
        fallbacks=[CommandHandler('cancel', cancel)]
    )
+
+
+def show_projects(bot, update):
+    """Prevent people for keep uploading projects"""
+    projects = Project.select()
+    text = []
+    for project in projects:
+
+        project_text = "{} \n owner: {} \n topic: {} \n level: {}".format(
+            project.name,
+            project.owner.username,
+            project.topic,
+            project.difficult_level
+        )
+        text.append(project_text)
+
+    text = "\n\n".join(text)
+
+    update.message.reply_text(text)

@@ -5,15 +5,12 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           CallbackQueryHandler, ConversationHandler)
 
 
-from pycamp_bot.models import (Pycampista, Project, ProjectOwner, Slot, Vote,
-                               Wizard, models_db_connection)
-from pycamp_bot.merge import merge, merge_project_handler
+from pycamp_bot.models import models_db_connection
 from pycamp_bot.voting import vote, start_voting, end_voting, button
-from pycamp_bot.load_project import (load_project, start_project_load,
-                                     end_project_load, load_project_handler)
+from pycamp_bot.projects import (load_project, start_project_load,
+                                     end_project_load, load_project_handler,
+                                     show_projects)
 from pycamp_bot.wizard import become_wizard, summon_wizard
-from pycamp_bot.own import own, own_project_handler
-from pycamp_bot.utils import projects
 from pycamp_bot.raffle import raffle
 from pycamp_bot.help_msg import HELP_MESSAGE
 
@@ -28,28 +25,18 @@ logger = logging.getLogger(__name__)
 def start(bot, update):
     logger.info('Start command')
     chat_id = update.message.chat_id
-    
+
     if update.message.from_user.username is None:
-           bot.send_message(
+        bot.send_message(
                 chat_id=chat_id,
                 text="""Hola! Necesitas tener un username primero.
                         \nCreate uno siguiendo esta guia: https://ewtnet.com/technology/how-to/how-to-add-a-username-on-telegram-android-app.
                         Y despues dame /start the nuevo :) """)
-      
+
     elif update.message.from_user.username:
         bot.send_message(
                 chat_id=chat_id,
                 text='Hola ' + update.message.from_user.username + '! Bienvenidx')
-     
-
-
-def text_input(bot, update):
-    '''This function handles text sent by the user'''
-    bot.send_message(chat_id=update.message.chat_id, chat="gabi gato")
-
-    print ("---------------------------------------------------------------")
-    print ("usuario: " + update.message.from_user.username)
-    print ("texto: " + update.message.text)
 
 
 def help(bot, update):
@@ -69,11 +56,6 @@ def set_handlers(updater, dispatcher):
 
     # Thread handlers
     updater.dispatcher.add_handler(load_project_handler)
-    updater.dispatcher.add_handler(merge_project_handler)
-    updater.dispatcher.add_handler(own_project_handler)
-
-    # Handlers that get activated using /
-    updater.dispatcher.add_handler(CommandHandler('mergear', merge))
 
     dispatcher.add_handler(CommandHandler('start', start))
 
@@ -96,9 +78,7 @@ def set_handlers(updater, dispatcher):
     updater.dispatcher.add_handler(
             CommandHandler('terminar_carga_proyectos', end_project_load))
 
-    updater.dispatcher.add_handler(CommandHandler('ownear', own))
-
-    updater.dispatcher.add_handler(CommandHandler('proyectos', projects))
+    updater.dispatcher.add_handler(CommandHandler('proyectos', show_projects))
 
     updater.dispatcher.add_handler(CommandHandler('sorteo', raffle))
 
