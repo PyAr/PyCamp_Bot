@@ -7,9 +7,10 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
 
 from pycamp_bot import voting
 from pycamp_bot import manage_pycamp
-from pycamp_bot.models import models_db_connection
 from pycamp_bot import projects
-from pycamp_bot.wizard import become_wizard, summon_wizard
+from pycamp_bot import wizard
+
+from pycamp_bot.models import models_db_connection
 from pycamp_bot.raffle import raffle
 from pycamp_bot.help_msg import HELP_MESSAGE
 
@@ -58,10 +59,7 @@ def set_handlers(updater, dispatcher):
     dispatcher.add_handler(CommandHandler('start', start))
 
     updater.dispatcher.add_handler(CommandHandler('ayuda', help))
-
-    updater.dispatcher.add_handler(
-            CommandHandler('evocar_magx', summon_wizard))
-    updater.dispatcher.add_handler(CommandHandler('ser_magx', become_wizard))
+    wizard.set_handlers(updater)
     voting.set_handlers(updater)
     manage_pycamp.set_handlers(updater)
     projects.set_handlers(updater)
