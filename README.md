@@ -21,6 +21,20 @@ pip install -e .
 
 y estas listo para trabajar.
 
+### Usando `pipenv`
+
+> Si no tenés `pipenv` podés instalarlo consultando la [Documentación Oficial](https://pipenv.readthedocs.io/en/latest/)
+
+Copiá el `.env.dist` en un `.env` y poné ahí la `TOKEN` que te dió el [@BotFather](https:/t.me/botfather).
+Luego creá el entorno virtual.
+Finalmente ejecutá el bot.
+
+```bash
+cp .env.dist .env
+pipenv install
+pipenv run python bin/run_bot.py
+```
+
 ## Testeo
 
 Para correr el bot ejecutá (desde el virtualenv):
