@@ -1,3 +1,4 @@
+import peewee
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CommandHandler, CallbackQueryHandler
 
@@ -40,21 +41,36 @@ def button(bot, update):
     project = Project.get(Project.name == project_name)
 
     # create a new vote object
-    new_vote = Vote(pycampista=user, project=project)
+    new_vote = Vote(
+        pycampista=user,
+        project=project,
+        _project_pycampista_id="{}-{}".format(project.id, user.id),
+    )
 
     # Save vote in the database and send a message
     if query.data == "si":
         result = 'Interesadx en: ' + project_name + ' 👍'
         new_vote.interest = True
-        new_vote.save()
     else:
         new_vote.interest = False
-        new_vote.save()
         result = 'No te interesa el proyecto ' + project_name
 
-    bot.edit_message_text(text=result,
-                          chat_id=query.message.chat_id,
-                          message_id=query.message.message_id)
+    try:
+        new_vote.save()
+        bot.edit_message_text(text=result,
+                              chat_id=query.message.chat_id,
+                              message_id=query.message.message_id)
+    except peewee.IntegrityError:
+        logger.warning("Error al guardar el voto de {} del proyecto {}".format(
+            username,
+            project_name
+        ))
+        bot.edit_message_text(
+            text="Ya habías votado el proyecto {}!!".format(project_name),
+            chat_id=query.message.chat_id,
+            message_id=query.message.message_id
+        )
+
 
 
 def vote(bot, update):

@@ -79,10 +79,12 @@ class Vote(pw.Model):
     project = pw.ForeignKeyField(Project)
     pycampista = pw.ForeignKeyField(Pycampista)
     interest = pw.BooleanField(null=True)
+    #this field is to prevent saving multi votes from the same user in the
+    # same project
+    _project_pycampista_id = pw.CharField(unique=True)
 
     class Meta:
         database = db
-        primary_key = pw.CompositeKey('project', 'pycampista')
 
 
 def models_db_connection(initialize=False):
