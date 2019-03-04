@@ -1,5 +1,4 @@
 import logging
-import sys
 import os
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
                           CallbackQueryHandler, ConversationHandler)
@@ -35,7 +34,7 @@ if __name__ == '__main__':
     if 'TOKEN' in os.environ.keys():
         updater = Updater(token=os.environ['TOKEN'])
 
-        models_db_connection(eval(sys.argv[1]))
+        models_db_connection()
         set_handlers(updater)
 
         updater.start_polling()

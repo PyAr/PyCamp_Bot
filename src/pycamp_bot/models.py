@@ -87,10 +87,10 @@ class Vote(pw.Model):
         database = db
 
 
-def models_db_connection(initialize=False):
+def models_db_connection():
     db.connect()
-    if initialize:
-        db.create_tables([BotStatus, Pycampista, Project, Slot, Vote])
+    db.create_tables([BotStatus, Pycampista, Project, Slot, Vote])
+    if BotStatus.select().count() == 0:
         base_status = BotStatus.create(
                             vote_authorized=False,
                             proyect_load_authorized=False
