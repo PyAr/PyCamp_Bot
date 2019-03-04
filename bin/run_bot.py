@@ -35,12 +35,10 @@ if __name__ == '__main__':
     if 'TOKEN' in os.environ.keys():
         updater = Updater(token=os.environ['TOKEN'])
 
-        users_status = {}
-        current_projects = {}
+        models_db_connection(eval(sys.argv[1]))
+        set_handlers(updater)
 
         updater.start_polling()
 
-        set_handlers(updater)
-        models_db_connection(eval(sys.argv[1]))
     else:
         logger.info('Token not defined. Exiting.')

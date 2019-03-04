@@ -3,7 +3,7 @@ from telegram.ext import CommandHandler, CallbackQueryHandler
 
 from pycamp_bot.commands.base import msg_to_active_pycamp_chat
 from pycamp_bot.commands.auth import admin_needed
-from pycamp_bot.models import Pycampista, Project, Vote
+from pycamp_bot.models import Pycampista, Project, Vote, BotStatus
 
 import logging
 
@@ -16,10 +16,12 @@ vote_auth = False
 @admin_needed
 def start_voting(bot, update):
     logger.info("Empezando la votacion")
-    global vote_auth
 
-    if not vote_auth:
-        vote_auth = True
+    bot_status = BotStatus.select()[0]
+
+    if not bot_status.vote_authorized:
+        bot_status.vote_authorized = True
+        bot_status.save()
         update.message.reply_text("Autorizadx \nVotación Abierta")
         msg_to_active_pycamp_chat(bot, "La Votación esta abierta")
     else:
@@ -44,10 +46,10 @@ def button(bot, update):
     if query.data == "si":
         result = 'Interesadx en: ' + project_name + ' 👍'
         new_vote.interest = True
-        new_vote.save(force_insert=True)
+        new_vote.save()
     else:
         new_vote.interest = False
-        new_vote.save(force_insert=True)
+        new_vote.save()
         result = 'No te interesa el proyecto ' + project_name
 
     bot.edit_message_text(text=result,
@@ -58,7 +60,9 @@ def button(bot, update):
 def vote(bot, update):
     logger.info("Vote message")
 
-    if vote_auth:
+    bot_status = BotStatus.select()[0]
+
+    if bot_status.vote_authorized:
         update.message.reply_text(
             'Te interesa el proyecto:'
         )
@@ -84,12 +88,11 @@ def vote(bot, update):
 
 @admin_needed
 def end_voting(bot, update):
-    """Ends voting mode, sets variable vote_auth to False"""
+    bot_status = BotStatus.select()[0]
 
-    global vote_auth
-
-    if vote_auth:
-        vote_auth = False
+    if bot_status.vote_authorized:
+        bot_status.vote_authorized = False
+        bot_status.save()
         update.message.reply_text("Autorizadx \nVotación cerrada")
         msg_to_active_pycamp_chat(bot, "La Votación esta cerrada")
     else:
