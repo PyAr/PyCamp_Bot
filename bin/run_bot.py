@@ -42,3 +42,4 @@ if __name__ == '__main__':
     set_handlers(updater)
 
     updater.start_polling()
+    updater.idle()
