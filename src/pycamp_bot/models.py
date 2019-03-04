@@ -4,6 +4,18 @@ import peewee as pw
 db = pw.SqliteDatabase('pycamp_projects.db')
 
 
+class BotStatus(pw.Model):
+    '''
+    Status of the pycamp bot
+    vote_autorized: the votation is autorized
+    '''
+    vote_authorized = pw.BooleanField(null=True)
+    proyect_load_authorized = pw.BooleanField(null=True)
+
+    class Meta:
+        database = db
+
+
 class Pycampista(pw.Model):
     '''
     Representation of the pycamp user
@@ -66,14 +78,21 @@ class Vote(pw.Model):
     '''
     project = pw.ForeignKeyField(Project)
     pycampista = pw.ForeignKeyField(Pycampista)
-    interest = pw.BooleanField()
+    interest = pw.BooleanField(null=True)
+    #this field is to prevent saving multi votes from the same user in the
+    # same project
+    _project_pycampista_id = pw.CharField(unique=True)
 
     class Meta:
         database = db
-        primary_key = pw.CompositeKey('project', 'pycampista')
 
 
 def models_db_connection(initialize=False):
     db.connect()
     if initialize:
-        db.create_tables([Pycampista, Project, Slot, Vote])
+        db.create_tables([BotStatus, Pycampista, Project, Slot, Vote])
+        base_status = BotStatus.create(
+                            vote_authorized=False,
+                            proyect_load_authorized=False
+                            )
+        base_status.save()
