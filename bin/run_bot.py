@@ -31,13 +31,14 @@ def set_handlers(updater):
 if __name__ == '__main__':
     logger.info('Starting PyCamp Bot')
 
-    if 'TOKEN' in os.environ.keys():
-        updater = Updater(token=os.environ['TOKEN'])
+    token = os.environ.get('TOKEN')
+    if token is None:
+        logger.error('Token not defined. Exiting.')
+        exit(1)
 
-        models_db_connection()
-        set_handlers(updater)
+    updater = Updater(token=token)
 
-        updater.start_polling()
+    models_db_connection()
+    set_handlers(updater)
 
-    else:
-        logger.info('Token not defined. Exiting.')
+    updater.start_polling()
