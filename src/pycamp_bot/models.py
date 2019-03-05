@@ -30,6 +30,7 @@ class Pycampista(pw.Model):
     arrive = pw.DateTimeField(null=True)
     leave = pw.DateTimeField(null=True)
     wizard = pw.BooleanField(null=True)
+    is_admin = pw.BooleanField(default=False, null=True)
 
     class Meta:
         database = db

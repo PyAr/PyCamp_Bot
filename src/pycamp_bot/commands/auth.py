@@ -1,12 +1,15 @@
 import logging
 
+from pycamp_bot.models import Pycampista
+
 
 logger = logging.getLogger(__name__)
 
 
 def is_admin(bot, update):
     """Checks if the user is authorized as admin"""
-    authorized = ["WinnaZ", "sofide", "ArthurMarduk", "xcancerberox"]
+    # authorized = ["WinnaZ", "sofide", "ArthurMarduk", "xcancerberox", "lecovi"]
+    authorized = [p.username for p in Pycampista.select().filter(is_admin=True)]
     username = update.message.from_user.username
 
     if username not in authorized:

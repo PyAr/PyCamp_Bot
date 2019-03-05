@@ -2,6 +2,7 @@ import logging
 
 from telegram.ext import CommandHandler
 
+from pycamp_bot.models import Pycampista
 from pycamp_bot.commands.help_msg import HELP_MESSAGE
 
 
@@ -19,19 +20,23 @@ def msg_to_active_pycamp_chat(bot, text):
 def start(bot, update):
     logger.info('Start command')
     chat_id = update.message.chat_id
+    username = update.message.from_user.username
 
-    if update.message.from_user.username is None:
+    user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
+    user.save()
+    logger.debug("Pycampista {} agregado a la DB".format(user.username))
+
+    if username is None:
         bot.send_message(
                 chat_id=chat_id,
                 text="""Hola! Necesitas tener un username primero.
                         \nCreate uno siguiendo esta guia: https://ewtnet.com/technology/how-to/how-to-add-a-username-on-telegram-android-app.
                         Y despues dame /start the nuevo :) """)
 
-    elif update.message.from_user.username:
+    elif username:
         bot.send_message(
                 chat_id=chat_id,
-                text='Hola ' + update.message.from_user.username +
-                     '! Bienvenidx'
+                text='Hola ' + username + '! Bienvenidx'
                 )
 
 
