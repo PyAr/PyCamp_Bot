@@ -44,6 +44,7 @@ class Slot(pw.Model):
     '''
     code = pw.CharField()  # For example A1 for first slot first day
     start = pw.DateTimeField()
+    current_wizzard = pw.ForeignKeyField(Pycampista)
 
     class Meta:
         database = db
@@ -58,7 +59,7 @@ class Project(pw.Model):
     slot: ForeignKey with the slot asigned
     owner: ForeignKey with the pycamp user asigned
     '''
-    name = pw.CharField()
+    name = pw.CharField(unique=True)
     difficult_level = pw.IntegerField(default=1)
     topic = pw.CharField(null=True)
     slot = pw.ForeignKeyField(Slot, null=True)
