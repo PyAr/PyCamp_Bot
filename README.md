@@ -25,7 +25,7 @@ y estas listo para trabajar.
 
 Para correr el bot ejecutá (desde el virtualenv):
 ```
-TOKEN='TOKEN_PERSONAL' python bint/run_bot.py
+TOKEN='TOKEN_PERSONAL' python bin/run_bot.py
 ```
 
 Y listo! Tu bot está corriendo en tu máquina, esperando que alguien le escriba por telegram.
