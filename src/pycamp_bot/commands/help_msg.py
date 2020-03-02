@@ -29,6 +29,8 @@ Comandos adicionales:
 /ser_magx: te transforma en el/la Magx de turno.
 /evocar_magx: pingea a la/el Magx de turno, informando que necesitas su\
 ayuda. Con un gran poder, viene una gran responsabilidad.
+/su (passwrd): convierte al usuario en admin. Si sabe el password :P
+/amins: lista a todos los admins.
 /ayuda: esta ayuda.'''
 
 HELP_MESSAGE_ADMIN = '''
@@ -41,7 +43,8 @@ actual.
 /start_voting: Habilita la votacion sobre los proyectos.
 /end_voting: Deshabilita la votacion sobre los proyectos.
 /start_pycamp: Inicia un nuevo pycamp.
-/end_pycamp: Termina el pycamp.'''
+/end_pycamp: Termina el pycamp.
+/degrdar (username): Le saca los permisos de admin a un usuario.'''
 
 
 def get_help(bot, update):
