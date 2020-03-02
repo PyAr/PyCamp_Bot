@@ -2,7 +2,7 @@ import logging
 
 from telegram.ext import CommandHandler
 
-from pycamp_bot.commands.help_msg import HELP_MESSAGE
+from pycamp_bot.commands.help_msg import get_help
 
 
 logger = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ def start(bot, update):
 
 def help(bot, update):
     logger.info('Returning help message')
-    bot.send_message(chat_id=update.message.chat_id, text=HELP_MESSAGE)
+    bot.send_message(chat_id=update.message.chat_id, text=get_help(bot, update))
 
 
 def error(bot, update, error):
