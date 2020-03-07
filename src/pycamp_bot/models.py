@@ -24,12 +24,14 @@ class Pycampista(pw.Model):
     arrive: time of arrival
     leave: time of departure
     wizard: True or False for is a wizard
+    admin: True or False for admin privileges
     '''
     username = pw.CharField(unique=True)
     chat_id = pw.CharField(unique=True)
     arrive = pw.DateTimeField(null=True)
     leave = pw.DateTimeField(null=True)
     wizard = pw.BooleanField(null=True)
+    admin = pw.BooleanField(null=True)
 
     class Meta:
         database = db

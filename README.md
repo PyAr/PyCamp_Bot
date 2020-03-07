@@ -1,5 +1,10 @@
 # Este es el bot del Pycamp!
 
+## Variables de entorno
+
+*TOKEN*: Token del bot generado con BotFather.
+*PYCAMP_BOT_MASTER_KEY*: Password para agregar nuevos admins.
+
 ## Development
 
 Si queres contribuir en este proyecto lo primero que vas a necesitar es crearte un bot para hacer
