@@ -2,8 +2,8 @@
 
 ## Variables de entorno
 
-*TOKEN*: Token del bot generado con BotFather.
-*PYCAMP_BOT_MASTER_KEY*: Password para agregar nuevos admins.
+* TOKEN: Token del bot generado con BotFather.
+* PYCAMP_BOT_MASTER_KEY: Password para agregar nuevos admins.
 
 ## Development
 
