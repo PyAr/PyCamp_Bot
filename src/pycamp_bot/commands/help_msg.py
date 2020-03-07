@@ -44,7 +44,7 @@ actual.
 /end_voting: Deshabilita la votacion sobre los proyectos.
 /start_pycamp: Inicia un nuevo pycamp.
 /end_pycamp: Termina el pycamp.
-/degrdar (username): Le saca los permisos de admin a un usuario.'''
+/degradar (username): Le saca los permisos de admin a un usuario.'''
 
 
 def get_help(bot, update):
