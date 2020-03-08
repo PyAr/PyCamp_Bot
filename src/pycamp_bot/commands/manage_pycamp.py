@@ -20,7 +20,7 @@ def is_pycamp_started(update):
 def start_pycamp(bot, update):
     global date_start_pycamp
 
-    if is_pycamp_started:
+    if is_pycamp_started(update):
         bot.send_message(
             chat_id=update.message.chat_id,
             text="PyCamp Ya habia empezado ! {}".format(str(date_start_pycamp))
