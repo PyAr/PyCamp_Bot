@@ -12,6 +12,7 @@ setup(
         packages=find_packages('src'),
         package_dir={'': 'src'},
         install_requires=[
+            'munch==2.1.1',
             'python-telegram-bot==10.0.2',
             'peewee',
             ],
