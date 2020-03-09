@@ -4,7 +4,13 @@ import peewee as pw
 db = pw.SqliteDatabase('pycamp_projects.db')
 
 
-class BotStatus(pw.Model):
+class BaseModel(pw.Model):
+
+    class Meta:
+        database = db
+
+
+class BotStatus(BaseModel):
     '''
     Status of the pycamp bot
     vote_autorized: the votation is autorized
@@ -12,11 +18,8 @@ class BotStatus(pw.Model):
     vote_authorized = pw.BooleanField(null=True)
     proyect_load_authorized = pw.BooleanField(null=True)
 
-    class Meta:
-        database = db
 
-
-class Pycampista(pw.Model):
+class Pycampista(BaseModel):
     '''
     Representation of the pycamp user
     username: name on telegram (ex. roberto for @roberto)
@@ -33,11 +36,9 @@ class Pycampista(pw.Model):
     wizard = pw.BooleanField(null=True)
     admin = pw.BooleanField(null=True)
 
-    class Meta:
-        database = db
 
 
-class Slot(pw.Model):
+class Slot(BaseModel):
     '''
     Time slot representation
     code: String that represent the slot in the form A1, where the letter
@@ -48,11 +49,8 @@ class Slot(pw.Model):
     start = pw.DateTimeField()
     current_wizzard = pw.ForeignKeyField(Pycampista)
 
-    class Meta:
-        database = db
 
-
-class Project(pw.Model):
+class Project(BaseModel):
     '''
     Project representation
     name: name of the project
@@ -67,11 +65,8 @@ class Project(pw.Model):
     slot = pw.ForeignKeyField(Slot, null=True)
     owner = pw.ForeignKeyField(Pycampista)
 
-    class Meta:
-        database = db
 
-
-class Vote(pw.Model):
+class Vote(BaseModel):
     '''
     Vote representation. Relation many to many
     project: ForeignKey project
@@ -85,9 +80,6 @@ class Vote(pw.Model):
     #this field is to prevent saving multi votes from the same user in the
     # same project
     _project_pycampista_id = pw.CharField(unique=True)
-
-    class Meta:
-        database = db
 
 
 def models_db_connection():
