@@ -4,6 +4,8 @@ import logging
 from telegram.ext import CommandHandler
 
 from pycamp_bot.models import Pycamp
+from pycamp_bot.models import Pycampista
+from pycamp_bot.models import PycampistaAtPycamp
 from pycamp_bot.commands.auth import admin_needed
 
 logger = logging.getLogger(__name__)
@@ -123,12 +125,15 @@ def end_pycamp(bot, update):
 
 def add_pycampista_to_pycamp(bot, update):
     username = update.message.from_user.username
+    chat_id = update.message.chat_id
+    pycampista = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
 
     parameters = update.message.text.split(' ')
     if len(parameters) == 2:
         pycamp = get_pycamp_by_name(parameters[1])
     else:
         is_active, pycamp = get_active_pycamp()
+    PycampistaAtPycamp.get_or_create(pycamp=pycamp, pycampista=pycampista)
 
     bot.send_message(
         chat_id=update.message.chat_id,
@@ -138,9 +143,24 @@ def add_pycampista_to_pycamp(bot, update):
 
 def list_pycamps(bot, update):
     pycamps = Pycamp.select()
-    text = []
+    text = ['Pycamps:']
     for pycamp in pycamps:
         text.append(str(pycamp))
+
+    text = "\n\n".join(text)
+    update.message.reply_text(text)
+
+
+@active_needed
+def list_pycampistas(bot, update):
+    is_active, pycamp = get_active_pycamp()
+
+    pycampistas_at_pycamp = PycampistaAtPycamp.select().where(
+        PycampistaAtPycamp.pycamp == pycamp)
+
+    text = ['Pycampistas:']
+    for pap in pycampistas_at_pycamp:
+        text.append(str(pap.pycampista))
 
     text = "\n\n".join(text)
     update.message.reply_text(text)
@@ -159,3 +179,5 @@ def set_handlers(updater):
         CommandHandler('pycamps', list_pycamps))
     updater.dispatcher.add_handler(
         CommandHandler('voy_al_pycamp', add_pycampista_to_pycamp))
+    updater.dispatcher.add_handler(
+        CommandHandler('pycampistas', list_pycampistas))
