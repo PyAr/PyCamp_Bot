@@ -48,6 +48,7 @@ activo.
 
 Pycamp
 ------
+/agregar_pycamp (pycamp): Agrega un pycamp.
 /activar_pycamp (pycamp): Setea un pycamp como activo (si ya hay uno activo lo\
 desactiva).
 /empezar_carga_proyectos: Habilita la carga de proyectos en el pycamp activo.
