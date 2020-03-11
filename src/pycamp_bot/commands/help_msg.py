@@ -2,6 +2,9 @@ from pycamp_bot.commands.auth import is_admin
 
 user_commands_help = '''
 Comandos de usuario:
+/voy_al_pycamp (pycamp name): avisá que vas al pycamp! si no especificas un\
+pycamp por default es el que esta activo.
+/pycamps: lista todos los pycamps.
 /proyectos: te muestra la informacion de todos los proyectos y sus responsables.
 /ser_magx: te transforma en el/la Magx de turno.
 /evocar_magx: pingea a la/el Magx de turno, informando que necesitas su\

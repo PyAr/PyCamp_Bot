@@ -121,6 +121,31 @@ def end_pycamp(bot, update):
         text="Terminó Pycamp :( ! {}".format(date))
 
 
+def add_pycampista_to_pycamp(bot, update):
+    username = update.message.from_user.username
+
+    parameters = update.message.text.split(' ')
+    if len(parameters) == 2:
+        pycamp = get_pycamp_by_name(parameters[1])
+    else:
+        is_active, pycamp = get_active_pycamp()
+
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text="El pycampista {} fue agregado al pycamp {}".format(username,
+                                                                 pycamp.headquarters))
+
+
+def list_pycamps(bot, update):
+    pycamps = Pycamp.select()
+    text = []
+    for pycamp in pycamps:
+        text.append(str(pycamp))
+
+    text = "\n\n".join(text)
+    update.message.reply_text(text)
+
+
 def set_handlers(updater):
     updater.dispatcher.add_handler(
         CommandHandler('empezar_pycamp', start_pycamp))
@@ -130,3 +155,7 @@ def set_handlers(updater):
         CommandHandler('activar_pycamp', set_active_pycamp))
     updater.dispatcher.add_handler(
         CommandHandler('agregar_pycamp', add_pycamp))
+    updater.dispatcher.add_handler(
+        CommandHandler('pycamps', list_pycamps))
+    updater.dispatcher.add_handler(
+        CommandHandler('voy_al_pycamp', add_pycampista_to_pycamp))
