@@ -30,12 +30,48 @@ class Pycampista(BaseModel):
     admin: True or False for admin privileges
     '''
     username = pw.CharField(unique=True)
-    chat_id = pw.CharField(unique=True)
+    chat_id = pw.CharField(unique=True, null=True)
     arrive = pw.DateTimeField(null=True)
     leave = pw.DateTimeField(null=True)
     wizard = pw.BooleanField(null=True)
     admin = pw.BooleanField(null=True)
 
+    def __str__(self):
+        rv_str = 'Pycampista:\n'
+        for attr in ['username', 'arrive', 'leave']:
+            rv_str += '{}: {}\n'.format(attr, getattr(self, attr))
+        rv_str += 'Wizard on!' if self.wizard else 'Muggle'
+        rv_str += '\n'
+        rv_str += 'Admin' if self.admin else 'Commoner'
+        return rv_str
+
+
+class Pycamp(BaseModel):
+    '''
+    Representation of the pycamp
+    headquartes: headquarters name
+    init: time of init
+    end: time of end
+    pycampistas: pycampistas attending
+    '''
+    headquarters = pw.CharField(unique=True)
+    init = pw.DateTimeField(null=True)
+    end = pw.DateTimeField(null=True)
+
+    def __str__(self):
+        rv_str = 'Pycamp:\n'
+        for attr in ['headquarters', 'init', 'end']:
+            rv_str += '{}: {}\n'.format(attr, getattr(self, attr))
+        return rv_str
+
+
+class PycampistaAtPycamp(BaseModel):
+    '''
+    Many to many relationship. Ona pycampista will attend many pycamps. A
+    pycamps will have many pycampistas
+    '''
+    pycamp = pw.ForeignKeyField(Pycamp)
+    pycampista = pw.ForeignKeyField(Pycampista)
 
 
 class Slot(BaseModel):
@@ -84,10 +120,17 @@ class Vote(BaseModel):
 
 def models_db_connection():
     db.connect()
-    db.create_tables([BotStatus, Pycampista, Project, Slot, Vote])
+    db.create_tables([
+        BotStatus,
+        Pycamp,
+        Pycampista,
+        PycampistaAtPycamp,
+        Project,
+        Slot,
+        Vote])
+
     if BotStatus.select().count() == 0:
         base_status = BotStatus.create(
-                            vote_authorized=False,
-                            proyect_load_authorized=False
-                            )
+            vote_authorized=False,
+            proyect_load_authorized=False)
         base_status.save()
