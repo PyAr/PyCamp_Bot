@@ -1,5 +1,14 @@
 from pycamp_bot.commands.auth import is_admin
 
+user_commands_help = '''
+Comandos de usuario:
+/proyectos: te muestra la informacion de todos los proyectos y sus responsables.
+/ser_magx: te transforma en el/la Magx de turno.
+/evocar_magx: pingea a la/el Magx de turno, informando que necesitas su\
+ayuda. Con un gran poder, viene una gran responsabilidad.
+/su (passwrd): convierte al usuario en admin. Si sabe el password :P
+/admins: lista a todos los admins.
+/ayuda: esta ayuda.'''
 
 HELP_MESSAGE = '''
 Este bot facilita la carga, administración y procesamiento de\
@@ -24,27 +33,34 @@ mergear durante las exposiciones (Por tematica similar, u otros\
 motivos), y luego se procesan los datos para obtener el cronograma\
 final.
 
-Comandos adicionales:
-/proyectos: te muestra la informacion de todos los proyectos y sus responsables.
-/ser_magx: te transforma en el/la Magx de turno.
-/evocar_magx: pingea a la/el Magx de turno, informando que necesitas su\
-ayuda. Con un gran poder, viene una gran responsabilidad.
-/su (passwrd): convierte al usuario en admin. Si sabe el password :P
-/amins: lista a todos los admins.
-/ayuda: esta ayuda.'''
+''' + user_commands_help
 
 HELP_MESSAGE_ADMIN = '''
 Be AWARE, you have sudo...
 
-/start_project_load: Habilita la carga de proyectos.
-/end_project_load: Deshabilita la carga de proyectos.
+General
+-------
 /sorteo: Realiza un sorteo entre todos los participantes del pycamp\
-actual.
-/start_voting: Habilita la votacion sobre los proyectos.
-/end_voting: Deshabilita la votacion sobre los proyectos.
-/start_pycamp: Inicia un nuevo pycamp.
-/end_pycamp: Termina el pycamp.
-/degradar (username): Le saca los permisos de admin a un usuario.'''
+activo.
+
+Pycamp
+------
+/activar_pycamp (pycamp): Setea un pycamp como activo (si ya hay uno activo lo\
+desactiva).
+/empezar_carga_proyectos: Habilita la carga de proyectos en el pycamp activo.
+/terminar_carga_proyectos: Deshabilita la carga de proyectos en el pycamp activo.
+/empezar_votacion: Habilita la votacion sobre los proyectos del pycamp activo.
+/terminar_votacion: Deshabilita la votacion sobre los proyectos del pycamp activo.
+/empezar_pycamp (isoformat time): Setea el tiempo de inicio del pycamp activo.\
+Por default usa datetime.now()
+/terminar_pycamp (isoformat time): Setea el timepo de fin del pycamp activo.\
+Por default usa datetime.now()
+
+Pycampista
+----------
+/degradar (username): Le saca los permisos de admin a un usuario.
+
+''' + user_commands_help
 
 
 def get_help(bot, update):
