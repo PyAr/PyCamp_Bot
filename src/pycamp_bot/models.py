@@ -10,15 +10,6 @@ class BaseModel(pw.Model):
         database = db
 
 
-class BotStatus(BaseModel):
-    '''
-    Status of the pycamp bot
-    vote_autorized: the votation is autorized
-    '''
-    vote_authorized = pw.BooleanField(null=True)
-    proyect_load_authorized = pw.BooleanField(null=True)
-
-
 class Pycampista(BaseModel):
     '''
     Representation of the pycamp user
@@ -52,15 +43,20 @@ class Pycamp(BaseModel):
     headquartes: headquarters name
     init: time of init
     end: time of end
-    pycampistas: pycampistas attending
+    vote_authorized: the vote is auth in this pycamp
+    project_load_authorized: the project load is auth in this pycamp
     '''
     headquarters = pw.CharField(unique=True)
     init = pw.DateTimeField(null=True)
     end = pw.DateTimeField(null=True)
+    vote_authorized = pw.BooleanField(default=False, null=True)
+    project_load_authorized = pw.BooleanField(default=False, null=True)
+    active = pw.BooleanField(default=False, null=True)
 
     def __str__(self):
         rv_str = 'Pycamp:\n'
-        for attr in ['headquarters', 'init', 'end']:
+        for attr in ['headquarters', 'init', 'end', 'active',
+                     'vote_authorized', 'project_load_authorized']:
             rv_str += '{}: {}\n'.format(attr, getattr(self, attr))
         return rv_str
 
@@ -121,16 +117,9 @@ class Vote(BaseModel):
 def models_db_connection():
     db.connect()
     db.create_tables([
-        BotStatus,
         Pycamp,
         Pycampista,
         PycampistaAtPycamp,
         Project,
         Slot,
         Vote])
-
-    if BotStatus.select().count() == 0:
-        base_status = BotStatus.create(
-            vote_authorized=False,
-            proyect_load_authorized=False)
-        base_status.save()
