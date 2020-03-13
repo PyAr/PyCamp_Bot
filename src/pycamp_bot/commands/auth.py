@@ -32,6 +32,7 @@ def is_admin(bot, update):
 
 def admin_needed(f):
     def wrap(*args, **kargs):
+        logger.info('Admin nedeed wrapper')
         bot, update = args
         if is_admin(*args):
             f(*args)
@@ -71,9 +72,9 @@ def grant_admin(bot, update):
 
     bot.send_message(chat_id=chat_id, text=rply_msg)
 
+
 @admin_needed
 def revoke_admin(bot, update):
-    username = update.message.from_user.username
     chat_id = update.message.chat_id
     text = update.message.text
 

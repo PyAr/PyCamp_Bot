@@ -4,19 +4,13 @@ import peewee as pw
 db = pw.SqliteDatabase('pycamp_projects.db')
 
 
-class BotStatus(pw.Model):
-    '''
-    Status of the pycamp bot
-    vote_autorized: the votation is autorized
-    '''
-    vote_authorized = pw.BooleanField(null=True)
-    proyect_load_authorized = pw.BooleanField(null=True)
+class BaseModel(pw.Model):
 
     class Meta:
         database = db
 
 
-class Pycampista(pw.Model):
+class Pycampista(BaseModel):
     '''
     Representation of the pycamp user
     username: name on telegram (ex. roberto for @roberto)
@@ -27,17 +21,56 @@ class Pycampista(pw.Model):
     admin: True or False for admin privileges
     '''
     username = pw.CharField(unique=True)
-    chat_id = pw.CharField(unique=True)
+    chat_id = pw.CharField(unique=True, null=True)
     arrive = pw.DateTimeField(null=True)
     leave = pw.DateTimeField(null=True)
     wizard = pw.BooleanField(null=True)
     admin = pw.BooleanField(null=True)
 
-    class Meta:
-        database = db
+    def __str__(self):
+        rv_str = 'Pycampista:\n'
+        for attr in ['username', 'arrive', 'leave']:
+            rv_str += '{}: {}\n'.format(attr, getattr(self, attr))
+        rv_str += 'Wizard on!' if self.wizard else 'Muggle'
+        rv_str += '\n'
+        rv_str += 'Admin' if self.admin else 'Commoner'
+        return rv_str
 
 
-class Slot(pw.Model):
+class Pycamp(BaseModel):
+    '''
+    Representation of the pycamp
+    headquartes: headquarters name
+    init: time of init
+    end: time of end
+    vote_authorized: the vote is auth in this pycamp
+    project_load_authorized: the project load is auth in this pycamp
+    '''
+    headquarters = pw.CharField(unique=True)
+    init = pw.DateTimeField(null=True)
+    end = pw.DateTimeField(null=True)
+    vote_authorized = pw.BooleanField(default=False, null=True)
+    project_load_authorized = pw.BooleanField(default=False, null=True)
+    active = pw.BooleanField(default=False, null=True)
+
+    def __str__(self):
+        rv_str = 'Pycamp:\n'
+        for attr in ['headquarters', 'init', 'end', 'active',
+                     'vote_authorized', 'project_load_authorized']:
+            rv_str += '{}: {}\n'.format(attr, getattr(self, attr))
+        return rv_str
+
+
+class PycampistaAtPycamp(BaseModel):
+    '''
+    Many to many relationship. Ona pycampista will attend many pycamps. A
+    pycamps will have many pycampistas
+    '''
+    pycamp = pw.ForeignKeyField(Pycamp)
+    pycampista = pw.ForeignKeyField(Pycampista)
+
+
+class Slot(BaseModel):
     '''
     Time slot representation
     code: String that represent the slot in the form A1, where the letter
@@ -48,11 +81,8 @@ class Slot(pw.Model):
     start = pw.DateTimeField()
     current_wizzard = pw.ForeignKeyField(Pycampista)
 
-    class Meta:
-        database = db
 
-
-class Project(pw.Model):
+class Project(BaseModel):
     '''
     Project representation
     name: name of the project
@@ -67,11 +97,8 @@ class Project(pw.Model):
     slot = pw.ForeignKeyField(Slot, null=True)
     owner = pw.ForeignKeyField(Pycampista)
 
-    class Meta:
-        database = db
 
-
-class Vote(pw.Model):
+class Vote(BaseModel):
     '''
     Vote representation. Relation many to many
     project: ForeignKey project
@@ -86,16 +113,13 @@ class Vote(pw.Model):
     # same project
     _project_pycampista_id = pw.CharField(unique=True)
 
-    class Meta:
-        database = db
-
 
 def models_db_connection():
     db.connect()
-    db.create_tables([BotStatus, Pycampista, Project, Slot, Vote])
-    if BotStatus.select().count() == 0:
-        base_status = BotStatus.create(
-                            vote_authorized=False,
-                            proyect_load_authorized=False
-                            )
-        base_status.save()
+    db.create_tables([
+        Pycamp,
+        Pycampista,
+        PycampistaAtPycamp,
+        Project,
+        Slot,
+        Vote])
