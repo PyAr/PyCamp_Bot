@@ -199,7 +199,10 @@ def show_projects(bot, update):
         )
         text.append(project_text)
 
-    text = "\n\n".join(text)
+    if text:
+        text = "\n\n".join(text)
+    else:
+        text = "Todavía no hay ningún proyecto cargado"
 
     update.message.reply_text(text)
 
