@@ -3,8 +3,7 @@
 from setuptools import find_packages
 from setuptools import setup
 
-setup( feature/scheduler_script
-        name='PyCamp_Bot',
+setup(  name='PyCamp_Bot',
         version='3.0',
         description='Bot de telegram para organizar pycamp',
         author='Pyar',
