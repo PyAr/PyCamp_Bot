@@ -2,45 +2,52 @@ import logging
 from telegram.ext import (ConversationHandler, CommandHandler,
                           MessageHandler, Filters)
 
-from pycamp_bot.models import Pycampista, Project, BotStatus
+from pycamp_bot.models import Pycampista, Project
 from pycamp_bot.commands.base import msg_to_active_pycamp_chat
+from pycamp_bot.commands.manage_pycamp import active_needed, get_active_pycamp
 from pycamp_bot.commands.auth import admin_needed
 
 
-project_auth = True
-users_status = {}
 current_projects = {}
 NOMBRE, DIFICULTAD, TOPIC = range(3)
 
 logger = logging.getLogger(__name__)
 
 
+def load_authorized(f):
+    def wrap(*args, **kargs):
+        logger.info('Load authorized wrapper')
+
+        bot, update = args
+        is_active, pycamp = get_active_pycamp()
+        if pycamp.project_load_authorized:
+            f(*args)
+        else:
+            bot.send_message(
+                chat_id=update.message.chat_id,
+                text="La carga de proyectos no está autorizada. Avisale a un\
+                admin (/admins)!")
+    return wrap
+
+
+@load_authorized
+@active_needed
 def load_project(bot, update):
     '''Command to start the cargar_proyectos dialog'''
     logger.info("Adding project")
     username = update.message.from_user.username
 
-    bot_status = BotStatus.select()[0]
+    logger.info("Load autorized. Starting dialog")
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text="Usuario: " + username
+    )
 
-    if bot_status.proyect_load_authorized:
-        logger.info("Load autorized. Starting dialog")
-        bot.send_message(
-            chat_id=update.message.chat_id,
-            text="Usuario: " + username
-        )
-
-        bot.send_message(
-            chat_id=update.message.chat_id,
-            text="Ingresá el Nombre del Proyecto a proponer",
-        )
-        return NOMBRE
-    else:
-        logger.info("Unauthorized load. Request rejected")
-        bot.send_message(
-            chat_id=update.message.chat_id,
-            text="Carga de projectos Cerrada"
-        )
-        return ConversationHandler.END
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text="Ingresá el Nombre del Proyecto a proponer",
+    )
+    return NOMBRE
 
 
 def naming_project(bot, update):
@@ -120,9 +127,7 @@ def project_topic(bot, update):
 
     bot.send_message(
         chat_id=update.message.chat_id,
-        text="Excelente {}! La temática de tu proyecto es: {}.".format(
-                                                            username, text)
-    )
+        text="Excelente {}! La temática de tu proyecto es: {}.".format(username, text))
     bot.send_message(
         chat_id=update.message.chat_id,
         text="Tu proyecto ha sido cargado".format(username, text)
@@ -133,20 +138,19 @@ def project_topic(bot, update):
 def cancel(bot, update):
     bot.send_message(
         chat_id=update.message.chat_id,
-        text="Has cancelado la carga del proyecto"
-        )
+        text="Has cancelado la carga del proyecto")
     return ConversationHandler.END
 
 
+@active_needed
 @admin_needed
 def start_project_load(bot, update):
     """Allow people to upload projects"""
+    pycamp = get_active_pycamp()
 
-    bot_status = BotStatus.select()[0]
-
-    if not bot_status.proyect_load_authorized:
-        bot_status.proyect_load_authorized = True
-        bot_status.save()
+    if not pycamp.project_load_authorized:
+        pycamp.proyect_load_authorized = True
+        pycamp.save()
 
         update.message.reply_text("Autorizadx \nCarga de proyectos Abierta")
         msg_to_active_pycamp_chat(bot, "Carga de proyectos Abierta")
@@ -154,33 +158,33 @@ def start_project_load(bot, update):
         update.message.reply_text("La carga de proyectos ya estaba abierta")
 
 
+@active_needed
 @admin_needed
 def end_project_load(bot, update):
     """Prevent people for keep uploading projects"""
     logger.info("Closing proyect load")
 
-    bot_status = BotStatus.select()[0]
+    pycamp = get_active_pycamp()
 
-    if bot_status.proyect_load_authorized:
-        bot_status.proyect_load_authorized = False
-        bot_status.save()
+    if pycamp.project_load_authorized:
+        pycamp.project_load_authorized = False
+        pycamp.save()
 
     update.message.reply_text(
-            "Autorizadx \nInformación Cargada, carga de proyectos cerrada")
+        "Autorizadx \nInformación Cargada, carga de proyectos cerrada")
     msg_to_active_pycamp_chat(bot, "La carga de projectos esta Cerrada")
 
 
 load_project_handler = ConversationHandler(
-       entry_points=[CommandHandler('cargar_proyecto', load_project)],
-       states={
-           NOMBRE: [MessageHandler(Filters.text, naming_project)],
-           DIFICULTAD: [MessageHandler(Filters.text, project_level)],
-           TOPIC: [MessageHandler(Filters.text, project_topic)],
-       },
-       fallbacks=[CommandHandler('cancel', cancel)]
-   )
+    entry_points=[CommandHandler('cargar_proyecto', load_project)],
+    states={
+        NOMBRE: [MessageHandler(Filters.text, naming_project)],
+        DIFICULTAD: [MessageHandler(Filters.text, project_level)],
+        TOPIC: [MessageHandler(Filters.text, project_topic)]},
+    fallbacks=[CommandHandler('cancel', cancel)])
 
 
+@active_needed
 def show_projects(bot, update):
     """Prevent people for keep uploading projects"""
     projects = Project.select()
@@ -206,10 +210,10 @@ def show_projects(bot, update):
 def set_handlers(updater):
     updater.dispatcher.add_handler(load_project_handler)
     updater.dispatcher.add_handler(
-            CommandHandler('empezar_carga_proyectos', start_project_load))
+        CommandHandler('empezar_carga_proyectos', start_project_load))
     updater.dispatcher.add_handler(
-            CommandHandler('cargar_proyecto', load_project))
+        CommandHandler('cargar_proyecto', load_project))
     updater.dispatcher.add_handler(
-            CommandHandler('terminar_carga_proyectos', end_project_load))
+        CommandHandler('terminar_carga_proyectos', end_project_load))
     updater.dispatcher.add_handler(
-            CommandHandler('proyectos', show_projects))
+        CommandHandler('proyectos', show_projects))
