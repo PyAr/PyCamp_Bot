@@ -82,7 +82,7 @@ def project_level(bot, update):
     username = update.message.from_user.username
     text = update.message.text
 
-    if text in ["1", "2", "3"]:
+    if float(text) in range(1,3):
         new_project = current_projects[username]
         new_project.difficult_level = text
 
@@ -146,16 +146,12 @@ def cancel(bot, update):
 @admin_needed
 def start_project_load(bot, update):
     """Allow people to upload projects"""
-    pycamp = get_active_pycamp()
+    is_active, pycamp = get_active_pycamp()
+    pycamp.project_load_authorized = True
+    pycamp.save()
 
-    if not pycamp.project_load_authorized:
-        pycamp.proyect_load_authorized = True
-        pycamp.save()
-
-        update.message.reply_text("Autorizadx \nCarga de proyectos Abierta")
-        msg_to_active_pycamp_chat(bot, "Carga de proyectos Abierta")
-    else:
-        update.message.reply_text("La carga de proyectos ya estaba abierta")
+    update.message.reply_text("Autorizadx \nCarga de proyectos Abierta")
+    msg_to_active_pycamp_chat(bot, "Carga de proyectos Abierta")
 
 
 @active_needed
@@ -164,7 +160,7 @@ def end_project_load(bot, update):
     """Prevent people for keep uploading projects"""
     logger.info("Closing proyect load")
 
-    pycamp = get_active_pycamp()
+    is_active, pycamp = get_active_pycamp()
 
     if pycamp.project_load_authorized:
         pycamp.project_load_authorized = False
