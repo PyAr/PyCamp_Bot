@@ -35,3 +35,32 @@ TOKEN='TOKEN_PERSONAL' python bin/run_bot.py
 
 Y listo! Tu bot está corriendo en tu máquina, esperando que alguien le escriba por telegram.
 Podés probarlo mandandole un `/start`
+
+
+## ¿Cómo usar el bot en un nuevo pycamp?
+
+Primero es necesario setear las siguientes variables de entorno:
+
+- `TOKEN`: token del bot que se usará durante el pycamp (gestionar desde telegram con BotFather)
+- `PYCAMP_BOT_MASTER_KEY`: con alguna password secreta que se va a usar para acceder a comandos de superuser
+
+
+Una vez creadas las variables de entorno, correr el bot con el comando `python bin/run_bot.py`
+
+En este momento ya se puede hablar con el bot. ¿Qué le digo?
+
+- `/start` para chequear que esté andando bien
+
+- `/su <password>` para reclamar permisos de admin, reemplazando <password> por la contraseña que hayamos 
+elegido en la envvar `PYCAMP_BOT_MASTER_KEY`
+
+- `/agregar_pycamp <pycamp_name>` para crear un pycamp en la deb
+
+- `activar_pycamp <pycamp_name>` activa un pycamp
+
+- `/empezar_pycamp` setea la fecha de inicio del pycamp activo
+
+- `/empezar_carga_proyectos` habilita la carga de los proyectos. En este punto los pycampistas pueden cargar sus proyectos,
+enviandole al bot el comando `/cargar_proyecto` 
+
+- 
