@@ -49,8 +49,8 @@ def set_active_pycamp(bot, update):
     if is_active:
         pycamp.active = False
         pycamp.save()
-        
-    if is_pycamp_started(update):
+
+    if not len(parameters) == 2:
         bot.send_message(
             chat_id=update.message.chat_id,
             text="El comando necesita un parametro (pycamp name)")
