@@ -9,7 +9,7 @@ from pycamp_bot.commands.auth import admin_needed
 
 
 current_projects = {}
-NOMBRE, DIFICULTAD, TOPIC = range(3)
+NOMBRE, DIFICULTAD, TOPIC = ["nombre", "dificultad", "topic"]
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ def load_authorized(f):
         bot, update = args
         is_active, pycamp = get_active_pycamp()
         if pycamp.project_load_authorized:
-            f(*args)
+            return f(*args, **kargs)
         else:
             bot.send_message(
                 chat_id=update.message.chat_id,
@@ -183,7 +183,8 @@ load_project_handler = ConversationHandler(
         TOPIC: [MessageHandler(Filters.text, project_topic)]},
     fallbacks=[CommandHandler('cancel', cancel)])
 
-@active_needed
+
+@load_authorized
 def show_projects(bot, update):
     """Prevent people for keep uploading projects"""
     projects = Project.select()
@@ -210,8 +211,6 @@ def set_handlers(updater):
     updater.dispatcher.add_handler(load_project_handler)
     updater.dispatcher.add_handler(
         CommandHandler('empezar_carga_proyectos', start_project_load))
-    updater.dispatcher.add_handler(
-        CommandHandler('cargar_proyecto', load_project))
     updater.dispatcher.add_handler(
         CommandHandler('terminar_carga_proyectos', end_project_load))
     updater.dispatcher.add_handler(

@@ -33,7 +33,7 @@ def active_needed(f):
         bot, update = args
         is_active, _ = get_active_pycamp()
         if is_active:
-            f(*args)
+            return f(*args)
         else:
             bot.send_message(
                 chat_id=update.message.chat_id,
