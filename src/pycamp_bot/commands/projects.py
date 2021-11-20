@@ -184,7 +184,6 @@ load_project_handler = ConversationHandler(
     fallbacks=[CommandHandler('cancel', cancel)])
 
 
-@load_authorized
 def show_projects(bot, update):
     """Prevent people for keep uploading projects"""
     projects = Project.select()
