@@ -254,6 +254,13 @@ def random_restart_hill_climbing(problem, max_iters=100, max_iters_without_impro
 
     return best_state
 
+def internal_export(myjson):
+    problem = PyCampScheduleProblem(myjson)
+    best_solution = random_restart_hill_climbing(problem,
+                                                 max_iters=10000,
+                                                 max_iters_without_improvement=10)
+    return best_solution
+
 if __name__ == '__main__':
     try:
         input_file = sys.argv[1]

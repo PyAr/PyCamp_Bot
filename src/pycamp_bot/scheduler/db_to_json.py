@@ -38,3 +38,6 @@ for responsable in all_responsables:
 
 with open('cualquiera.json', 'w') as fjson:
     json.dump(result, fjson, indent=2)
+
+def internal_json():
+    return result
