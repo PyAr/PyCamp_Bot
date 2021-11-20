@@ -79,6 +79,9 @@ python bin/db_to_json.db_to_json
 python bin/scheduler.py cualquiera.json
 ```
 
+Para modificar los slots disponibles, modificar la variable `available_slots`
+dentro del script `bin/db_to_json.py`.
+
 
 ### Flujo pycampista
 - `/cargar_proyecto` carga un proyecto (si está habilitada la carga)
