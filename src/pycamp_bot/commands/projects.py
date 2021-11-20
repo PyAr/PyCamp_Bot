@@ -146,10 +146,10 @@ def cancel(bot, update):
 @admin_needed
 def start_project_load(bot, update):
     """Allow people to upload projects"""
-    pycamp = get_active_pycamp()
+    _, pycamp = get_active_pycamp()
 
     if not pycamp.project_load_authorized:
-        pycamp.proyect_load_authorized = True
+        pycamp.project_load_authorized = True
         pycamp.save()
 
         update.message.reply_text("Autorizadx \nCarga de proyectos Abierta")
@@ -164,7 +164,7 @@ def end_project_load(bot, update):
     """Prevent people for keep uploading projects"""
     logger.info("Closing proyect load")
 
-    pycamp = get_active_pycamp()
+    _, pycamp = get_active_pycamp()
 
     if pycamp.project_load_authorized:
         pycamp.project_load_authorized = False
@@ -182,7 +182,6 @@ load_project_handler = ConversationHandler(
         DIFICULTAD: [MessageHandler(Filters.text, project_level)],
         TOPIC: [MessageHandler(Filters.text, project_topic)]},
     fallbacks=[CommandHandler('cancel', cancel)])
-
 
 @active_needed
 def show_projects(bot, update):
