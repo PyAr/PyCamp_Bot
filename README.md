@@ -51,6 +51,8 @@ En este momento ya se puede hablar con el bot. ¿Qué le digo?
 
 - `/start` para chequear que esté andando bien
 
+### Flujo admin
+
 - `/su <password>` para reclamar permisos de admin, reemplazando <password> por la contraseña que hayamos 
 elegido en la envvar `PYCAMP_BOT_MASTER_KEY`
 
@@ -63,4 +65,23 @@ elegido en la envvar `PYCAMP_BOT_MASTER_KEY`
 - `/empezar_carga_proyectos` habilita la carga de los proyectos. En este punto los pycampistas pueden cargar sus proyectos,
 enviandole al bot el comando `/cargar_proyecto` 
 
-- 
+- `/terminar_carga_proyectos` termina carga proyectos
+
+- `/empezar_votacion`  activa la votacion (a partir de ahora los pycampistas pueden votar con `/votar`)
+
+- `/terminar_votacion` termina la votacion
+
+
+Para generar el schedule ejecutar en la terminal:
+
+```bash
+python bin/db_to_json.db_to_json
+python bin/scheduler.py cualquiera.json
+```
+
+
+### Flujo pycampista
+- `/cargar_proyecto` carga un proyecto (si está habilitada la carga)
+- `/votar` envia opciones para votar (si está habilitada la votacion)
+
+
