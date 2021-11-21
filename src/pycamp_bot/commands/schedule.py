@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 def _dictToString(dicto):
   if dicto:
-    return str(dicto).replace(', ','\r\n').replace('}','\r\n').replace("u'","").replace("'","").replace('[','\r\n').replace(']  ','\r\n\r\n').replace(': {','\r\n')[1:-1]
+    return str(dicto).replace(', ','\r\n').replace('}','\r\n').replace("u'","").replace("'","").replace('[','\r\n').replace(']','\r\n\r\n').replace(': {','\r\n')[1:-1]
   else:
     return "me mandaste un dict vacio"
 
