@@ -8,11 +8,7 @@ def  export_db_2_json():
     result = {"projects": {}, "responsable_available_slots": {}}
 
     available_slots = [slot.code for slot in Slot.select()]
-
-    available_slots = [
-        "A1", "A2", "A3", "A4",
-        "B1", "B2", "B3", "B4", "B5", "B6", "B7",
-    ]
+        
     result["available_slots"] = available_slots
     all_responsables = []
 

@@ -15,6 +15,11 @@ DAY_LETTERS = []
 
 logger = logging.getLogger(__name__)
 
+def _dictToString(dicto):
+  if dicto:
+    return str(dicto).replace(', ','\r\n').replace('}','\r\n').replace("u'","").replace("'","").replace('[','\r\n').replace(']  ','\r\n\r\n').replace(': {','\r\n')[1:-1]
+  else:
+    return "me mandaste un dict vacio"
 
 def cancel(bot, update):
     bot.send_message(
@@ -23,7 +28,7 @@ def cancel(bot, update):
     return ConversationHandler.END
 
 
-
+@admin_needed
 def define_slot_days(bot, update):
     username = update.message.from_user.username
         
@@ -91,7 +96,7 @@ def create_slot(bot, update):
 def make_schedule(bot, update):
     bot.send_message(
         chat_id=update.message.chat_id,
-        text="Generando el Cronograma!"
+        text="Generando el Cronograma..."
         )
 
     data_json = export_db_2_json()
@@ -103,10 +108,25 @@ def make_schedule(bot, update):
         project.slot = slot.id
         project.save()
     
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text="Cronograma Generado!"
+        )
 
 def show_schedule(bot, update):
-    pass
-
+    slots = Slot.select()
+    projects = Project.select()
+    cronograma = {}
+    for slot in slots:
+        cronograma[slot.code] = []
+        for project in projects:
+            if project.slot_id == slot.id:
+                cronograma[slot.code].append(project.name)
+    
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text=_dictToString(cronograma)
+        )
 
 load_scheduke_handler = ConversationHandler(
     entry_points=[CommandHandler('cronogramear', define_slot_days)],
