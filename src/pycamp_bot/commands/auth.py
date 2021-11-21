@@ -35,7 +35,7 @@ def admin_needed(f):
         logger.info('Admin nedeed wrapper')
         bot, update = args
         if is_admin(*args):
-            f(*args)
+            return f(*args)
         else:
             bot.send_message(
                 chat_id=update.message.chat_id,
