@@ -1,8 +1,6 @@
 import logging
 import os
-from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
-                          CallbackQueryHandler, ConversationHandler)
-
+from telegram.ext import (Updater)
 from pycamp_bot.commands import auth
 from pycamp_bot.commands import voting
 from pycamp_bot.commands import manage_pycamp

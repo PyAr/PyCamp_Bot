@@ -72,12 +72,10 @@ enviandole al bot el comando `/cargar_proyecto`
 - `/terminar_votacion` termina la votacion
 
 
-Para generar el schedule ejecutar en la terminal:
+Para generar el schedule:
 
-```bash
-python bin/db_to_json.db_to_json
-python bin/scheduler.py cualquiera.json
-```
+- `/cronogramear` te va a preguntar cuantos dias queres cronogramear y cuantos slots por dia tenes y hacer el cronograma.
+
 
 Para modificar los slots disponibles, modificar la variable `available_slots`
 dentro del script `bin/db_to_json.py`.
