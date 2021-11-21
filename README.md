@@ -83,6 +83,7 @@ dentro del script `bin/db_to_json.py`.
 
 ### Flujo pycampista
 - `/cargar_proyecto` carga un proyecto (si está habilitada la carga)
+
 - `/votar` envia opciones para votar (si está habilitada la votacion)
 
-
+- `/cronograma` te muestra el cronograma!
