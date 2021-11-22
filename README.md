@@ -71,14 +71,11 @@ enviandole al bot el comando `/cargar_proyecto`
 
 - `/terminar_votacion` termina la votacion
 
-
 Para generar el schedule:
 
 - `/cronogramear` te va a preguntar cuantos dias queres cronogramear y cuantos slots por dia tenes y hacer el cronograma.
 
-
-Para modificar los slots disponibles, modificar la variable `available_slots`
-dentro del script `bin/db_to_json.py`.
+- `/cambiar_slot ` toma un nombre de projecto y un slot; y te cambia ese projecto a ese slot.
 
 
 ### Flujo pycampista
@@ -86,4 +83,4 @@ dentro del script `bin/db_to_json.py`.
 
 - `/votar` envia opciones para votar (si está habilitada la votacion)
 
-- `/cronograma` te muestra el cronograma!
+- `/ver_cronograma` te muestra el cronograma!

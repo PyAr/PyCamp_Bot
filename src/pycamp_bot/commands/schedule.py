@@ -128,7 +128,43 @@ def show_schedule(bot, update):
         text=_dictToString(cronograma)
         )
 
-load_scheduke_handler = ConversationHandler(
+
+@admin_needed
+def change_slot(bot, update):
+    projects = Project.select()
+    slots = Slot.select()
+    text = update.message.text.split(' ')
+
+    if not len(text) ==3:
+        bot.send_message(
+        chat_id=update.message.chat_id,
+        text="""El formato de este comando es:
+                /cambiar_slot NOMBRE_DEL_PROJECTO NUEVO SLOT
+            ej: /cambiar_slot fades AB
+        """
+        )
+        return
+
+    found = False
+    for project in projects:
+        if project.name == text[1]:
+            for slot in slots:
+                if slot.code == text[2]:
+                    found = True
+                    project.slot = slot.id
+                    project.save()
+    if found:
+        bot.send_message(
+        chat_id=update.message.chat_id,
+        text="Exito"
+        )
+    else:
+        bot.send_message(
+        chat_id=update.message.chat_id,
+        text="O el slot o el nombre del projecto no estan en la db"
+        )
+
+load_schedule_handler = ConversationHandler(
     entry_points=[CommandHandler('cronogramear', define_slot_days)],
     states={
         1: [MessageHandler(Filters.text, define_slot_times)],
@@ -137,4 +173,5 @@ load_scheduke_handler = ConversationHandler(
 
 def set_handlers(updater):
     updater.dispatcher.add_handler(CommandHandler('ver_cronograma', show_schedule))
-    updater.dispatcher.add_handler(load_scheduke_handler)
+    updater.dispatcher.add_handler(CommandHandler('cambiar_slot', change_slot))
+    updater.dispatcher.add_handler(load_schedule_handler)
