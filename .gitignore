@@ -1,6 +1,7 @@
 # slots data
 data.json
 pycamp_projects.db
+pycamp_projects.backup.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
