@@ -10,6 +10,7 @@ Bienvenido a la documentación de Pycamp Bot's!
    :maxdepth: 2
    :caption: Contents:
 
+   instalacion_entorno
 
 Indices and tables
 ==================
