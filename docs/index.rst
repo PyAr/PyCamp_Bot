@@ -11,6 +11,7 @@ Bienvenido a la documentación de Pycamp Bot's!
    :caption: Contents:
 
    instalacion_entorno
+   comandos_bot
 
 Indices and tables
 ==================
