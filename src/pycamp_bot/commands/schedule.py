@@ -173,6 +173,6 @@ load_schedule_handler = ConversationHandler(
     fallbacks=[CommandHandler('cancel', cancel)])
 
 def set_handlers(updater):
-    updater.dispatcher.add_handler(CommandHandler('ver_cronograma', show_schedule))
+    updater.dispatcher.add_handler(CommandHandler('cronograma', show_schedule))
     updater.dispatcher.add_handler(CommandHandler('cambiar_slot', change_slot))
     updater.dispatcher.add_handler(load_schedule_handler)
