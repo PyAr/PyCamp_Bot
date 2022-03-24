@@ -33,7 +33,4 @@ def  export_db_2_json():
     for responsable in all_responsables:
         result["responsable_available_slots"][responsable] = available_slots
 
-    # with open('cualquiera.json', 'w') as fjson:
-    #     json.dump(result, fjson, indent=2)
-
     return result
