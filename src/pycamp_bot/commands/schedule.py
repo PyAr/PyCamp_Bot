@@ -135,21 +135,22 @@ def change_slot(bot, update):
     slots = Slot.select()
     text = update.message.text.split(' ')
 
-    if not len(text) ==3:
+    if not len(text) > 3:
         bot.send_message(
         chat_id=update.message.chat_id,
         text="""El formato de este comando es:
-                /cambiar_slot NOMBRE_DEL_PROJECTO NUEVO SLOT
+                /cambiar_slot NOMBRE_DEL_PROJECTO NUEVO_SLOT
             ej: /cambiar_slot fades AB
         """
         )
         return
 
     found = False
+    project_name = text[1:-1]
     for project in projects:
-        if project.name == text[1]:
+        if project.name == project_name:
             for slot in slots:
-                if slot.code == text[2]:
+                if slot.code == text[-1]:
                     found = True
                     project.slot = slot.id
                     project.save()

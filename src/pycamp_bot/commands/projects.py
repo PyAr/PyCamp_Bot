@@ -206,12 +206,6 @@ def show_projects(bot, update):
     update.message.reply_text(text)
 
 
-def show_schedule(bot, update):
-    """Print the schedule for people to see on telegram"""
-    projects = Project.select()
-    text = []
-
-
 def set_handlers(updater):
     updater.dispatcher.add_handler(load_project_handler)
     updater.dispatcher.add_handler(
@@ -220,5 +214,3 @@ def set_handlers(updater):
         CommandHandler('terminar_carga_proyectos', end_project_load))
     updater.dispatcher.add_handler(
         CommandHandler('proyectos', show_projects))
-    updater.dispatcher.add_handler(
-        CommandHandler('cronograma', show_schedule))
