@@ -10,7 +10,7 @@ def announce(bot, update):
     project_name = update.message.text.split()[1:]
 
     project_name = " ".join(project_name)
-    project =Project.select().where(Project.name ==project_name)
+    project = Project.select().where(Project.name ==project_name)
     if len(project) <= 0:
         bot.send_message(
         chat_id=update.message.chat_id,
@@ -20,7 +20,7 @@ def announce(bot, update):
         )
         return
 
-    pycampistas = Vote.select().join(Pycampista).where(Vote.project == project.get())
+    pycampistas = Vote.select().join(Pycampista).where((Vote.project == project) & (Vote.interest))
 
     chat_id_list = [user.pycampista.chat_id for user in pycampistas]
     
