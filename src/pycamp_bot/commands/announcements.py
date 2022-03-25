@@ -29,10 +29,10 @@ def announce(bot, update):
             chat_id=chat_id,
             text=f"Esta por empezar {project_name} a cargo de @{project.get().owner.username}."
         )
-        bot.send_message(
-            chat_id=update.message.chat_id,
-            text=f"Anunciado!"
-        )
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text=f"Anunciado!"
+    )
 
 def set_handlers(updater):
     updater.dispatcher.add_handler(CommandHandler('anunciar', announce))
