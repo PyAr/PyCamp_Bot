@@ -32,12 +32,20 @@ def cancel(bot, update):
 def define_slot_days(bot, update):
     username = update.message.from_user.username
     # TODO: filtrar proyectos por pycamp activo.
+    if Slot.select().exists():
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="El cronograma ya existe."
+        )
+        return
+
     if not Project.select().exists():
         bot.send_message(
             chat_id=update.message.chat_id,
             text="No hay proyectos que cronogramear."
         )
         return
+
     if not Vote.select().exists():
         bot.send_message(
             chat_id=update.message.chat_id,
@@ -136,7 +144,7 @@ def show_schedule(bot, update):
         for project in projects:
             if project.slot_id == slot.id:
                 cronograma[slot.code].append(project.name)
-                cronograma[slot.code].append(f'@' + project.owner)
+                cronograma[slot.code].append(f'@' + project.owner.username)
     
 
     bot.send_message(
@@ -150,8 +158,8 @@ def change_slot(bot, update):
     projects = Project.select()
     slots = Slot.select()
     text = update.message.text.split(' ')
-
-    if not len(text) > 3:
+    import ipdb; ipdb.set_trace()
+    if not len(text) >= 3:
         bot.send_message(
         chat_id=update.message.chat_id,
         text="""El formato de este comando es:
@@ -162,7 +170,7 @@ def change_slot(bot, update):
         return
 
     found = False
-    project_name = text[1:-1]
+    project_name = " ".join(text[1:-1])
     for project in projects:
         if project.name == project_name:
             for slot in slots:
