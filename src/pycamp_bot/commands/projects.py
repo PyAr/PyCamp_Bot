@@ -195,7 +195,7 @@ def show_projects(bot, update):
             project.topic,
             project.difficult_level
         )
-        participants_count = Vote.select().where(Vote.project == project).count()
+        participants_count = Vote.select().where((Vote.project == project) & (Vote.interest)).count()
         if participants_count > 0:
             project_text += "\n Interesades: {}".format(participants_count)
         text.append(project_text)
