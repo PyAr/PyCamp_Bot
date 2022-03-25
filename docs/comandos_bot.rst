@@ -16,7 +16,7 @@ Comandos de Administrador
 - ``/empezar_votacion``: Activa la votacion (a partir de ahora los pycampistas pueden votar con ``/votar``).  
 - ``/terminar_votacion``: Termina la votacion.  
 - ``/cronogramear``: Pregunta los dias y slot por día para poder crear el cronograma.  
-- ``/cambiar_slot``: Toma un nombre de projecto y un slot; y te cambia ese projecto a ese slot.
+- ``/cambiar_slot``: Toma un nombre de proyecto y un slot; y te cambia ese proyecto a ese slot.
 
 
 Compandos Pycampista

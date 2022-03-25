@@ -75,7 +75,7 @@ Para generar el schedule:
 
 - `/cronogramear` te va a preguntar cuantos dias queres cronogramear y cuantos slots por dia tenes y hacer el cronograma.
 
-- `/cambiar_slot ` toma un nombre de projecto y un slot; y te cambia ese projecto a ese slot.
+- `/cambiar_slot ` toma un nombre de proyecto y un slot; y te cambia ese proyecto a ese slot.
 
 
 ### Flujo pycampista

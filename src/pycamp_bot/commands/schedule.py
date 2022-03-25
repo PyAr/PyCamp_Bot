@@ -5,7 +5,7 @@ import string
 from telegram.ext import (ConversationHandler, CommandHandler,
                           MessageHandler, Filters)
 
-from pycamp_bot.models import Project, Slot, Pycampista
+from pycamp_bot.models import Project, Slot, Pycampista, Vote
 from pycamp_bot.commands.auth import admin_needed
 from pycamp_bot.scheduler.db_to_json import export_db_2_json
 from pycamp_bot.scheduler.schedule_calculator import export_scheduled_result
@@ -31,7 +31,28 @@ def cancel(bot, update):
 @admin_needed
 def define_slot_days(bot, update):
     username = update.message.from_user.username
-        
+    # TODO: filtrar proyectos por pycamp activo.
+    if Slot.select().exists():
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="El cronograma ya existe."
+        )
+        return
+
+    if not Project.select().exists():
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="No hay proyectos que cronogramear."
+        )
+        return
+
+    if not Vote.select().exists():
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Todavia no se realizo la votacion."
+        )
+        return
+
     bot.send_message(
         chat_id=update.message.chat_id,
         text="Cuantos dias tiene tu cronograma?"
@@ -117,12 +138,15 @@ def show_schedule(bot, update):
     slots = Slot.select()
     projects = Project.select()
     cronograma = {}
+
     for slot in slots:
         cronograma[slot.code] = []
         for project in projects:
             if project.slot_id == slot.id:
                 cronograma[slot.code].append(project.name)
+                cronograma[slot.code].append(f'@' + project.owner.username)
     
+
     bot.send_message(
         chat_id=update.message.chat_id,
         text=_dictToString(cronograma)
@@ -134,22 +158,23 @@ def change_slot(bot, update):
     projects = Project.select()
     slots = Slot.select()
     text = update.message.text.split(' ')
-
-    if not len(text) ==3:
+    
+    if not len(text) >= 3:
         bot.send_message(
         chat_id=update.message.chat_id,
         text="""El formato de este comando es:
-                /cambiar_slot NOMBRE_DEL_PROJECTO NUEVO SLOT
+                /cambiar_slot NOMBRE_DEL_PROYECTO NUEVO_SLOT
             ej: /cambiar_slot fades AB
         """
         )
         return
 
     found = False
+    project_name = " ".join(text[1:-1])
     for project in projects:
-        if project.name == text[1]:
+        if project.name == project_name:
             for slot in slots:
-                if slot.code == text[2]:
+                if slot.code == text[-1]:
                     found = True
                     project.slot = slot.id
                     project.save()
@@ -161,7 +186,7 @@ def change_slot(bot, update):
     else:
         bot.send_message(
         chat_id=update.message.chat_id,
-        text="O el slot o el nombre del projecto no estan en la db"
+        text="O el slot o el nombre del proyecto no estan en la db"
         )
 
 load_schedule_handler = ConversationHandler(
@@ -172,6 +197,6 @@ load_schedule_handler = ConversationHandler(
     fallbacks=[CommandHandler('cancel', cancel)])
 
 def set_handlers(updater):
-    updater.dispatcher.add_handler(CommandHandler('ver_cronograma', show_schedule))
+    updater.dispatcher.add_handler(CommandHandler('cronograma', show_schedule))
     updater.dispatcher.add_handler(CommandHandler('cambiar_slot', change_slot))
     updater.dispatcher.add_handler(load_schedule_handler)

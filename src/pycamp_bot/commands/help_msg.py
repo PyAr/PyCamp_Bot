@@ -9,6 +9,8 @@ pycamp por default es el que esta activo.
 /ser_magx: te transforma en el/la Magx de turno.
 /evocar_magx: pingea a la/el Magx de turno, informando que necesitas su\
 ayuda. Con un gran poder, viene una gran responsabilidad.
+/votar: te muestra los proyectos presentados para que los votes.
+/cronograma: te muestra el cronograma del PyCamp.
 /su (passwrd): convierte al usuario en admin. Si sabe el password :P
 /admins: lista a todos los admins.
 /ayuda: esta ayuda.'''
@@ -20,11 +22,11 @@ proyectos y votos durante el PyCamp
 El proceso se divide en 3 etapas:
 
 *Primera etapa*: Lxs responsables de los proyectos cargan sus proyectos\
-mediante el comando /cargar_proyecto. Solo un responsable carga el\
+mediante el comando **/cargar_proyecto**. Solo un responsable carga el\
 proyecto, y luego si hay otrxs responsables adicionales, pueden\
 agregarse con el comando /ownear.
 
-*Segunda etapa*: Mediante el comando /votar todxs lxs participantes\
+*Segunda etapa*: Mediante el comando **/votar** todxs lxs participantes\
 votan los proyectos que se expongan. Esto se puede hacer a medida que\
 se expone, o al haber finalizado todas las exposiciones. Si no se está\
 segurx de un proyecto, conviene no votar nada, ya que luego podés\
@@ -59,6 +61,10 @@ desactiva).
 Por default usa datetime.now()
 /terminar_pycamp (isoformat time): Setea el timepo de fin del pycamp activo.\
 Por default usa datetime.now()
+/cronogramear: Te pregunta cuantos dias y que slot tiene tu pycamp \
+    y genera el cronograma.
+/cambiar_slot: Tome el nombre de un proyecto y el nuevo slot \
+    y lo cambia en el cronograma.
 
 Pycampista
 ----------

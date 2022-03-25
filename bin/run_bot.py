@@ -9,6 +9,7 @@ from pycamp_bot.commands import wizard
 from pycamp_bot.commands import base
 from pycamp_bot.commands import raffle
 from pycamp_bot.commands import schedule
+from pycamp_bot.commands import announcements
 
 from pycamp_bot.models import models_db_connection
 
@@ -28,6 +29,7 @@ def set_handlers(updater):
     projects.set_handlers(updater)
     raffle.set_handlers(updater)
     schedule.set_handlers(updater)
+    announcements.set_handlers(updater)
 
 
 if __name__ == '__main__':
