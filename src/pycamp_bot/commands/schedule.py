@@ -122,6 +122,7 @@ def show_schedule(bot, update):
         for project in projects:
             if project.slot_id == slot.id:
                 cronograma[slot.code].append(project.name)
+                cronograma[slot.code].append(f'@' + project.owner)
     
     bot.send_message(
         chat_id=update.message.chat_id,
