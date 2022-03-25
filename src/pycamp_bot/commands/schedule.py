@@ -140,7 +140,7 @@ def change_slot(bot, update):
         bot.send_message(
         chat_id=update.message.chat_id,
         text="""El formato de este comando es:
-                /cambiar_slot NOMBRE_DEL_PROJECTO NUEVO_SLOT
+                /cambiar_slot NOMBRE_DEL_PROYECTO NUEVO_SLOT
             ej: /cambiar_slot fades AB
         """
         )
@@ -163,7 +163,7 @@ def change_slot(bot, update):
     else:
         bot.send_message(
         chat_id=update.message.chat_id,
-        text="O el slot o el nombre del projecto no estan en la db"
+        text="O el slot o el nombre del proyecto no estan en la db"
         )
 
 load_schedule_handler = ConversationHandler(

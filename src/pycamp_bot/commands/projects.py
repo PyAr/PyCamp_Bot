@@ -172,7 +172,7 @@ def end_project_load(bot, update):
 
     update.message.reply_text(
         "Autorizadx \nInformación Cargada, carga de proyectos cerrada")
-    msg_to_active_pycamp_chat(bot, "La carga de projectos esta Cerrada")
+    msg_to_active_pycamp_chat(bot, "La carga de proyectos esta Cerrada")
 
 
 load_project_handler = ConversationHandler(
