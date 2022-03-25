@@ -2,7 +2,7 @@ import logging
 from telegram.ext import (ConversationHandler, CommandHandler,
                           MessageHandler, Filters)
 
-from pycamp_bot.models import Pycampista, Project
+from pycamp_bot.models import Pycampista, Project, Vote
 from pycamp_bot.commands.base import msg_to_active_pycamp_chat
 from pycamp_bot.commands.manage_pycamp import active_needed, get_active_pycamp
 from pycamp_bot.commands.auth import admin_needed
@@ -189,7 +189,6 @@ def show_projects(bot, update):
     projects = Project.select()
     text = []
     for project in projects:
-
         project_text = "{} \n owner: @{} \n topic: {} \n level: {}".format(
             project.name,
             project.owner.username,
@@ -197,6 +196,10 @@ def show_projects(bot, update):
             project.difficult_level
         )
         text.append(project_text)
+        participants_count = Vote.select().where(Vote.project == project).count()
+        if participants_count > 0:
+            project_text += "\n Interesades: {}".format(participants_count)
+    text.append(project_text)
 
     if text:
         text = "\n\n".join(text)
