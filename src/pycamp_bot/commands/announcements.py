@@ -23,8 +23,7 @@ def announce(bot, update):
     pycampistas = Vote.select().join(Pycampista).where(Vote.project == project.get())
 
     chat_id_list = [user.pycampista.chat_id for user in pycampistas]
-    chat_id_list = [53517488]
-    import ipdb; ipdb.set_trace()
+    
     for chat_id in chat_id_list:
         bot.send_message(
             chat_id=chat_id,

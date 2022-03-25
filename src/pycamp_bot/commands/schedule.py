@@ -158,7 +158,7 @@ def change_slot(bot, update):
     projects = Project.select()
     slots = Slot.select()
     text = update.message.text.split(' ')
-    import ipdb; ipdb.set_trace()
+    
     if not len(text) >= 3:
         bot.send_message(
         chat_id=update.message.chat_id,
