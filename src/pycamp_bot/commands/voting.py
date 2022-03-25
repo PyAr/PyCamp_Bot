@@ -24,7 +24,7 @@ def vote_authorized(f):
         else:
             bot.send_message(
                 chat_id=update.message.chat_id,
-                text="La votacion no está autorizada. Avisale a un admin\
+                text="La eleccion no está autorizada. Avisale a un admin\
                 (/admins)!")
     return wrap
 
@@ -32,17 +32,17 @@ def vote_authorized(f):
 @admin_needed
 @active_needed
 def start_voting(bot, update):
-    logger.info("Empezando la votacion")
+    logger.info("Empezando la seleccion.")
 
     is_active, pycamp = get_active_pycamp()
 
     if not pycamp.vote_authorized:
         pycamp.vote_authorized = True
         pycamp.save()
-        update.message.reply_text("Autorizadx \nVotación Abierta")
-        msg_to_active_pycamp_chat(bot, "La Votación esta abierta")
+        update.message.reply_text("Autorizadx. \nSelección Abierta.")
+        msg_to_active_pycamp_chat(bot, "La elección de proyectos esta abierta!")
     else:
-        update.message.reply_text("La votacion ya estaba abierta")
+        update.message.reply_text("La eleccion ya estaba abierta.")
 
 
 def button(bot, update):
@@ -60,16 +60,17 @@ def button(bot, update):
     new_vote = Vote(
         pycampista=user,
         project=project,
-        _project_pycampista_id="{}-{}".format(project.id, user.id),
+        _project_pycampista_id=f"{project.id}-{user.id}"
     )
 
-    # Save vote in the database and send a message
+    # Save vote in the database and confirm the chosen proyects.
+
     if query.data == "si":
-        result = 'Interesadx en: ' + project_name + ' 👍'
+        result = f"✅ Sumade a {project_name}!"
         new_vote.interest = True
     else:
         new_vote.interest = False
-        result = 'No te interesa el proyecto ' + project_name
+        result = f'❌ Proyecto {project_name} salteado.'
 
     try:
         new_vote.save()
@@ -77,16 +78,12 @@ def button(bot, update):
                               chat_id=query.message.chat_id,
                               message_id=query.message.message_id)
     except peewee.IntegrityError:
-        logger.warning("Error al guardar el voto de {} del proyecto {}".format(
-            username,
-            project_name
-        ))
+        logger.warning(f"Error al guardar la eleccion de {username} en el proyecto {project_name}")
         bot.edit_message_text(
-            text="Ya habías votado el proyecto {}!!".format(project_name),
+            text=f"Ya te habías sumado al proyecto {project_name}!",
             chat_id=query.message.chat_id,
             message_id=query.message.message_id
         )
-
 
 @vote_authorized
 def vote(bot, update):
@@ -102,8 +99,8 @@ def vote(bot, update):
 
     # ask user for each project in the database
     for project in Project.select():
-        keyboard = [[InlineKeyboardButton("Si!", callback_data="si"),
-                    InlineKeyboardButton("Nop", callback_data="no")]]
+        keyboard = [[InlineKeyboardButton("Me Sumo!", callback_data="si"),
+                    InlineKeyboardButton("Paso", callback_data="no")]]
 
         reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -121,16 +118,16 @@ def end_voting(bot, update):
 
     pycamp.vote_authorized = False
     pycamp.save()
-    update.message.reply_text("Votación cerrada")
-    msg_to_active_pycamp_chat(bot, "La Votación esta cerrada")
+    update.message.reply_text("Selección cerrada")
+    msg_to_active_pycamp_chat(bot, "La selección de proyectos ha finalizado.")
 
 
 def set_handlers(updater):
     updater.dispatcher.add_handler(
         CallbackQueryHandler(button))
     updater.dispatcher.add_handler(
-        CommandHandler('empezar_votacion', start_voting))
+        CommandHandler('empezar_seleccion_proyectos', start_voting))
     updater.dispatcher.add_handler(
-        CommandHandler('votar', vote))
+        CommandHandler('elegir_proyectos', vote))
     updater.dispatcher.add_handler(
-        CommandHandler('terminar_votacion', end_voting))
+        CommandHandler('terminar_seleccion_proyectos', end_voting))
