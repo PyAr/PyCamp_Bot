@@ -5,7 +5,7 @@ import string
 from telegram.ext import (ConversationHandler, CommandHandler,
                           MessageHandler, Filters)
 
-from pycamp_bot.models import Project, Slot, Pycampista
+from pycamp_bot.models import Project, Slot, Pycampista, Vote
 from pycamp_bot.commands.auth import admin_needed
 from pycamp_bot.scheduler.db_to_json import export_db_2_json
 from pycamp_bot.scheduler.schedule_calculator import export_scheduled_result
@@ -31,7 +31,20 @@ def cancel(bot, update):
 @admin_needed
 def define_slot_days(bot, update):
     username = update.message.from_user.username
-        
+    # TODO: filtrar proyectos por pycamp activo.
+    if not Project.select().exists():
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="No hay proyectos que cronogramear."
+        )
+        return
+    if not Vote.select().exists():
+        bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Todavia no se realizo la votacion."
+        )
+        return
+
     bot.send_message(
         chat_id=update.message.chat_id,
         text="Cuantos dias tiene tu cronograma?"
@@ -117,12 +130,13 @@ def show_schedule(bot, update):
     slots = Slot.select()
     projects = Project.select()
     cronograma = {}
+
     for slot in slots:
         cronograma[slot.code] = []
         for project in projects:
             if project.slot_id == slot.id:
                 cronograma[slot.code].append(project.name)
-    
+
     bot.send_message(
         chat_id=update.message.chat_id,
         text=_dictToString(cronograma)
