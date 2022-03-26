@@ -28,7 +28,7 @@ def announce(bot, update):
     if not (project.get().owner.username == username or username in admins):
         bot.send_message(
         chat_id=update.message.chat_id,
-        text=f"No sos ni admin ni el owner de este proyecto careta"
+        text=f"No sos ni admin ni el owner de este proyecto, Careta."
     )
         return
 
