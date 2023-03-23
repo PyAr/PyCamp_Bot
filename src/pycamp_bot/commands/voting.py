@@ -126,8 +126,8 @@ def set_handlers(updater):
     updater.dispatcher.add_handler(
         CallbackQueryHandler(button))
     updater.dispatcher.add_handler(
-        CommandHandler('empezar_seleccion_proyectos', start_voting))
+        CommandHandler('empezar_votacion_proyectos', start_voting))
     updater.dispatcher.add_handler(
-        CommandHandler('elegir_proyectos', vote))
+        CommandHandler('votar', vote))
     updater.dispatcher.add_handler(
-        CommandHandler('terminar_seleccion_proyectos', end_voting))
+        CommandHandler('terminar_votacion_proyectos', end_voting))
