@@ -1,5 +1,5 @@
 import logging
-from telegram.ext import (ConversationHandler, CommandHandler, MessageHandler, Filters)
+from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, filters
 from pycamp_bot.models import Pycampista, Project, Vote
 from pycamp_bot.commands.base import msg_to_active_pycamp_chat
 from pycamp_bot.commands.manage_pycamp import active_needed, get_active_pycamp
@@ -13,15 +13,15 @@ logger = logging.getLogger(__name__)
 
 
 def load_authorized(f):
-    def wrap(*args, **kargs):
+    async def wrap(*args, **kargs):
         logger.info('Load authorized wrapper')
 
-        bot, update = args
+        update, context = args
         is_active, pycamp = get_active_pycamp()
         if pycamp.project_load_authorized:
-            return f(*args, **kargs)
+            return await f(*args, **kargs)
         else:
-            bot.send_message(
+            await context.bot.send_message(
                 chat_id=update.message.chat_id,
                 text="La carga de proyectos no está autorizada. Avisale a un\
                 admin (/admins)!")
@@ -30,25 +30,25 @@ def load_authorized(f):
 
 @load_authorized
 @active_needed
-def load_project(bot, update):
+async def load_project(update, context):
     '''Command to start the cargar_proyectos dialog'''
     logger.info("Adding project")
     username = update.message.from_user.username
 
     logger.info("Load autorized. Starting dialog")
-    bot.send_message(
+    await context.bot.send_message(
         chat_id=update.message.chat_id,
         text="Usuario: " + username
     )
 
-    bot.send_message(
+    await context.bot.send_message(
         chat_id=update.message.chat_id,
         text="Ingresá el Nombre del Proyecto a proponer",
     )
     return NOMBRE
 
 
-def naming_project(bot, update):
+async def naming_project(update, context):
     '''Dialog to set project name'''
     logger.info("Nombrando el proyecto")
     username = update.message.from_user.username
@@ -57,15 +57,15 @@ def naming_project(bot, update):
     new_project = Project(name=text)
     current_projects[username] = new_project
 
-    bot.send_message(
+    await context.bot.send_message(
         chat_id=update.message.chat_id,
         text="Estamos cargando tu proyecto: {}!".format(username)
     )
-    bot.send_message(
+    await context.bot.send_message(
         chat_id=update.message.chat_id,
         text="Tu proyecto se llama: {}".format(text)
     )
-    bot.send_message(
+    await context.bot.send_message(
         chat_id=update.message.chat_id,
         text="""Cual es el nivel de dificultad?
             1 = newbie friendly
@@ -75,7 +75,7 @@ def naming_project(bot, update):
     return DIFICULTAD
 
 
-def project_level(bot, update):
+async def project_level(update, context):
     '''Dialog to set project level'''
     username = update.message.from_user.username
     text = update.message.text
@@ -84,11 +84,11 @@ def project_level(bot, update):
         new_project = current_projects[username]
         new_project.difficult_level = text
 
-        bot.send_message(
+        await context.bot.send_message(
             chat_id=update.message.chat_id,
             text="Ok! Tu proyecto es nivel: {}".format(text)
         )
-        bot.send_message(
+        await context.bot.send_message(
             chat_id=update.message.chat_id,
             text="""Ahora necesitamos que nos digas la temática de tu proyecto.
             Algunos ejemplos pueden ser:
@@ -100,7 +100,7 @@ def project_level(bot, update):
         )
         return TOPIC
     else:
-        bot.send_message(
+        await context.bot.send_message(
             chat_id=update.message.chat_id,
             text="Nooooooo input no válido, por favor "
                  "ingresá 1, 2 o 3".format(text)
@@ -108,7 +108,7 @@ def project_level(bot, update):
         return DIFICULTAD
 
 
-def project_topic(bot, update):
+async def project_topic(update, context):
     '''Dialog to set project topic'''
     username = update.message.from_user.username
     text = update.message.text
@@ -123,18 +123,18 @@ def project_topic(bot, update):
 
     new_project.save()
 
-    bot.send_message(
+    await context.bot.send_message(
         chat_id=update.message.chat_id,
         text="Excelente {}! La temática de tu proyecto es: {}.".format(username, text))
-    bot.send_message(
+    await context.bot.send_message(
         chat_id=update.message.chat_id,
         text="Tu proyecto ha sido cargado".format(username, text)
     )
     return ConversationHandler.END
 
 
-def cancel(bot, update):
-    bot.send_message(
+async def cancel(update, context):
+    await context.bot.send_message(
         chat_id=update.message.chat_id,
         text="Has cancelado la carga del proyecto")
     return ConversationHandler.END
@@ -142,7 +142,7 @@ def cancel(bot, update):
 
 @active_needed
 @admin_needed
-def start_project_load(bot, update):
+async def start_project_load(update, context):
     """Allow people to upload projects"""
     _, pycamp = get_active_pycamp()
 
@@ -150,15 +150,15 @@ def start_project_load(bot, update):
         pycamp.project_load_authorized = True
         pycamp.save()
 
-        update.message.reply_text("Autorizadx \nCarga de proyectos Abierta")
-        msg_to_active_pycamp_chat(bot, "Carga de proyectos Abierta")
+        await update.message.reply_text("Autorizadx \nCarga de proyectos Abierta")
+        await msg_to_active_pycamp_chat(context.bot, "Carga de proyectos Abierta")
     else:
-        update.message.reply_text("La carga de proyectos ya estaba abierta")
+        await update.message.reply_text("La carga de proyectos ya estaba abierta")
 
 
 @active_needed
 @admin_needed
-def end_project_load(bot, update):
+async def end_project_load(update, context):
     """Prevent people for keep uploading projects"""
     logger.info("Closing proyect load")
 
@@ -168,21 +168,21 @@ def end_project_load(bot, update):
         pycamp.project_load_authorized = False
         pycamp.save()
 
-    update.message.reply_text(
+    await update.message.reply_text(
         "Autorizadx \nInformación Cargada, carga de proyectos cerrada")
-    msg_to_active_pycamp_chat(bot, "La carga de proyectos esta Cerrada")
+    await msg_to_active_pycamp_chat(context.bot, "La carga de proyectos esta Cerrada")
 
 
 load_project_handler = ConversationHandler(
     entry_points=[CommandHandler('cargar_proyecto', load_project)],
     states={
-        NOMBRE: [MessageHandler(Filters.text, naming_project)],
-        DIFICULTAD: [MessageHandler(Filters.text, project_level)],
-        TOPIC: [MessageHandler(Filters.text, project_topic)]},
+        NOMBRE: [MessageHandler(filters.TEXT, naming_project)],
+        DIFICULTAD: [MessageHandler(filters.TEXT, project_level)],
+        TOPIC: [MessageHandler(filters.TEXT, project_topic)]},
     fallbacks=[CommandHandler('cancel', cancel)])
 
 
-def show_projects(bot, update):
+async def show_projects(update, context):
     """Prevent people for keep uploading projects"""
     projects = Project.select()
     text = []
@@ -205,14 +205,14 @@ def show_projects(bot, update):
     else:
         text = "Todavía no hay ningún proyecto cargado"
 
-    update.message.reply_text(text)
+    await update.message.reply_text(text)
 
 
-def set_handlers(updater):
-    updater.dispatcher.add_handler(load_project_handler)
-    updater.dispatcher.add_handler(
+def set_handlers(application):
+    application.add_handler(load_project_handler)
+    application.add_handler(
         CommandHandler('empezar_carga_proyectos', start_project_load))
-    updater.dispatcher.add_handler(
+    application.add_handler(
         CommandHandler('terminar_carga_proyectos', end_project_load))
-    updater.dispatcher.add_handler(
+    application.add_handler(
         CommandHandler('proyectos', show_projects))

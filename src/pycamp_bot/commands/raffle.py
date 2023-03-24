@@ -5,24 +5,23 @@ from pycamp_bot.commands.auth import admin_needed
 
 
 @admin_needed
-def raffle(bot, update):
-    bot.send_message(
+async def raffle(update, context):
+    await context.bot.send_message(
         chat_id=update.message.chat_id,
         text="Voy a sortear algo entre todxs lxs Pycampistas!"
         )
-    bot.send_message(
+    await context.bot.send_message(
         chat_id=update.message.chat_id,
         text="Y la persona ganadora eeeeeeeeeeeeessss...."
         )
     pycampistas = Pycampista.select(Pycampista.username)
     lista_pycampistas = [persona.username for persona in pycampistas]
     persona_ganadora = random.choice(lista_pycampistas)
-    bot.send_message(
+    await context.bot.send_message(
         chat_id=update.message.chat_id,
         text="@{}".format(persona_ganadora)
         )
 
 
-def set_handlers(updater):
-    updater.dispatcher.add_handler(
-            CommandHandler('sorteo', raffle))
+def set_handlers(application):
+    application.add_handler(CommandHandler('sorteo', raffle))

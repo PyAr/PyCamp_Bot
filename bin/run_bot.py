@@ -1,6 +1,6 @@
 import logging
 import os
-from telegram.ext import (Updater)
+from telegram.ext import Application
 from pycamp_bot.commands import auth
 from pycamp_bot.commands import voting
 from pycamp_bot.commands import manage_pycamp
@@ -19,28 +19,28 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def set_handlers(updater):
-    base.set_handlers(updater)
-    auth.set_handlers(updater)
-    wizard.set_handlers(updater)
-    voting.set_handlers(updater)
-    manage_pycamp.set_handlers(updater)
-    projects.set_handlers(updater)
-    raffle.set_handlers(updater)
-    schedule.set_handlers(updater)
-    announcements.set_handlers(updater)
+def set_handlers(application):
+    base.set_handlers(application)
+    auth.set_handlers(application)
+    wizard.set_handlers(application)
+    voting.set_handlers(application)
+    manage_pycamp.set_handlers(application)
+    projects.set_handlers(application)
+    raffle.set_handlers(application)
+    schedule.set_handlers(application)
+    announcements.set_handlers(application)
 
 
 if __name__ == '__main__':
     logger.info('Starting PyCamp Bot')
 
     if 'TOKEN' in os.environ.keys():
-        updater = Updater(token=os.environ['TOKEN'])
-
         models_db_connection()
-        set_handlers(updater)
 
-        updater.start_polling()
+        application = Application.builder().token(os.environ['TOKEN']).build()
+    # application.add_handler(CommandHandler("start", start))
+        set_handlers(application)
+        application.run_polling()
 
     else:
         logger.info('Token not defined. Exiting.')

@@ -16,7 +16,7 @@ def get_admins_username():
     return admins
 
 
-def is_admin(bot, update):
+def is_admin(update, context):
     """Checks if the user is authorized as admin"""
     username = update.message.from_user.username
     authorized = get_admins_username()
@@ -30,27 +30,27 @@ def is_admin(bot, update):
 
 
 def admin_needed(f):
-    def wrap(*args, **kargs):
+    async def wrap(*args, **kargs):
         logger.info('Admin nedeed wrapper')
-        bot, update = args
+        update, context = args
         if is_admin(*args):
-            return f(*args)
+            return await f(*args)
         else:
-            bot.send_message(
+            await context.bot.send_message(
                 chat_id=update.message.chat_id,
                 text="No estas Autorizadx para hacer esta acción"
             )
     return wrap
 
 
-def grant_admin(bot, update):
+async def grant_admin(update, context):
     username = update.message.from_user.username
     chat_id = update.message.chat_id
     text = update.message.text
 
     parameters = text.split(' ')
     if not len(parameters) == 2:
-        bot.send_message(chat_id=chat_id,
+        await context.bot.send_message(chat_id=chat_id,
                          text='Parametros incorrectos.')
         return
 
@@ -69,17 +69,17 @@ def grant_admin(bot, update):
         logger.error('PYCAMP_BOT_MASTER_KEY env not set.')
         rply_msg = 'Hay un problema en el servidor, avisale a un admin.'
 
-    bot.send_message(chat_id=chat_id, text=rply_msg)
+    await context.bot.send_message(chat_id=chat_id, text=rply_msg)
 
 
 @admin_needed
-def revoke_admin(bot, update):
+async def revoke_admin(update, context):
     chat_id = update.message.chat_id
     text = update.message.text
 
     parameters = text.split(' ')
     if not len(parameters) == 2:
-        bot.send_message(chat_id=chat_id,
+        await context.bot.send_message(chat_id=chat_id,
                          text='Parametros incorrectos.')
         return
 
@@ -88,11 +88,11 @@ def revoke_admin(bot, update):
     user = Pycampista.select().where(Pycampista.username == fallen_admin)[0]
     user.admin = False
     user.save()
-    bot.send_message(chat_id=chat_id,
+    await context.bot.send_message(chat_id=chat_id,
                      text='Un admin a caido --{}--.'.format(fallen_admin))
 
 
-def list_admins(bot, update):
+async def list_admins(update, context):
     chat_id = update.message.chat_id
 
     admins = get_admins_username()
@@ -102,10 +102,10 @@ def list_admins(bot, update):
         rply_msg += admin
         rply_msg += '\n'
 
-    bot.send_message(chat_id=chat_id, text=rply_msg)
+    await context.bot.send_message(chat_id=chat_id, text=rply_msg)
 
 
-def set_handlers(updater):
-    updater.dispatcher.add_handler(CommandHandler('su', grant_admin))
-    updater.dispatcher.add_handler(CommandHandler('degradar', revoke_admin))
-    updater.dispatcher.add_handler(CommandHandler('admins', list_admins))
+def set_handlers(application):
+    application.add_handler(CommandHandler('su', grant_admin))
+    application.add_handler(CommandHandler('degradar', revoke_admin))
+    application.add_handler(CommandHandler('admins', list_admins))

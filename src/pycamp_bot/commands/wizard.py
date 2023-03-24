@@ -2,7 +2,7 @@ from telegram.ext import CommandHandler
 from pycamp_bot.models import Pycampista
 
 
-def become_wizard(bot, update):
+async def become_wizard(update, context):
     current_wizards = Pycampista.select().where(Pycampista.wizard is True)
 
     for w in current_wizards:
@@ -16,29 +16,29 @@ def become_wizard(bot, update):
     user.wizard = True
     user.save()
 
-    bot.send_message(
+    await context.bot.send_message(
         chat_id=update.message.chat_id,
         text="Felicidades! Eres el Magx de turno"
     )
 
 
-def summon_wizard(bot, update):
+async def summon_wizard(update, context):
     username = update.message.from_user.username
     try:
         wizard = Pycampista.get(Pycampista.wizard is True)
-        bot.send_message(
+        await context.bot.send_message(
             chat_id=wizard.chat_id,
             text="PING PING PING MAGX! @{} te necesesita!".format(username)
         )
     except Pycampista.DoesNotExist:
-        bot.send_message(
+        await context.bot.send_message(
             chat_id=update.chat_id,
             text="Hubo un accidente, el mago esta en otro plano.".format(username)
         )
 
 
-def set_handlers(updater):
-    updater.dispatcher.add_handler(
+def set_handlers(application):
+    application.add_handler(
             CommandHandler('evocar_magx', summon_wizard))
-    updater.dispatcher.add_handler(
+    application.add_handler(
             CommandHandler('ser_magx', become_wizard))
