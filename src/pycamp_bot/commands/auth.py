@@ -57,6 +57,8 @@ async def grant_admin(update, context):
     passwrd = parameters[1]
 
     user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
+    #seteo para pruebas problema windows kargs TODO sacar
+    os.environ['PYCAMP_BOT_MASTER_KEY'] = 'pass2023'
     if 'PYCAMP_BOT_MASTER_KEY' in os.environ.keys():
         if passwrd == os.environ['PYCAMP_BOT_MASTER_KEY']:
             user.admin = True

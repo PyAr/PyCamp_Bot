@@ -34,6 +34,9 @@ def set_handlers(application):
 if __name__ == '__main__':
     logger.info('Starting PyCamp Bot')
 
+    # escribo environ para pruebas por no poder pasar kargs en consola windows
+    os.environ['TOKEN'] = '6166771762:AAGifhVfpIpvqL6EZVJ3YnVK7r1YG9C5OME'
+
     if 'TOKEN' in os.environ.keys():
         models_db_connection()
 
