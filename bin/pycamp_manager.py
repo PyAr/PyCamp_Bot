@@ -1,11 +1,9 @@
 import argparse
 import datetime
 import logging
-
 from pycamp_bot.models import Pycamp
 from pycamp_bot.models import Pycampista
 from pycamp_bot.models import PycampistaAtPycamp
-
 from pycamp_bot.models import models_db_connection
 
 

@@ -1,7 +1,5 @@
 import logging
-
 from telegram.ext import CommandHandler
-
 from pycamp_bot.commands.help_msg import get_help
 
 

@@ -10,7 +10,6 @@ import sys
 from collections import OrderedDict
 from itertools import combinations
 from operator import itemgetter
-
 from munch import munchify
 
 IMPOSIBLE_COST = 1000000
@@ -254,12 +253,14 @@ def random_restart_hill_climbing(problem, max_iters=100, max_iters_without_impro
 
     return best_state
 
+
 def export_scheduled_result(myjson):
     problem = PyCampScheduleProblem(myjson)
     best_solution = random_restart_hill_climbing(problem,
                                                  max_iters=10000,
                                                  max_iters_without_improvement=10)
     return best_solution
+
 
 if __name__ == '__main__':
     try:

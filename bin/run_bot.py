@@ -10,7 +10,6 @@ from pycamp_bot.commands import base
 from pycamp_bot.commands import raffle
 from pycamp_bot.commands import schedule
 from pycamp_bot.commands import announcements
-
 from pycamp_bot.models import models_db_connection
 
 

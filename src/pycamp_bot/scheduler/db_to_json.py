@@ -1,17 +1,16 @@
 import json
-
 from pycamp_bot.models import Project, Slot, Vote
 
-def  export_db_2_json():
+
+def export_db_2_json():
     projects = Project.select()
 
     result = {"projects": {}, "responsable_available_slots": {}}
 
     available_slots = [slot.code for slot in Slot.select()]
-        
+
     result["available_slots"] = available_slots
     all_responsables = []
-
 
     for project in projects:
         votes = list(Vote.select().where(Vote.project == project, Vote.interest))
@@ -28,7 +27,6 @@ def  export_db_2_json():
             "votes": list(votes_users),
             "theme": project.topic,
         }
-
 
     for responsable in all_responsables:
         result["responsable_available_slots"][responsable] = available_slots
