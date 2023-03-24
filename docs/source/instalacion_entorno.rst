@@ -1,5 +1,6 @@
 Instalación del entorno de desarrollo
 =====================================
+
 Para poder colaborar con este desarrollo vas a necesitar 4 cosas:
 
 - Obtener el token de telegram
@@ -7,9 +8,9 @@ Para poder colaborar con este desarrollo vas a necesitar 4 cosas:
 - Instalar las dependencias
 - Ejecutar el bot
 
-
 Obtención del token de telegram
 -------------------------------
+
 Hace click en `este link <https://telegram.me/BotFather>`_ para hablar con **BotFather** y seguí los pasos:
 
 - ``/start``
@@ -18,17 +19,16 @@ Hace click en `este link <https://telegram.me/BotFather>`_ para hablar con **Bot
 - Dale un username
 - Copia el token de acceso
 
-
 Variables de entorno
 --------------------
 =====================    =======    =========    =======
 Variable                 Ejemplo    Requerida    Default
 =====================    =======    =========    =======
-TOKEN                    {TOKEN}       True         
-PYCAMP_BOT_MASTER_KEY     {KEY}        True         
+TOKEN                    {TOKEN}       True
+PYCAMP_BOT_MASTER_KEY     {KEY}        True
 =====================    =======    =========    =======
 
-El ``PYCAMP_BOT_MASTER_KEY`` es una clave que tenes que inventar para poder ser admin con el bot.  
+El ``PYCAMP_BOT_MASTER_KEY`` es una clave que tenes que inventar para poder ser admin con el bot.
 
 Instalación de dependencias
 ---------------------------
@@ -37,15 +37,14 @@ Instalación de dependencias
 
     python setup.py install
 
-
 Ejecutar el bot
 ---------------
-Para correr el bot ejecutá:  
+
+Para correr el bot ejecutá:
 
 .. code-block:: bash
 
     TOKEN='TOKEN_PERSONAL' PYCAMP_BOT_MASTER_KEY='KEY' python bin/run_bot.py
-
 
 Y listo! Tu bot está corriendo en tu máquina, esperando que alguien le escriba por telegram.
 Para probarlo buscalo en telegram y mandale el comando `/start`
