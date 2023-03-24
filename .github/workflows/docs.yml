@@ -5,15 +5,16 @@ permissions:
 jobs:
   docs:
     runs-on: ubuntu-latest
+    container: sphinxdoc/sphinx
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
       - name: Install dependencies
         run: |
-          pip install sphinx sphinx_rtd_theme
+          pip install sphinx_rtd_theme
       - name: Sphinx build
         run: |
-          sphinx-build docs/source docs/build
+          sphinx-build -b html docs/source docs/build/html
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         # if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
@@ -21,5 +22,5 @@ jobs:
         with:
           publish_branch: gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/build
+          publish_dir: docs/build/html
           force_orphan: true
