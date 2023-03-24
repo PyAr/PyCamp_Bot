@@ -49,3 +49,18 @@ Para correr el bot ejecutá:
 
 Y listo! Tu bot está corriendo en tu máquina, esperando que alguien le escriba por telegram.
 Para probarlo buscalo en telegram y mandale el comando `/start`
+
+Ejecutar en un entorno dockerizado
+__________________________________
+
+Para ejecutar el bot primero contruya la imagen:
+
+.. code-block:: bash
+
+    docker build -t pycamp_bot:latest .
+
+Ahora inicie el contenedor:
+
+.. code-block:: bash
+
+    docker run -e "TOKEN=TOKEN_PERSONAL" -e "PYCAMP_BOT_MASTER_KEY=KEY" -v ./:/pycamp/telegram_bot --name pycamp_telegram_bot pycamp_bot
