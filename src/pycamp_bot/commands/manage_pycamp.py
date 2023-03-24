@@ -1,8 +1,6 @@
 import datetime
 import logging
-
 from telegram.ext import CommandHandler
-
 from pycamp_bot.models import Pycamp
 from pycamp_bot.models import Pycampista
 from pycamp_bot.models import PycampistaAtPycamp

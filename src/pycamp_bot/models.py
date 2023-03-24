@@ -30,7 +30,7 @@ class Pycampista(BaseModel):
     def __str__(self):
         rv_str = 'Pycampista:\n'
         for attr in ['username', 'arrive', 'leave']:
-            rv_str += '{}: {}\n'.format(attr, getattr(self, attr))
+            rv_str += f'{attr}: {getattr(self, attr)}\n'
         rv_str += 'Wizard on!' if self.wizard else 'Muggle'
         rv_str += '\n'
         rv_str += 'Admin' if self.admin else 'Commoner'
@@ -57,7 +57,7 @@ class Pycamp(BaseModel):
         rv_str = 'Pycamp:\n'
         for attr in ['headquarters', 'init', 'end', 'active',
                      'vote_authorized', 'project_load_authorized']:
-            rv_str += '{}: {}\n'.format(attr, getattr(self, attr))
+            rv_str += f'{attr}: {getattr(self, attr)}\n'
         return rv_str
 
 
@@ -109,7 +109,7 @@ class Vote(BaseModel):
     project = pw.ForeignKeyField(Project)
     pycampista = pw.ForeignKeyField(Pycampista)
     interest = pw.BooleanField(null=True)
-    #this field is to prevent saving multi votes from the same user in the
+    # this field is to prevent saving multi votes from the same user in the
     # same project
     _project_pycampista_id = pw.CharField(unique=True)
 

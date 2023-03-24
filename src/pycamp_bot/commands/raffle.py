@@ -1,7 +1,5 @@
 import random
-
 from telegram.ext import CommandHandler
-
 from pycamp_bot.models import Pycampista
 from pycamp_bot.commands.auth import admin_needed
 

@@ -1,0 +1,6 @@
+[MESSAGES CONTROL]
+disable=
+    C0103, # Doesn't conform to snake_case naming style
+    W0612, # Unused variable
+    W0621, # Redefined outer name
+    C0209 # Consider using f string
