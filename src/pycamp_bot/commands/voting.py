@@ -12,15 +12,15 @@ logger = logging.getLogger(__name__)
 
 
 def vote_authorized(f):
-    def wrap(*args, **kargs):
+    async def wrap(*args, **kargs):
         logger.info('Vote authorized wrapper')
 
         update, context = args
         is_active, pycamp = get_active_pycamp()
         if pycamp.vote_authorized:
-            f(*args)
+           await f(*args)
         else:
-            context.bot.send_message(
+            await context.bot.send_message(
                 chat_id=update.message.chat_id,
                 text="La eleccion no está autorizada. Avisale a un admin\
                 (/admins)!")

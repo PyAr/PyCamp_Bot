@@ -120,8 +120,14 @@ async def project_topic(update, context):
     user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
 
     new_project.owner = user
-
-    new_project.save()
+    try:
+        new_project.save()
+    except peewee.IntegrityError:
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Ups ese proyecto ya fue cargado"
+        )
+        return ConversationHandler.END
 
     await context.bot.send_message(
         chat_id=update.message.chat_id,
