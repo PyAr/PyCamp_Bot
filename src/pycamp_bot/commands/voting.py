@@ -42,6 +42,18 @@ async def start_voting(update, context):
     else:
         await update.message.reply_text("La eleccion ya estaba abierta.")
 
+# pruebo agregar un segundo CallbackHandler en los handlers para ver si
+# no es compatible con dos y siempre debe haber un query handler
+async def button2(update,context):
+    query = update.callback_query
+    project_name = query.message['text']
+    await context.bot.edit_message_text(
+            text=f"Ya te habías sumado al proyecto {project_name}!",
+            chat_id=query.message.chat_id,
+            message_id=query.message.message_id
+        )
+    logger.info('segundo button callbackqueryhandler')
+### termina prueba
 
 async def button(update, context):
     '''Save user vote in the database'''
@@ -118,12 +130,18 @@ async def end_voting(update, context):
     pycamp.vote_authorized = False
     pycamp.save()
     await update.message.reply_text("Selección cerrada")
-    await msg_to_active_pycamp_chat(context.bot, "La selección de proyectos ha finalizado.")
+    # await msg_to_active_pycamp_chat(context.bot, "La selección de proyectos ha finalizado.")
 
 
 def set_handlers(application):
     application.add_handler(
         CallbackQueryHandler(button))
+    #pruebo agregar segundo handler
+    #toma siempre el que va primero, usa la funcion asignada cuando hay 
+    #un InlineKeyboardButton y posiblemente otros
+    application.add_handler(
+        CallbackQueryHandler(button2))
+    #termina prueba
     application.add_handler(
         CommandHandler('empezar_votacion_proyectos', start_voting))
     application.add_handler(

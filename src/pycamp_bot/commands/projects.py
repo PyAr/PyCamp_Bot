@@ -3,7 +3,8 @@ from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, fi
 from pycamp_bot.models import Pycampista, Project, Vote
 from pycamp_bot.commands.base import msg_to_active_pycamp_chat
 from pycamp_bot.commands.manage_pycamp import active_needed, get_active_pycamp
-from pycamp_bot.commands.auth import admin_needed
+from pycamp_bot.commands.auth import admin_needed, get_admins_username
+import peewee
 
 
 current_projects = {}
@@ -120,16 +121,21 @@ async def project_topic(update, context):
     user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
 
     new_project.owner = user
-
-    new_project.save()
-
-    await context.bot.send_message(
-        chat_id=update.message.chat_id,
-        text="Excelente {}! La temática de tu proyecto es: {}.".format(username, text))
-    await context.bot.send_message(
-        chat_id=update.message.chat_id,
-        text="Tu proyecto ha sido cargado".format(username, text)
-    )
+    try:
+        new_project.save()
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Excelente {}! La temática de tu proyecto es: {}.".format(username, text))
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Tu proyecto ha sido cargado".format(username, text)
+        )
+    
+    except peewee.IntegrityError:
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Ups ese proyecto ya fue cargado".format(username, text)
+        )
     return ConversationHandler.END
 
 
@@ -207,8 +213,29 @@ async def show_projects(update, context):
 
     await update.message.reply_text(text)
 
+@admin_needed
+async def cancel_project(update, context):
+    """Cancel project loaded"""
+    project_name = update.message.text.split()[1]
+    print('project: ', project_name)
+
+    try:
+        project = Project.select().where(Project.name == project_name).get()
+        #time.sleep(5)
+        print('project: ', dir(project))
+        Project.delete().where(Project.name == project_name).execute()
+    except:
+        await update.message.reply_text(
+            "Parece que no lo pudimos cargar, controla que hayas puesto bien el nombre del proyecto")
+    #project.delete_instance()
+    #print('project: ', project.owner.username)
+
+    username = update.message.from_user.username
+    admins = get_admins_username()
 
 def set_handlers(application):
+    application.add_handler(CommandHandler('cancelar_proyecto', cancel_project))
+    
     application.add_handler(load_project_handler)
     application.add_handler(
         CommandHandler('empezar_carga_proyectos', start_project_load))
