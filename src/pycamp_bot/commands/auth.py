@@ -34,7 +34,7 @@ def admin_needed(f):
         logger.info('Admin nedeed wrapper')
         update, context = args
         if is_admin(*args):
-            return await f(*args)
+            return await f(*args) # ver si va aca o si las otras funciones ya lo tienen
         else:
             await context.bot.send_message(
                 chat_id=update.message.chat_id,

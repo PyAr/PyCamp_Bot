@@ -170,7 +170,7 @@ async def end_project_load(update, context):
 
     await update.message.reply_text(
         "Autorizadx \nInformación Cargada, carga de proyectos cerrada")
-    await msg_to_active_pycamp_chat(context.bot, "La carga de proyectos esta Cerrada")
+    # await msg_to_active_pycamp_chat(context.bot, "La carga de proyectos esta Cerrada")
 
 
 load_project_handler = ConversationHandler(
