@@ -58,11 +58,17 @@ Para ejecutar el bot primero contruya la imagen:
 
     docker build -t pycamp_bot:latest .
 
-Ahora inicie el contenedor:
+Ahora inicie el contenedor por primera vez:
 
 .. code-block:: bash
 
     docker run -e "TOKEN=TOKEN_PERSONAL" -e "PYCAMP_BOT_MASTER_KEY=KEY" -v ./:/pycamp/telegram_bot --name pycamp_telegram_bot pycamp_bot
+
+Luego puede arrancar con:
+
+.. code-block:: bash
+
+    docker start -ia pycamp_telegram_bot
 
 Para ejecutar los test:
 
