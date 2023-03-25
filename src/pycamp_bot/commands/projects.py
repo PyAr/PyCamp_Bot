@@ -1,13 +1,16 @@
+import logging
+import peewee
 from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, filters
 from pycamp_bot.models import Pycampista, Project, Vote
 from pycamp_bot.commands.base import msg_to_active_pycamp_chat
 from pycamp_bot.commands.manage_pycamp import active_needed, get_active_pycamp
-from pycamp_bot.commands.auth import admin_needed
-from pycamp_bot.logger import logger
+from pycamp_bot.commands.auth import admin_needed, get_admins_username
 
 
 current_projects = {}
 NOMBRE, DIFICULTAD, TOPIC = ["nombre", "dificultad", "topic"]
+
+logger = logging.getLogger(__name__)
 
 
 def load_authorized(f):
@@ -50,7 +53,7 @@ async def naming_project(update, context):
     '''Dialog to set project name'''
     logger.info("Nombrando el proyecto")
     username = update.message.from_user.username
-    text = update.message.text
+    text = update.message.text.lower()
 
     new_project = Project(name=text)
     current_projects[username] = new_project
@@ -61,7 +64,7 @@ async def naming_project(update, context):
     )
     await context.bot.send_message(
         chat_id=update.message.chat_id,
-        text="Tu proyecto se llama: {}".format(text)
+        text="Tu proyecto se llama: {}".format(text.title())
     )
     await context.bot.send_message(
         chat_id=update.message.chat_id,
@@ -186,6 +189,45 @@ load_project_handler = ConversationHandler(
     fallbacks=[CommandHandler('cancel', cancel)])
 
 
+async def delete_project(update, context):
+    """delete project loaded"""
+    username = update.message.from_user.username
+    project_name_splited = update.message.text.split()
+    project_name_lower = [i.lower() for i in project_name_splited]
+
+    if len(project_name_splited) < 2:
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Debes ingresar el nombre de proyecto a eliminar. \n Ej: /borrar_proyecto intro django."
+        )
+        return
+    else:
+        try:
+            project_name = ' '.join(project_name_lower[1:])
+            project = Project.select().where(Project.name == project_name).get()
+        except:
+            await context.bot.send_message(
+                chat_id=update.message.chat_id,
+                text="No se encontró el proyecto '{}'.".format(project_name)
+            )
+            return
+
+
+    if username !=  project.owner.username and username not in get_admins_username():
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text="No sos ni admin ni el owner de este proyecto, Careta."
+        )
+        return
+    else:
+        project.delete_instance()
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Se ha eliminado el proyecto {} satisfactoriamente.".format(project_name.title())
+        )
+        return
+
+
 async def show_projects(update, context):
     """Prevent people for keep uploading projects"""
     projects = Project.select()
@@ -202,6 +244,8 @@ async def show_projects(update, context):
         if participants_count > 0:
             project_text += "\n Interesades: {}".format(participants_count)
         text.append(project_text)
+    else:
+        text = None
 
     if text:
         text = "\n\n".join(text)
@@ -218,4 +262,7 @@ def set_handlers(application):
     application.add_handler(
         CommandHandler('terminar_carga_proyectos', end_project_load))
     application.add_handler(
+        CommandHandler('borrar_proyecto', delete_project))
+    application.add_handler(
         CommandHandler('proyectos', show_projects))
+
