@@ -5,13 +5,12 @@ permissions:
 jobs:
   docs:
     runs-on: ubuntu-latest
-    container: sphinxdoc/sphinx
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
       - name: Install dependencies
         run: |
-          pip install sphinx_rtd_theme
+          pip install sphinx sphinxcontrib-napoleon sphinx_rtd_theme
       - name: Sphinx build
         run: |
           sphinx-build -b html docs/source docs/build/html
