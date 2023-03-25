@@ -1,10 +1,6 @@
-import logging
 from telegram.ext import CommandHandler
 from pycamp_bot.models import Project, Pycampista, Vote
 from pycamp_bot.commands.auth import get_admins_username
-
-
-logger = logging.getLogger(__name__)
 
 
 async def announce(update, context):

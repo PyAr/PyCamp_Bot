@@ -14,8 +14,8 @@ Comandos de Administrador
 - ``/empezar_pycamp``: Setea la fecha de inicio del pycamp activo.
 - ``/empezar_carga_proyectos``: Habilita la carga de los proyectos. En este punto los pycampistas pueden cargar sus proyectos, enviandole al bot el comando ``/cargar_proyecto``.
 - ``/terminar_carga_proyectos``: Termina carga proyectos.
-- ``/empezar_votacion``: Activa la votacion (a partir de ahora los pycampistas pueden votar con ``/votar``).
-- ``/terminar_votacion``: Termina la votacion.
+- ``/empezar_votacion_proyectos``: Activa la votacion (a partir de ahora los pycampistas pueden votar con ``/votar``).
+- ``/terminar_votacion_proyectos``: Termina la votacion.
 - ``/cronogramear``: Pregunta los dias y slot por día para poder crear el cronograma.
 - ``/cambiar_slot``: Toma un nombre de proyecto y un slot; y te cambia ese proyecto a ese slot.
 

@@ -1,4 +1,3 @@
-import logging
 import os
 from telegram.ext import Application
 from pycamp_bot.commands import auth
@@ -11,12 +10,7 @@ from pycamp_bot.commands import raffle
 from pycamp_bot.commands import schedule
 from pycamp_bot.commands import announcements
 from pycamp_bot.models import models_db_connection
-
-
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO)
-logger = logging.getLogger(__name__)
+from pycamp_bot.logger import logger
 
 
 def set_handlers(application):

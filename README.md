@@ -64,8 +64,8 @@ elegido en la envvar `PYCAMP_BOT_MASTER_KEY`
 * `/empezar_carga_proyectos` habilita la carga de los proyectos. En este punto los pycampistas pueden cargar sus proyectos,
 enviandole al bot el comando `/cargar_proyecto`
 * `/terminar_carga_proyectos` termina carga proyectos
-* `/empezar_votacion`  activa la votacion (a partir de ahora los pycampistas pueden votar con `/votar`)
-* `/terminar_votacion` termina la votacion
+* `/empezar_votacion_proyectos`  activa la votacion (a partir de ahora los pycampistas pueden votar con `/votar`)
+* `/terminar_votacion_proyectos` termina la votacion
 
 Para generar el schedule:
 

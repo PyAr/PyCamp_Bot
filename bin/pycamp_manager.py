@@ -1,10 +1,10 @@
 import argparse
 import datetime
-import logging
 from pycamp_bot.models import Pycamp
 from pycamp_bot.models import Pycampista
 from pycamp_bot.models import PycampistaAtPycamp
 from pycamp_bot.models import models_db_connection
+from pycamp_bot.logger import logger
 
 
 def parse_args():
@@ -59,12 +59,12 @@ if __name__ == '__main__':
 
     if args.wich == 'pycampista':
         if args.add:
-            logging.info('Adding pycampista')
+            logger.info('Adding pycampista')
             pycampista = Pycampista.create(username=args.name)
 
         if args.arrive:
             arrive_time = datetime.datetime.fromisoformat(args.arrive)
-            logging.info('Changing arrive time to {}'.format(arrive_time))
+            logger.info('Changing arrive time to {}'.format(arrive_time))
             pycampista = Pycampista.select().where(
                 Pycampista.username == args.name)[0]
             pycampista.arrive = arrive_time
@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
         if args.departure:
             departure_time = datetime.datetime.fromisoformat(args.departure)
-            logging.info('Changing departure time to {}'.format(departure_time))
+            logger.info('Changing departure time to {}'.format(departure_time))
             pycampista = Pycampista.select().where(
                 Pycampista.username == args.name)[0]
             pycampista.leave = departure_time
@@ -83,12 +83,12 @@ if __name__ == '__main__':
         print(pycampista)
     elif args.wich == 'pycamp':
         if args.add:
-            logging.info('Adding pycamp')
+            logger.info('Adding pycamp')
             pycamp = Pycamp.create(headquarters=args.name)
 
         if args.init:
             init_time = datetime.datetime.fromisoformat(args.init)
-            logging.info('Changing init time to {}'.format(init_time))
+            logger.info('Changing init time to {}'.format(init_time))
             pycamp = Pycamp.select().where(
                 Pycamp.headquarters == args.name)[0]
             pycamp.init = init_time
@@ -96,7 +96,7 @@ if __name__ == '__main__':
 
         if args.end:
             end_time = datetime.datetime.fromisoformat(args.end)
-            logging.info('Changing end time to {}'.format(end_time))
+            logger.info('Changing end time to {}'.format(end_time))
             pycamp = Pycamp.select().where(
                 Pycamp.headquarters == args.name)[0]
             pycamp.end = end_time
