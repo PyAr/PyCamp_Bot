@@ -1,3 +1,4 @@
+import functools
 import peewee
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CommandHandler, CallbackQueryHandler
@@ -8,19 +9,19 @@ from pycamp_bot.models import Pycampista, Project, Vote
 from pycamp_bot.logger import logger
 
 
-def vote_authorized(f):
-    def wrap(*args, **kargs):
+def vote_authorized(func):
+    @functools.wraps(func)
+    async def wrap(*args):
         logger.info('Vote authorized wrapper')
 
         update, context = args
         is_active, pycamp = get_active_pycamp()
         if pycamp.vote_authorized:
-            f(*args)
+            await func(update, context)
         else:
             context.bot.send_message(
                 chat_id=update.message.chat_id,
-                text="La eleccion no está autorizada. Avisale a un admin\
-                (/admins)!")
+                text="La eleccion no está autorizada. Avisale a un admin (/admins)!")
     return wrap
 
 
