@@ -12,9 +12,9 @@ setup(
     packages=find_packages('src'),
     package_dir={'': 'src'},
     install_requires=[
-        'munch==2.1.1',
-        'python-telegram-bot==10.0.2',
-        'peewee',
+        'munch==2.5.0',
+        'python-telegram-bot==20.2',
+        'peewee==3.16.0',
     ],
     test_suite='tests'
 )
