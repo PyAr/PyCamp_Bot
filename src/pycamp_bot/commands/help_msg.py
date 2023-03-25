@@ -71,7 +71,7 @@ Pycampista
 ''' + user_commands_help
 
 
-def get_help(bot, update):
-    if is_admin(bot, update):
+def get_help(update, context):
+    if is_admin(update, context):
         return HELP_MESSAGE_ADMIN
     return HELP_MESSAGE
