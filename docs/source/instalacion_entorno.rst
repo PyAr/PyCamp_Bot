@@ -63,3 +63,9 @@ Ahora inicie el contenedor:
 .. code-block:: bash
 
     docker run -e "TOKEN=TOKEN_PERSONAL" -e "PYCAMP_BOT_MASTER_KEY=KEY" -v ./:/pycamp/telegram_bot --name pycamp_telegram_bot pycamp_bot
+
+Para ejecutar los test:
+
+.. code-block:: bash
+
+    docker run --rm -e "TOKEN=TOKEN_PERSONAL" -e "PYCAMP_BOT_MASTER_KEY=KEY" -v ./:/pycamp/telegram_bot --name pycamp_telegram_bot_test pycamp_bot python -m unittest -v test
