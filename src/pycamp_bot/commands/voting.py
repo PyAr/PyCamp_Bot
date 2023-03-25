@@ -118,6 +118,10 @@ async def end_voting(update, context):
     await update.message.reply_text("Selección cerrada")
     await msg_to_active_pycamp_chat(context.bot, "La selección de proyectos ha finalizado.")
 
+def vote_count(update, context):
+    import pdb; pdb.set_trace()
+    Vote.sele .select().count()
+
 
 def set_handlers(application):
     application.add_handler(
@@ -128,3 +132,5 @@ def set_handlers(application):
         CommandHandler('votar', vote))
     application.add_handler(
         CommandHandler('terminar_votacion_proyectos', end_voting))
+    application.add_handler(
+        CommandHandler('contar_votos', vote_count))
