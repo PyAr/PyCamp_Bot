@@ -19,7 +19,7 @@ def vote_authorized(func):
         if pycamp.vote_authorized:
             await func(update, context)
         else:
-            context.bot.send_message(
+            await context.bot.send_message(
                 chat_id=update.message.chat_id,
                 text="La eleccion no está autorizada. Avisale a un admin (/admins)!")
     return wrap
