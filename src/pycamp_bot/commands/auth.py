@@ -1,10 +1,7 @@
-import logging
 import os
 from telegram.ext import CommandHandler
 from pycamp_bot.models import Pycampista
-
-
-logger = logging.getLogger(__name__)
+from pycamp_bot.logger import logger
 
 
 def get_admins_username():

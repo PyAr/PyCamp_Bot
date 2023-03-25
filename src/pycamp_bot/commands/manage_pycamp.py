@@ -1,12 +1,10 @@
 import datetime
-import logging
 from telegram.ext import CommandHandler
 from pycamp_bot.models import Pycamp
 from pycamp_bot.models import Pycampista
 from pycamp_bot.models import PycampistaAtPycamp
 from pycamp_bot.commands.auth import admin_needed
-
-logger = logging.getLogger(__name__)
+from pycamp_bot.logger import logger
 
 
 def get_pycamp_by_name(name):

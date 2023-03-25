@@ -1,9 +1,6 @@
-import logging
 from telegram.ext import CommandHandler
 from pycamp_bot.commands.help_msg import get_help
-
-
-logger = logging.getLogger(__name__)
+from pycamp_bot.logger import logger
 
 
 async def msg_to_active_pycamp_chat(bot, text):

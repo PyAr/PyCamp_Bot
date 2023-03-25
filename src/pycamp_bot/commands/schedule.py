@@ -1,4 +1,3 @@
-import logging
 import string
 from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, filters
 from pycamp_bot.models import Project, Slot, Pycampista, Vote
@@ -8,8 +7,6 @@ from pycamp_bot.scheduler.schedule_calculator import export_scheduled_result
 
 
 DAY_LETTERS = []
-
-logger = logging.getLogger(__name__)
 
 
 def _dictToString(dicto):

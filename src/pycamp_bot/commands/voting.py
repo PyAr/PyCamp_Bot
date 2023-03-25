@@ -1,4 +1,3 @@
-import logging
 import peewee
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CommandHandler, CallbackQueryHandler
@@ -6,9 +5,7 @@ from pycamp_bot.commands.base import msg_to_active_pycamp_chat
 from pycamp_bot.commands.auth import admin_needed
 from pycamp_bot.commands.manage_pycamp import active_needed, get_active_pycamp
 from pycamp_bot.models import Pycampista, Project, Vote
-
-
-logger = logging.getLogger(__name__)
+from pycamp_bot.logger import logger
 
 
 def vote_authorized(f):
