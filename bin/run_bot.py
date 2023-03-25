@@ -1,5 +1,5 @@
 import os
-from telegram.ext import Application
+from telegram.ext import Application, MessageHandler, filters
 from pycamp_bot.commands import auth
 from pycamp_bot.commands import voting
 from pycamp_bot.commands import manage_pycamp
@@ -12,6 +12,10 @@ from pycamp_bot.commands import announcements
 from pycamp_bot.models import models_db_connection
 from pycamp_bot.logger import logger
 
+async def unknown_command(update, context):
+    text = "No reconozco el comando, para ver comandos válidos usá /ayuda"
+    await context.bot.send_message(chat_id=update.message.chat_id, text=text)
+
 
 def set_handlers(application):
     base.set_handlers(application)
@@ -23,6 +27,7 @@ def set_handlers(application):
     raffle.set_handlers(application)
     schedule.set_handlers(application)
     announcements.set_handlers(application)
+    application.add_handler(MessageHandler(filters.COMMAND, unknown_command))
 
 
 if __name__ == '__main__':

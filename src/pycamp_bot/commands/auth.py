@@ -86,18 +86,17 @@ async def revoke_admin(update, context):
     user.admin = False
     user.save()
     await context.bot.send_message(chat_id=chat_id,
-                     text='Un admin a caido --{}--.'.format(fallen_admin))
+                     text='Un admin ha caido --{}--.'.format(fallen_admin))
 
 
 async def list_admins(update, context):
     chat_id = update.message.chat_id
 
     admins = get_admins_username()
-    rply_msg = 'Los administradores son:\n'
+    rply_msg = 'Lxs administradorxs son:\n'
 
     for admin in admins:
-        rply_msg += admin
-        rply_msg += '\n'
+        rply_msg += '@' + admin + '\n'
 
     await context.bot.send_message(chat_id=chat_id, text=rply_msg)
 

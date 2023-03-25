@@ -45,3 +45,4 @@ def set_handlers(application):
 
     application.add_handler(CommandHandler('start', start))
     application.add_handler(CommandHandler('ayuda', help))
+    application.add_handler(CommandHandler('help', help))
