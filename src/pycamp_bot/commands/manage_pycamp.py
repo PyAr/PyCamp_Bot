@@ -17,11 +17,10 @@ def get_pycamp_by_name(name):
 
 
 def get_active_pycamp():
-    active = Pycamp.select().where(Pycamp.active == True)
+    active = Pycamp.select().where(Pycamp.active)
     if active.count() == 0:
         return False, None
-    else:
-        return True, active[0]
+    return True, active[0]
 
 
 def active_needed(f):
