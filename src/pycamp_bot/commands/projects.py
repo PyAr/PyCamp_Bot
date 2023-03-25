@@ -1,4 +1,5 @@
 import logging
+import peewee
 from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, filters
 from pycamp_bot.models import Pycampista, Project, Vote
 from pycamp_bot.commands.base import msg_to_active_pycamp_chat
