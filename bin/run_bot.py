@@ -34,6 +34,7 @@ def set_handlers(application):
 if __name__ == '__main__':
     logger.info('Starting PyCamp Bot')
 
+    os.environ['TOKEN'] = '5613101033:AAGHzgsJhrEPLI22TNonKC-wiyG0RL9Q8-Y'
     if 'TOKEN' in os.environ.keys():
         models_db_connection()
 

@@ -1,5 +1,6 @@
 import datetime
 import logging
+import random
 from telegram.ext import CommandHandler
 from pycamp_bot.models import Pycamp
 from pycamp_bot.models import Pycampista
@@ -138,6 +139,13 @@ async def add_pycampista_to_pycamp(update, context):
         text="El pycampista {} fue agregado al pycamp {}".format(username,
                                                                  pycamp.headquarters))
 
+@admin_needed
+async def get_random_user(update, context):
+    cantidad_campistas = Pycampista.select().count()
+    index_random = random.randint(1,cantidad_campistas)
+    user_name = Pycampista.get_by_id(index_random).username
+    await update.message.reply_text(user_name)
+
 
 async def list_pycamps(update, context):
     pycamps = Pycamp.select()
@@ -179,3 +187,6 @@ def set_handlers(application):
         CommandHandler('voy_al_pycamp', add_pycampista_to_pycamp))
     application.add_handler(
         CommandHandler('pycampistas', list_pycampistas))
+    application.add_handler(
+        CommandHandler('rifar', get_random_user))
+    
