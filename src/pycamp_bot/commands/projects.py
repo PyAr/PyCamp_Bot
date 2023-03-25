@@ -204,7 +204,6 @@ async def show_projects(update, context):
         if participants_count > 0:
             project_text += "\n Interesades: {}".format(participants_count)
         text.append(project_text)
-    text.append(project_text)
 
     if text:
         text = "\n\n".join(text)
