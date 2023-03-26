@@ -6,7 +6,11 @@ from pycamp_bot.scheduler.db_to_json import export_db_2_json
 from pycamp_bot.scheduler.schedule_calculator import export_scheduled_result
 
 
-DAY_LETTERS = []
+DAY_SLOT_TIME = {
+    'day':[], # Guarda el codigo del dia ej: ['A','B']
+    'slot':[], # Guarda la cantidad de slots del dia iterado ej [5] (se sobreescribe)
+    'time':[], # Guarda la hora a la que empieza el dia iterado [15] (se sobreescribe)
+}
 
 
 def _dictToString(dicto):
@@ -56,8 +60,8 @@ async def define_slot_days(update, context):
     return 1
 
 
-async def define_slot_times(update, context):
-    global DAY_LETTERS
+async def define_slot_ammount(update, context):
+    global DAY_SLOT_TIME
     text = update.message.text
     if text not in ["1", "2", "3", "4", "5", "6", "7"]:
         await context.bot.send_message(
@@ -66,24 +70,38 @@ async def define_slot_times(update, context):
         )
         return 1
 
-    DAY_LETTERS = list(string.ascii_uppercase[0:int(text)])
+    
+    DAY_SLOT_TIME['day'] =list(string.ascii_uppercase[0:int(text)])
 
     await context.bot.send_message(
         chat_id=update.message.chat_id,
-        text="Cuantos slots tiene  tu dia {}".format(DAY_LETTERS[0])
+        text="Cuantos slots tiene  tu dia {}".format(DAY_SLOT_TIME['day'][0])
     )
     return 2
+
+async def define_slot_times(update, context):
+    text = update.message.text
+    day = DAY_SLOT_TIME['day'][0]
+    await context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text="A que hora empieza tu dia {}".format(day)
+    )
+    DAY_SLOT_TIME['slot'] = [text]
+    return 3
 
 
 async def create_slot(update, context):
     username = update.message.from_user.username
     chat_id = update.message.chat_id
     text = update.message.text
-    times = list(range(int(text)+1))[1:]
-    starting_hour = 10
+
+    DAY_SLOT_TIME['time'] = [text]
+    slot_amount = DAY_SLOT_TIME['slot'][0]
+    times = list(range(int(slot_amount)+1))[1:]
+    starting_hour = int(text)
 
     while len(times) > 0:
-        new_slot = Slot(code=str(DAY_LETTERS[0]+str(times[0])))
+        new_slot = Slot(code=str(DAY_SLOT_TIME['day'][0]+str(times[0])))
         new_slot.start = starting_hour
 
         pycampista = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
@@ -93,12 +111,12 @@ async def create_slot(update, context):
         times.pop(0)
         starting_hour += 1
 
-    DAY_LETTERS.pop(0)
+    DAY_SLOT_TIME['day'].pop(0)
 
-    if len(DAY_LETTERS) > 0:
+    if len(DAY_SLOT_TIME['day']) > 0:
         await context.bot.send_message(
             chat_id=update.message.chat_id,
-            text="Cuantos slots tiene tu dia {}".format(DAY_LETTERS[0])
+            text="Cuantos slots tiene tu dia {}".format(DAY_SLOT_TIME['day'][0])
         )
         return 2
     else:
@@ -137,11 +155,11 @@ async def show_schedule(update, context):
     cronograma = {}
 
     for slot in slots:
-        cronograma[slot.code] = []
+        cronograma[f'({slot.code}) {slot.start}:00hs'] = []
         for project in projects:
             if project.slot_id == slot.id:
-                cronograma[slot.code].append(project.name)
-                cronograma[slot.code].append('@' + project.owner.username)
+                cronograma[f'({slot.code}) {slot.start}:00hs'].append(project.name)
+                cronograma[f'({slot.code}) {slot.start}:00hs'].append('@' + project.owner.username)
 
     await context.bot.send_message(
         chat_id=update.message.chat_id,
@@ -189,8 +207,9 @@ async def change_slot(update, context):
 load_schedule_handler = ConversationHandler(
     entry_points=[CommandHandler('cronogramear', define_slot_days)],
     states={
-        1: [MessageHandler(filters.TEXT, define_slot_times)],
-        2: [MessageHandler(filters.TEXT, create_slot)]},
+        1: [MessageHandler(filters.TEXT, define_slot_ammount)],
+        2: [MessageHandler(filters.TEXT, define_slot_times)],
+        3: [MessageHandler(filters.TEXT, create_slot)]},
     fallbacks=[CommandHandler('cancel', cancel)])
 
 
