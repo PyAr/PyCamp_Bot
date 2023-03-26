@@ -118,8 +118,13 @@ async def end_voting(update, context):
     await update.message.reply_text("Selección cerrada")
     await msg_to_active_pycamp_chat(context.bot, "La selección de proyectos ha finalizado.")
 
-#def vote_count(update, context):
-    
+async def vote_count(update, context):
+    votes = [vote.pycampista_id for vote in Vote.select()]
+    vote_count = len(set(votes))
+    await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text=f"Votaron: {vote_count}"
+        )
 
 
 def set_handlers(application):
@@ -131,5 +136,5 @@ def set_handlers(application):
         CommandHandler('votar', vote))
     application.add_handler(
         CommandHandler('terminar_votacion_proyectos', end_voting))
-#    application.add_handler(
-#        CommandHandler('contar_votos', vote_count))
+    application.add_handler(
+        CommandHandler('contar_votos', vote_count))
