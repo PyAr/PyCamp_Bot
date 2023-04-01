@@ -24,13 +24,13 @@ def get_active_pycamp():
 
 
 def active_needed(f):
-    def wrap(*args, **kargs):
-        bot, update = args
+    async def wrap(*args, **kargs):
+        update, context = args
         is_active, _ = get_active_pycamp()
         if is_active:
-            return f(*args)
+            return await f(*args)
         else:
-            bot.send_message(
+            await context.bot.send_message(
                 chat_id=update.message.chat_id,
                 text="No hay un PyCamp activo.")
     return wrap
