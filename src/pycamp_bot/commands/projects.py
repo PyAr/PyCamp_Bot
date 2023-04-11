@@ -1,6 +1,7 @@
 import logging
 import peewee
-from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, filters
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from pycamp_bot.models import Pycampista, Project, Vote
 from pycamp_bot.commands.base import msg_to_active_pycamp_chat
 from pycamp_bot.commands.manage_pycamp import active_needed, get_active_pycamp
@@ -192,40 +193,49 @@ load_project_handler = ConversationHandler(
 async def delete_project(update, context):
     """delete project loaded"""
     username = update.message.from_user.username
-    project_name_splited = update.message.text.split()
-    project_name_lower = [i.lower() for i in project_name_splited]
-
-    if len(project_name_splited) < 2:
-        await context.bot.send_message(
-            chat_id=update.message.chat_id,
-            text="Debes ingresar el nombre de proyecto a eliminar. \n Ej: /borrar_proyecto intro django."
-        )
-        return
+    ## si sos admin. traer todos los proyectos para que puedas clickearlos y eliminarlos
+    if username in get_admins_username():
+        projects = list(Project.select())
+        if projects:
+            await update.message.reply_text(
+                    text='¿Qué proyecto queres cancelar?',
+                )
+            for project in projects:
+                keyboard = [[InlineKeyboardButton('Borrar!', callback_data=project.id)]]
+                reply_markup = InlineKeyboardMarkup(keyboard)
+                await update.message.reply_text(
+                    text=project.name,
+                    reply_markup=reply_markup
+                )
     else:
-        try:
-            project_name = ' '.join(project_name_lower[1:])
-            project = Project.select().where(Project.name == project_name).get()
-        except:
-            await context.bot.send_message(
-                chat_id=update.message.chat_id,
-                text="No se encontró el proyecto '{}'.".format(project_name)
-            )
-            return
+        await update.message.reply_text(text='Buen intento, pero no tenes permiso para esto')
+    
+    return
 
-
-    if username !=  project.owner.username and username not in get_admins_username():
+async def button_project(update, context):
+    '''Save user vote in the database'''
+    query = update.callback_query
+    username = query.message['chat']['username']
+    chat_id = query.message.chat_id
+    user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
+    project_name = query.message['text']
+    try:
+        project = Project.select().where(Project.id == query.data).get()
+    except:
         await context.bot.send_message(
-            chat_id=update.message.chat_id,
-            text="No sos ni admin ni el owner de este proyecto, Careta."
+            chat_id=query.message.chat_id,
+            text="No se encontró el proyecto"
         )
         return
-    else:
-        project.delete_instance()
-        await context.bot.send_message(
-            chat_id=update.message.chat_id,
-            text="Se ha eliminado el proyecto {} satisfactoriamente.".format(project_name.title())
+    
+    project.delete_instance()
+    await context.bot.edit_message_text(text=f'❌Proyecto {project_name} Borrado!',
+                            chat_id=query.message.chat_id,
+                            message_id=query.message.message_id)
+    await context.bot.send_message(
+            chat_id=query.message.chat_id,
+            text=f'Perfecto. Se borró el proyecto: \n{project_name}\nDel Usuario: {username}'
         )
-        return
 
 
 async def show_projects(update, context):
@@ -244,8 +254,6 @@ async def show_projects(update, context):
         if participants_count > 0:
             project_text += "\n Interesades: {}".format(participants_count)
         text.append(project_text)
-    else:
-        text = None
 
     if text:
         text = "\n\n".join(text)
@@ -257,6 +265,8 @@ async def show_projects(update, context):
 
 def set_handlers(application):
     application.add_handler(load_project_handler)
+    application.add_handler(
+        CallbackQueryHandler(button_project))
     application.add_handler(
         CommandHandler('empezar_carga_proyectos', start_project_load))
     application.add_handler(
