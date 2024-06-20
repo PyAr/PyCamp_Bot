@@ -38,11 +38,8 @@ async def should_be_able_to_announce(pycampista: str, proyect: Project) -> bool:
 async def announce(update: Update, context: CallbackContext) -> str:
     logger.info("Announcement project process started")
     parameters: list[str] = update.message.text.split()
+    project_name = ("").join(parameters[1:])
 
-    if len(parameters) > 2:
-        await handle_error(context, update.message.chat_id, "format_error")
-        logger.warning("Error de formato en la solicitud. Too many parameters")
-        return ConversationHandler.END
     state.username = update.message.from_user.username
     state.projects = Project.select().join(Pycampista).where(Pycampista.username == state.username)
 
@@ -72,9 +69,10 @@ async def announce(update: Update, context: CallbackContext) -> str:
                 text=f"""Ingresá el Nombre del Proyecto a anunciar.\n\nTienes los siguientes proyectos:\n{project_list}""",
             )
 
-    if len(parameters) == 2:
+    if len(parameters) > 2:
         print('-Handle correct commands-')
-        state.p_name = update.message.text.split()[1].lower()
+        project_name = (" ").join(parameters[1:])
+        state.p_name = project_name
         _projects = Project.select().join(Pycampista).where(Project.name == state.p_name)
 
         if len(_projects) == 0:
@@ -108,13 +106,10 @@ async def get_project(update: Update, context: CallbackContext) -> str:
     logger.info("Getting project")
     parameters_list: list[str] = update.message.text.split()
 
-    if len(parameters_list) > 2:
-        await handle_error(context, update.message.chat_id, "format_error")
-        return ConversationHandler.END
-
     if "/anunciar" in parameters_list:
-        if len(parameters_list) == 2:
-            state.current_project = Project.select().join(Pycampista).where(Project.name == parameters_list[1].lower())
+        if len(parameters_list) > 2:
+            project_name = " ".join(parameters_list[1:])
+            state.current_project = Project.select().join(Pycampista).where(Project.name == project_name.lower())
             if not await should_be_able_to_announce(update.message.from_user.username, state.current_project[0]):
                 await handle_error(context, update.message.chat_id, "format_error", state.current_project)
                 logger.warning(f"Project {parameters_list[1]} not found!")
@@ -133,14 +128,9 @@ async def get_project(update: Update, context: CallbackContext) -> str:
             )
             return PROYECTO
 
-    elif len(parameters_list) == 2:
-        await handle_error(context, update.message.chat_id, "format_error")
-        logger.warning("Error de formato en la solicitud. Too many parameters")
-        return PROYECTO
-
     else:
-        c_proyect = Project.select().where(Project.name == parameters_list[0].lower()).first()
-        print('c_proyect: ', c_proyect)
+        project_name = (" ").join(parameters_list)
+        c_proyect = Project.select().where(Project.name == project_name).first()
         if c_proyect:
             if await should_be_able_to_announce(update.message.from_user.username, c_proyect):
                 state.current_project = c_proyect
@@ -164,7 +154,7 @@ async def get_project(update: Update, context: CallbackContext) -> str:
                     context, 
                     update.message.chat_id, 
                     "not_found",
-                    project_name=parameters_list[0]
+                    project_name=project_name
                 )
             logger.warning("Error de formato en la solicitud. No se encontró el proyecto.")
             return PROYECTO
@@ -236,7 +226,6 @@ async def handle_error(context: CallbackContext, chat_id: int, error_key: str, *
         await context.bot.send_message(
             chat_id=chat_id,
             text=error_message,
-            #parse_mode='Markdown'
         )
     except Exception as e:
         logger.error(f"Error al enviar el mensaje: {e}")
