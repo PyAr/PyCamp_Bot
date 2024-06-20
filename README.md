@@ -59,7 +59,7 @@ En este momento ya se puede hablar con el bot. ¿Qué le digo?
 * `/su <password>` para reclamar permisos de admin, reemplazando `<password>` por la contraseña que hayamos
 elegido en la envvar `PYCAMP_BOT_MASTER_KEY`
 * `/agregar_pycamp <pycamp_name>` para crear un pycamp en la deb
-* `activar_pycamp <pycamp_name>` activa un pycamp
+* `/activar_pycamp <pycamp_name>` activa un pycamp
 * `/empezar_pycamp` setea la fecha de inicio del pycamp activo
 * `/empezar_carga_proyectos` habilita la carga de los proyectos. En este punto los pycampistas pueden cargar sus proyectos,
 enviandole al bot el comando `/cargar_proyecto`

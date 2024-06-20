@@ -127,7 +127,11 @@ async def create_slot(update, context):
             chat_id=update.message.chat_id,
             text="Genial! Slots Asignados"
         )
+<<<<<<< Updated upstream
         await make_schedule(context.bot, update)
+=======
+        make_schedule(update, context)
+>>>>>>> Stashed changes
         return ConversationHandler.END
 
 
