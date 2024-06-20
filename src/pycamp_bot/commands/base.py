@@ -4,7 +4,7 @@ from pycamp_bot.logger import logger
 
 
 async def msg_to_active_pycamp_chat(bot, text):
-    chat_id = -220368252  # Prueba
+    chat_id = -1001404878013  # Prueba
     await bot.send_message(
         chat_id=chat_id,
         text=text
