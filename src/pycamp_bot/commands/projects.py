@@ -53,9 +53,9 @@ async def naming_project(update, context):
     '''Dialog to set project name'''
     logger.info("Nombrando el proyecto")
     username = update.message.from_user.username
-    text = update.message.text.lower()
+    name = update.message.text
 
-    new_project = Project(name=text)
+    new_project = Project(name=name)
     current_projects[username] = new_project
 
     await context.bot.send_message(
@@ -64,7 +64,7 @@ async def naming_project(update, context):
     )
     await context.bot.send_message(
         chat_id=update.message.chat_id,
-        text="Tu proyecto se llama: {}".format(text.title())
+        text="Tu proyecto se llama: {}".format(name)
     )
     await context.bot.send_message(
         chat_id=update.message.chat_id,
@@ -103,8 +103,7 @@ async def project_level(update, context):
     else:
         await context.bot.send_message(
             chat_id=update.message.chat_id,
-            text="Nooooooo input no válido, por favor "
-                 "ingresá 1, 2 o 3".format(text)
+            text="Nooooooo input no válido, por favor ingresá 1, 2 o 3"
         )
         return DIFICULTAD
 
@@ -135,7 +134,7 @@ async def project_topic(update, context):
         text="Excelente {}! La temática de tu proyecto es: {}.".format(username, text))
     await context.bot.send_message(
         chat_id=update.message.chat_id,
-        text="Tu proyecto ha sido cargado".format(username, text)
+        text="Tu proyecto ha sido cargado"
     )
     return ConversationHandler.END
 
@@ -198,22 +197,24 @@ async def delete_project(update, context):
     if len(project_name_splited) < 2:
         await context.bot.send_message(
             chat_id=update.message.chat_id,
-            text="Debes ingresar el nombre de proyecto a eliminar. \n Ej: /borrar_proyecto intro django."
+            text=(
+                "Debes ingresar el nombre de proyecto a eliminar.\n"
+                "Ej: /borrar_proyecto intro django."
+            )
         )
         return
     else:
         try:
             project_name = ' '.join(project_name_lower[1:])
             project = Project.select().where(Project.name == project_name).get()
-        except:
+        except Exception:
             await context.bot.send_message(
                 chat_id=update.message.chat_id,
                 text="No se encontró el proyecto '{}'.".format(project_name)
             )
             return
 
-
-    if username !=  project.owner.username and username not in get_admins_username():
+    if username != project.owner.username and username not in get_admins_username():
         await context.bot.send_message(
             chat_id=update.message.chat_id,
             text="No sos ni admin ni el owner de este proyecto, Careta."
@@ -239,8 +240,8 @@ async def show_projects(update, context):
             project.topic,
             project.difficult_level
         )
-        participants_count = Vote.select().where((Vote.project == project)
-                                                 & (Vote.interest)).count()
+        participants_count = Vote.select().where(
+            (Vote.project == project) & (Vote.interest)).count()
         if participants_count > 0:
             project_text += "\n Interesades: {}".format(participants_count)
         text.append(project_text)
@@ -263,4 +264,3 @@ def set_handlers(application):
         CommandHandler('borrar_proyecto', delete_project))
     application.add_handler(
         CommandHandler('proyectos', show_projects))
-
