@@ -30,6 +30,10 @@ pip install -e .
 
 y estas listo para trabajar.
 
+### Python 3.12
+
+`pip install setuptools`
+
 ## Testeo
 
 Para correr el bot ejecutá (desde el virtualenv):
