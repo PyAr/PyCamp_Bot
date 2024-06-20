@@ -149,6 +149,7 @@ def models_db_connection():
         Pycamp,
         Pycampista,
         PycampistaAtPycamp,
+        WizardAtPycamp,
         Project,
         Slot,
         Vote])
