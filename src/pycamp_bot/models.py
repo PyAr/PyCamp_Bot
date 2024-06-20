@@ -36,6 +36,11 @@ class Pycampista(BaseModel):
         rv_str += 'Admin' if self.admin else 'Commoner'
         return rv_str
 
+    def is_busy(self, moment):
+        import random
+        if random.random() > 0.5:
+            return True
+        return False
 
 class Pycamp(BaseModel):
     '''
