@@ -108,7 +108,7 @@ class Slot(BaseModel):
     '''
     code = pw.CharField()  # For example A1 for first slot first day
     start = pw.DateTimeField()
-    current_wizzard = pw.ForeignKeyField(Pycampista)
+    current_wizard = pw.ForeignKeyField(Pycampista)
 
 
 class Project(BaseModel):
