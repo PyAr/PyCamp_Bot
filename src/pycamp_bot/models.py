@@ -87,6 +87,18 @@ class PycampistaAtPycamp(BaseModel):
     pycampista = pw.ForeignKeyField(Pycampista)
 
 
+class WizardAtPycamp(BaseModel):
+    '''
+    Many to many relationship. Ona pycampista will attend many pycamps. A
+    pycamps will have many pycampistas
+    '''
+    pycamp = pw.ForeignKeyField(Pycamp)
+    wizard = pw.ForeignKeyField(Pycampista)
+    slot_ini = pw.DateTimeField()
+    slot_end = pw.DateTimeField()
+
+
+
 class Slot(BaseModel):
     '''
     Time slot representation
