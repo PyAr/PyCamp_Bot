@@ -57,6 +57,7 @@ class Pycamp(BaseModel):
     vote_authorized = pw.BooleanField(default=False, null=True)
     project_load_authorized = pw.BooleanField(default=False, null=True)
     active = pw.BooleanField(default=False, null=True)
+    wizard_slot_duration = pw.IntegerField(default=60, null=False)  # In minutes
 
     def __str__(self):
         rv_str = 'Pycamp:\n'
@@ -64,6 +65,17 @@ class Pycamp(BaseModel):
                      'vote_authorized', 'project_load_authorized']:
             rv_str += f'{attr}: {getattr(self, attr)}\n'
         return rv_str
+
+    def set_as_only_active(self):
+        active = Pycamp.select().where(Pycamp.active)
+        for p in active:
+            p.active = False
+        Pycamp.bulk_update(active, fields=[Pycamp.active])
+        self.active = True
+        self.save()
+
+    def get_wizards(self):
+        return Pycampista.select().where(Pycampista.wizard == 1)
 
 
 class PycampistaAtPycamp(BaseModel):
