@@ -1,10 +1,15 @@
 import datetime
-from telegram.ext import CommandHandler
+from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, filters
 from pycamp_bot.models import Pycamp
 from pycamp_bot.models import Pycampista
 from pycamp_bot.models import PycampistaAtPycamp
 from pycamp_bot.commands.auth import admin_needed
 from pycamp_bot.logger import logger
+
+
+SET_DATE_STATE = "set_fate"
+SET_DURATION_STATE = "set_duration"
+WRAP_UP_STATE = "wrap_up"
 
 
 def get_pycamp_by_name(name):
@@ -68,36 +73,98 @@ async def set_active_pycamp(update, context):
 
 @admin_needed
 async def add_pycamp(update, context):
-    parameters = update.message.text.split(' ')
-    if not len(parameters) == 2:
+    parameters = update.message.text.split(' ', 1)
+    if len(parameters) < 2:
         await context.bot.send_message(
             chat_id=update.message.chat_id,
-            text="El comando necesita un parametro (pycamp name)")
+            text="El comando necesita un parametro (headquarters)")
+        return
+    hq = parameters[1].strip()
+    if not hq:
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text="El parámetro headquarters no puede ser vacío")
         return
 
-    pycamp = Pycamp.get_or_create(headquarters=parameters[1])[0]
+    pycamp = Pycamp.get_or_create(headquarters=hq, active=True)[0]
+    pycamp.set_as_only_active()
+    logger.info('Creado: {}'.format(pycamp))
 
+    msg = "El Pycamp {} fue creado.\n¿Cuándo empieza? (formato yyyy-mm-dd)"
     await context.bot.send_message(
         chat_id=update.message.chat_id,
-        text="El Pycamp {} fue creado.".format(pycamp.headquarters))
+        text=msg.format(pycamp.headquarters)
+    )
+    return SET_DATE_STATE
 
 
-@active_needed
-@admin_needed
-async def start_pycamp(update, context):
-    parameters = update.message.text.split(' ')
-    if len(parameters) == 2:
-        date = datetime.datetime.fromisoformat(parameters[1])
-    else:
-        date = datetime.datetime.now()
-
-    is_active, pycamp = get_active_pycamp()
-    pycamp.init = date
+async def define_start_date(update, context):
+    text = update.message.text
+    try:
+        start_date = datetime.datetime.fromisoformat(text)
+    except ValueError:
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text="mmm no entiendo esa fecha, de nuevo?"
+        )
+        return SET_DATE_STATE
+    
+    _, pycamp = get_active_pycamp()
+    pycamp.init = start_date
     pycamp.save()
 
     await context.bot.send_message(
         chat_id=update.message.chat_id,
-        text="Empezó Pycamp :) ! {}".format(date))
+        text="¿Cuantos días dura el PyCamp?"
+    )
+    return SET_DURATION_STATE
+
+
+async def define_duration(update, context):
+    text = update.message.text.strip()
+    try:
+        duration = int(text)
+    except ValueError:
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text="mmm no entiendo. Poné un número entero porfa."
+        )
+        return SET_DURATION_STATE
+
+    _, pycamp = get_active_pycamp()
+    pycamp.end = pycamp.init + datetime.timedelta(days=duration - 1)
+    pycamp.save()
+
+    msg = "Listo, el PyCamp '{}' está activo, desde el {} hasta el {}".format(
+        pycamp.headquarters,
+        pycamp.init.date(),
+        pycamp.end.date()
+    )
+    await context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text=msg
+    )
+
+
+async def cancel(update, context):
+    await context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text="Se canceló la carga del PyCamp...")
+    return ConversationHandler.END
+
+
+load_start_pycamp = ConversationHandler(
+    entry_points=[CommandHandler('empezar_pycamp', add_pycamp)],
+    states={
+        SET_DATE_STATE: [MessageHandler(filters.TEXT, define_start_date)],
+        SET_DURATION_STATE: [MessageHandler(filters.TEXT, define_duration)]
+    },
+    fallbacks=[CommandHandler('cancel', cancel)]
+)
+
+
+
+
 
 
 @active_needed
@@ -162,19 +229,14 @@ async def list_pycampistas(update, context):
 
 
 def set_handlers(application):
-    application.add_handler(
-        CommandHandler('empezar_pycamp', start_pycamp))
+    application.add_handler(load_start_pycamp)
     application.add_handler(
         CommandHandler('terminar_pycamp', end_pycamp))
     application.add_handler(
         CommandHandler('activar_pycamp', set_active_pycamp))
-    application.add_handler(
-        CommandHandler('agregar_pycamp', add_pycamp))
     application.add_handler(
         CommandHandler('pycamps', list_pycamps))
     application.add_handler(
         CommandHandler('voy_al_pycamp', add_pycampista_to_pycamp))
     application.add_handler(
         CommandHandler('pycampistas', list_pycampistas))
-
-    
