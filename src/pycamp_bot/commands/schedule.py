@@ -13,13 +13,15 @@ DAY_SLOT_TIME = {
 }
 
 
-def _dictToString(dicto):
-    if dicto:
-        return str(dicto).replace(', ', '\r\n').replace('}', '\r\n').replace("u'", "") \
-            .replace("'", "").replace('[', '\r\n').replace(']', '\r\n\r\n') \
-            .replace(': {', '\r\n')[1:-1]
-    else:
-        return "No tengo un cronograma para darte. Pedile a unx admin que haga /cronogramear"
+DIAS = {
+    'A':'Jueves',
+    'B':'Viernes',
+    'C':'Sabado',
+    'D':'Domingo',
+    'E':'Lunes',
+    'F':'Martes',
+    'G':'Miercoles',
+    }
 
 
 async def cancel(update, context):
@@ -79,6 +81,7 @@ async def define_slot_ammount(update, context):
     )
     return 2
 
+
 async def define_slot_times(update, context):
     text = update.message.text
     day = DAY_SLOT_TIME['day'][0]
@@ -124,7 +127,7 @@ async def create_slot(update, context):
             chat_id=update.message.chat_id,
             text="Genial! Slots Asignados"
         )
-        make_schedule(context.bot, update)
+        await make_schedule(context.bot, update)
         return ConversationHandler.END
 
 
@@ -149,21 +152,33 @@ async def make_schedule(update, context):
     )
 
 
+async def check_day_tab(day, slots, cronograma, i):
+    try:
+        if day != DIAS[slots[i-1].code[0]]:
+            cronograma += f'\n*{day}:*\n'
+    except Exception as e:
+        print("ERROR       ", e)
+    return cronograma
+
+
 async def show_schedule(update, context):
     slots = Slot.select()
     projects = Project.select()
-    cronograma = {}
+    cronograma = "*Crónograma:* \n"
 
-    for slot in slots:
-        cronograma[f'({slot.code}) {slot.start}:00hs'] = []
+    for i, slot in enumerate(slots):
+        day = DIAS[slot.code[0]]
+        cronograma = await check_day_tab(day, slots, cronograma, i)
+
         for project in projects:
             if project.slot_id == slot.id:
-                cronograma[f'({slot.code}) {slot.start}:00hs'].append(project.name)
-                cronograma[f'({slot.code}) {slot.start}:00hs'].append('@' + project.owner.username)
+                cronograma += f'*-* {slot.start}:00hs = *{(project.name).capitalize()}.*\n'
+                cronograma += f'A cargo de 👉🏼 {"@" + project.owner.username}\n'
 
     await context.bot.send_message(
         chat_id=update.message.chat_id,
-        text=_dictToString(cronograma)
+        text=cronograma,
+        parse_mode='Markdown'
     )
 
 
