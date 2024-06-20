@@ -94,8 +94,36 @@ async def summon_wizard(update, context):
             text="Tu magx asignadx es: @{}".format(wizard.username)
         )
 
+
+@admin_needed
+async def schedule_wizards(update, context):
+    _, pycamp = get_active_pycamp()
+    logger.info(pycamp)
+
+    schedule = define_wizards_schedule(pycamp)
+
+    for slot, wizard in schedule.items():
+        start, end = slot
+        WizardAtPycamp.create(
+            pycamp=pycamp,
+            wizard=wizard,
+            slot_ini=start,
+            slot_end=end
+        )
+        logger.debug("From {} to {} the wizard is {}".format(start, end, wizard.username))
+
+    # Mandar mensajes a los magos con su agenda propia
+    msg = "Lista la agenda de magos."
+    await context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text=msg
+    )
+
+
 def set_handlers(application):
     application.add_handler(
             CommandHandler('evocar_magx', summon_wizard))
     application.add_handler(
             CommandHandler('ser_magx', become_wizard))
+    application.add_handler(
+        CommandHandler('agendar_magos', schedule_wizards))
