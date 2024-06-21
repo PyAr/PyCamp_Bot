@@ -1,4 +1,5 @@
 import random
+from collections import defaultdict
 from datetime import datetime, timedelta
 
 from telegram.ext import CommandHandler
@@ -176,6 +177,34 @@ async def schedule_wizards(update, context):
     )
 
 
+async def show_wizards_schedule(update, context):
+    _, pycamp = get_active_pycamp()
+
+    agenda = WizardAtPycamp.select().where(pycamp == pycamp).order_by(WizardAtPycamp.init)
+    per_day = defaultdict(list)
+    for entry in agenda:
+        k = entry.init.strftime("%a %d de %b")
+        per_day[k].append(entry)
+
+    msg = "Esta es la agenda de magos para el PyCamp {}".format(pycamp.headquarters)
+    for day, items in per_day.items():
+        msg += "\nEl día _{}_:\n".format(day)
+        for i in items:
+            msg += "\t \\- {} a {}:\t*{}* \n".format(
+                i.init.strftime("%H:%M"), 
+                i.end.strftime("%H:%M"), 
+                "@" + i.wizard.username
+            )
+    
+    logger.debug(msg)
+    
+    await context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text=msg,
+        parse_mode="MarkdownV2"
+    )
+
+
 def set_handlers(application):
     application.add_handler(
             CommandHandler('evocar_magx', summon_wizard))
@@ -183,3 +212,5 @@ def set_handlers(application):
             CommandHandler('ser_magx', become_wizard))
     application.add_handler(
         CommandHandler('agendar_magos', schedule_wizards))
+    application.add_handler(
+        CommandHandler('ver_agenda_magx', show_wizards_schedule))
