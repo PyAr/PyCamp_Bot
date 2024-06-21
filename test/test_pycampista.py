@@ -1,12 +1,6 @@
 from datetime import datetime, timedelta
 from pycamp_bot.models import Pycampista, Slot
-from peewee import SqliteDatabase
-from functools import wraps
-
-MODELS = [Pycampista, Slot]
-
-# use an in-memory SQLite for tests.
-test_db = SqliteDatabase(':memory:')
+from test.conftest import use_test_database, test_db, MODELS
 
 
 # ---------------------------
@@ -28,18 +22,6 @@ def teardown_module(module):
     test_db.close()
     # If we wanted, we could re-bind the models to their original
     # database here. But for tests this is probably not necessary.
-
-# Bind the given models to the db for the duration of wrapped block.
-def use_test_database(fn):
-    @wraps(fn)
-    def inner(self):
-        with test_db.bind_ctx(MODELS):
-            test_db.create_tables(MODELS)
-            try:
-                fn(self)
-            finally:
-                test_db.drop_tables(MODELS)
-    return inner
 
 
 class TestPycampistaIsBusy:
