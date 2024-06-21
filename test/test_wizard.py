@@ -1,7 +1,7 @@
-from datetime import datetime, timedelta
-from pycamp_bot.models import Pycamp
+from datetime import datetime
+from pycamp_bot.models import Pycamp, Pycampista, Slot
 from pycamp_bot.commands import wizard
-from test.conftest import use_test_database, test_db, MODELS
+from test.conftest import use_test_database, test_db, MODELS, TEST_END_DATE, TEST_INIT_DATE
 
 
 # ---------------------------
@@ -99,4 +99,71 @@ class TestWizardScheduleSlots:
 
 
 class TestDefineWizardsSchedule:
-    pass
+
+    def init_pycamp(self):
+        self.pycamp = Pycamp.create(
+            headquarters="Narnia",
+            init=datetime(2024,6,20),
+            end=datetime(2024,6,24),
+        )
+
+    # If no wizards, returns {}
+    @use_test_database
+    def test_no_wizards_then_return_empty_dict(self):
+        self.init_pycamp()
+        sched = wizard.define_wizards_schedule(self.pycamp)
+        assert sched == {}
+    
+    # all slots are asigned a wizard
+    @use_test_database
+    def test_all_slots_are_signed_a_wizard(self):
+        self.init_pycamp()
+        gandalf = Pycampista.create(username="gandalf", wizard=True)
+        sched = wizard.define_wizards_schedule(self.pycamp)
+        assert all(
+            (isinstance(s, Pycampista) and s.wizard) for s in sched.values()
+        )
+
+    # Wizards are not asigned to slots when they are busy
+    @use_test_database
+    def test_all_slots_are_signed_a_wizard(self):
+        self.init_pycamp()
+        gandalf = Pycampista.create(username="gandalf", wizard=True)
+        merlin = Pycampista.create(username="merlin", wizard=True)
+        for h in [9, 10, 11, 12]:
+            # Create 3 slots where Gandalf is busy
+            Slot.create(
+                code = "A1", 
+                start=datetime(2024, 6, 21, h, 30, 0),
+                current_wizard=gandalf
+            )
+        sched = wizard.define_wizards_schedule(self.pycamp)
+        # Verify Gandalf is not assigned to slots where he is busy
+        for (ini, end), w in sched.items():
+            if gandalf.is_busy(ini, end):
+                print(ini, end, w.username)
+                assert w != gandalf
+
+    # If all wizards are busy in a slot, then one is asigned all the same
+    @use_test_database
+    def test_all_slots_are_signed_a_wizard(self):
+        self.init_pycamp()
+        gandalf = Pycampista.create(username="gandalf", wizard=True)
+        merlin = Pycampista.create(username="merlin", wizard=True)
+        for h in [9, 10, 11, 12]:
+            # Create 3 slots where Gandalf AND Merlin are busy
+            Slot.create(
+                code = "A1", 
+                start=datetime(2024, 6, 21, h, 30, 0),
+                current_wizard=gandalf
+            )
+            Slot.create(
+                code = "A1", 
+                start=datetime(2024, 6, 21, h, 30, 0),
+                current_wizard=merlin
+            )
+        sched = wizard.define_wizards_schedule(self.pycamp)
+
+        assert all(
+            (isinstance(s, Pycampista) and s.wizard) for s in sched.values()
+        )

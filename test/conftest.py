@@ -1,6 +1,9 @@
 import os
+
+from datetime import datetime
 from functools import wraps
 from peewee import SqliteDatabase
+import pytest
 from telegram import Bot
 
 from pycamp_bot.models import Pycampista, Slot, Pycamp, WizardAtPycamp
@@ -27,3 +30,7 @@ def use_test_database(fn):
             finally:
                 test_db.drop_tables(MODELS)
     return inner
+
+
+TEST_INIT_DATE = datetime(2024, 6, 20, 0, 0, 0)
+TEST_END_DATE = datetime(2024, 6, 24, 23, 59, 59, 99999)
