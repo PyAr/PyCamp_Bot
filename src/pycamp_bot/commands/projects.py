@@ -258,8 +258,20 @@ async def show_projects(update, context):
 async def show_my_projects(update, context):
     """Let people see what projects they have voted for"""
 
-    user = Pycampista.get(Pycampista.username == update.message.from_user.username)
-    votes = Vote.select(Project, Slot).join(Project).join(Slot).where((Vote.pycampista == user) & Vote.interest).order_by(Slot.code)
+    user = Pycampista.get(
+        Pycampista.username == update.message.from_user.username,
+    )
+    votes = (
+        Vote
+        .select(Project, Slot)
+        .join(Project)
+        .join(Slot)
+        .where(
+            (Vote.pycampista == user) &
+            Vote.interest
+        )
+        .order_by(Slot.code)
+    )
 
     if votes:
         text_chunks = []
