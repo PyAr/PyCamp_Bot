@@ -1,7 +1,7 @@
 import random
 from collections import defaultdict
 from datetime import datetime, timedelta
-
+from itertools import cycle
 from telegram.ext import CommandHandler
 from telegram.error import BadRequest
 from pycamp_bot.models import Pycampista, WizardAtPycamp
@@ -75,24 +75,27 @@ def define_wizards_schedule(pycamp):
     Returns a dict whose keys are times and values are wizards (Pycampistas instances).
 
     """
-    slots_list = compute_wizards_slots(pycamp)
-    wizards_list = pycamp.get_wizards()
-    n_wizards = wizards_list.count()
+    all_wizards = pycamp.get_wizards()
+    if all_wizards.count() == 0:
+        return {}
+    
     wizard_per_slot = {}
-    idx = 0
-    for slot in slots_list:
-        wizard = wizards_list[idx%n_wizards]
-        n_iter = 0  # railguard
-        while wizard.is_busy(*slot):
-            logger.info('Magx {} con conflicto en el slot {}. Pruebo otro.'.format(wizard.username, slot))
-            if n_iter == n_wizards:
-                logger.warning('Queda el magx {} con conflicto en el slot {}'.format(wizard, slot))
-                break
-            idx += 1
-            wizard = wizards_list[idx%n_wizards]
-            n_iter += 1
+    wizards_iter = cycle(all_wizards)
+    for slot in compute_wizards_slots(pycamp):
+        # Cycle through the wizards, asigning them to slots.
+        wizard = next(wizards_iter)
+        if wizard.is_busy(*slot):
+            # If the target wizard is busy in this time slot, try to find another available wizard
+            if all(w.is_busy(*slot) for w in all_wizards):
+                # Nada que hacer, todos ocupados. Queda
+                logger.warning(
+                    'Queda el magx {} con conflicto en el slot {}'.format(wizard.username, slot)
+                )
+            else:
+                # Sigo hasta el próximo que esté disponible
+                continue
         wizard_per_slot[slot] = wizard
-        idx += 1
+    
     return wizard_per_slot
 
 
