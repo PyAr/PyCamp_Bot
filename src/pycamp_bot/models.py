@@ -40,14 +40,13 @@ class Pycampista(BaseModel):
         rv_str += 'Admin' if self.admin else 'Commoner'
         return rv_str
 
-    def is_busy(self, moment):
-        """`moment` is a tuple (start, end) with two datetime objects."""
-        target_period_start, target_period_end = moment
+    def is_busy(self, from_time, to_time):
+        """`from_time, to_time` are two datetime objects."""
         project_presentation_slots = Slot.select().where(Slot.current_wizard == self)
         for slot in project_presentation_slots:
             # https://stackoverflow.com/a/13403827/1161156
-            latest_start = max(target_period_start, slot.start)
-            earliest_end = min(target_period_end, slot.get_end_time())
+            latest_start = max(from_time, slot.start)
+            earliest_end = min(to_time, slot.get_end_time())
             if latest_start <= earliest_end:  # Overlap
                 return True
         return False

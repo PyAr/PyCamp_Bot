@@ -83,7 +83,7 @@ def define_wizards_schedule(pycamp):
     for slot in slots_list:
         wizard = wizards_list[idx%n_wizards]
         n_iter = 0  # railguard
-        while wizard.is_busy(slot):
+        while wizard.is_busy(*slot):
             logger.info('Magx {} con conflicto en el slot {}. Pruebo otro.'.format(wizard.username, slot))
             if n_iter == n_wizards:
                 logger.warning('Queda el magx {} con conflicto en el slot {}'.format(wizard, slot))
