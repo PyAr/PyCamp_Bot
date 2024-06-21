@@ -8,6 +8,41 @@ from pycamp_bot.commands.manage_pycamp import get_active_pycamp
 from pycamp_bot.logger import logger
 
 
+LUNCH_TIME_START_HOUR = 13
+LUNCH_TIME_END_HOUR = 14
+WIZARD_TIME_START_HOUR = 9
+WIZARD_TIME_END_HOUR = 20
+
+
+def is_wizard_time_slot(slot):
+    return slot[0].hour in range(WIZARD_TIME_START_HOUR, WIZARD_TIME_END_HOUR)
+
+
+def is_lunch_time_slot(slot):
+    return slot[0].hour in range(LUNCH_TIME_START_HOUR, LUNCH_TIME_END_HOUR)
+
+
+def is_after_first_lunch_slot(pycamp, slot):
+    return slot[0].day != pycamp.start.day or slot[0].hour >= LUNCH_TIME_END_HOUR
+            
+
+
+def is_before_last_lunch_slot(pycamp, slot):
+    return slot[0].day != pycamp.end.day or slot[0].hour < LUNCH_TIME_START_HOUR
+
+
+def is_valid_wizard_slot(pycamp, slot):
+    return (
+        is_wizard_time_slot(slot)
+        and not is_lunch_time_slot(slot)
+        and is_after_first_lunch_slot(pycamp, slot)
+        and is_before_last_lunch_slot(pycamp, slot)
+    )
+
+
+def clean_wizards_free_slots(pycamp, slots):
+    return [slot for slot in slots if is_valid_wizard_slot(pycamp, slot)]
+
 
 def compute_wizards_slots(pycamp):
     """
@@ -26,6 +61,8 @@ def compute_wizards_slots(pycamp):
             (slot_start, slot_end)
         )
         current_period = slot_end
+
+    slots = clean_wizards_free_slots(pycamp, slots)
 
     return slots
 
