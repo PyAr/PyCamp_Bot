@@ -94,3 +94,4 @@ Para agendar los magos:
 * `/ver_cronograma` te muestra el cronograma!
 * `/ser_magx` te registra como mago.
 * `/evocar_magx` llama al mago de turno para pedirle ayuda.
+* `/ver_agenda_magx` te muestra la agenda de magos del PyCamp.
