@@ -15,6 +15,8 @@ LUNCH_TIME_END_HOUR = 14
 WIZARD_TIME_START_HOUR = 9
 WIZARD_TIME_END_HOUR = 20
 
+MSG_MAX_LEN = 4096
+
 
 def is_wizard_time_slot(slot):
     return slot[0].hour in range(WIZARD_TIME_START_HOUR, WIZARD_TIME_END_HOUR)
@@ -231,12 +233,17 @@ async def schedule_wizards(update, context):
     agenda = WizardAtPycamp.select().where(WizardAtPycamp.pycamp == pycamp)
     
     msg = format_wizards_schedule(agenda)
-    
-    await context.bot.send_message(
-        chat_id=update.message.chat_id,
-        text=msg,
-        parse_mode="MarkdownV2"
-    )
+    try:
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text=msg,
+            parse_mode="MarkdownV2"
+        )  
+    except BadRequest as e:
+        m = "Coulnd't return the Wizards list to the admin. ".format(update.message.from_user.username)
+        if len(msg) >= MSG_MAX_LEN:
+            m += "The message is too long. Check the data in the DB ;-)"
+        logger.exception(m)
 
 
 def format_wizards_schedule(agenda):

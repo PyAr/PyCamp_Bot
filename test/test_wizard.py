@@ -1,12 +1,9 @@
 from datetime import datetime
 from pycamp_bot.models import Pycamp, Pycampista, Slot
 from pycamp_bot.commands import wizard
-from test.conftest import use_test_database, test_db, MODELS, TEST_END_DATE, TEST_INIT_DATE
+from test.conftest import use_test_database, test_db, MODELS
 
 
-# ---------------------------
-# Module Level Setup/TearDown
-# ---------------------------
 def setup_module(module):
     """setup any state specific to the execution of the given module."""
     test_db.bind(MODELS, bind_refs=False, bind_backrefs=False)

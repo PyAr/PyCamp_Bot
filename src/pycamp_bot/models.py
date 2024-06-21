@@ -60,6 +60,8 @@ class Pycamp(BaseModel):
     end: time of end
     vote_authorized: the vote is auth in this pycamp
     project_load_authorized: the project load is auth in this pycamp
+    active: boolean telling wheter this PyCamp instance is active (or an old one)
+    wizard_slot_duration: config to compute the schedule of mages
     '''
     headquarters = pw.CharField(unique=True)
     init = pw.DateTimeField(null=True)
