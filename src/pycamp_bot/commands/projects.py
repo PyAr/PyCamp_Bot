@@ -8,7 +8,7 @@ from pycamp_bot.commands.auth import admin_needed, get_admins_username
 
 
 current_projects = {}
-NOMBRE, DIFICULTAD, TOPIC, PARTICIPANTS = ["nombre", "dificultad", "topic", "participantes"]
+NOMBRE, DIFICULTAD, TOPIC = ["nombre", "dificultad", "topic"]
 
 logger = logging.getLogger(__name__)
 
