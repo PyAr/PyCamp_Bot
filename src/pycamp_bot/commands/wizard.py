@@ -217,6 +217,7 @@ async def schedule_wizards(update, context):
 
 
 def format_wizards_schedule(agenda):
+    """Aux function to render the wizards schedule as a friendly  message."""
     per_day = defaultdict(list)
     for entry in agenda:
         k = entry.init.strftime("%a %d de %b")
@@ -275,6 +276,6 @@ def set_handlers(application):
     application.add_handler(
             CommandHandler('ser_magx', become_wizard))
     application.add_handler(
-        CommandHandler('agendar_magos', schedule_wizards))
+        CommandHandler('agendar_magx', schedule_wizards))
     application.add_handler(
         CommandHandler('ver_agenda_magx', show_wizards_schedule))

@@ -82,7 +82,7 @@ Para agendar los magos:
 1. Todos los candidatos tienen que haberse registrado con `/ser_magx`
 2. Tiene que estar creado el schedule de presentaciones de proyectos (`/cronogramear`)
 
-* `/agendar_magos` Asigna un mago por hora durante todo el PyCamp.
+* `/agendar_magx` Asigna un mago por hora durante todo el PyCamp.
     * De 9 a 13 y de 14 a 19.
     * El primer día arranca después del almuerzo (14hs).
     * El último día termina al almuerzo (13hs).
@@ -94,4 +94,4 @@ Para agendar los magos:
 * `/ver_cronograma` te muestra el cronograma!
 * `/ser_magx` te registra como mago.
 * `/evocar_magx` llama al mago de turno para pedirle ayuda.
-* `/ver_agenda_magx` te muestra la agenda de magos del PyCamp.
+* `/ver_agenda_magx completa` te muestra la agenda de magos del PyCamp. El parámetro `completa` es opcional, si se omite solo muestra los turnos pendientes.
