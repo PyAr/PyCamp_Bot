@@ -223,17 +223,39 @@ def format_wizards_schedule(agenda):
     return msg
 
 async def show_wizards_schedule(update, context):
+    show_all = False
+    parameters = update.message.text.strip().split(' ', 1)
+    if len(parameters) == 2:
+        flag = parameters[1].strip().lower()
+        show_all = (flag == "completa")
+        if not show_all:
+            await context.bot.send_message(
+                chat_id=update.message.chat_id,
+                text="El comando solo acepta un parámetro (opcional): 'completa'. ¿Probás de nuevo?",
+            )
+            return
+    elif len(parameters) > 2:
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text="El comando solo acepta un parámetro (opcional): 'completa'. ¿Probás de nuevo?",
+        )
+        return
+    
     _, pycamp = get_active_pycamp()
 
-    agenda = WizardAtPycamp.select().where(pycamp == pycamp).order_by(WizardAtPycamp.init)
+    agenda = WizardAtPycamp.select().where(WizardAtPycamp.pycamp == pycamp)
+    if not show_all:
+        agenda = agenda.where(WizardAtPycamp.end > datetime.now())
+    agenda = agenda.order_by(WizardAtPycamp.init)
     msg = format_wizards_schedule(agenda)
-    logger.debug(msg)
     
     await context.bot.send_message(
         chat_id=update.message.chat_id,
         text=msg,
         parse_mode="MarkdownV2"
     )
+    logger.debug("Wizards schedule delivered to {}".format(update.message.from_user.username))
+
 
 
 def set_handlers(application):
