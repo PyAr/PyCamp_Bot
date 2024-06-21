@@ -169,7 +169,7 @@ async def notify_scheduled_slots_to_wizard(update, context, pycamp, wizard, agen
 async def notify_schedule_to_wizards(update, context, pycamp):
     for wizard in pycamp.get_wizards():
         wizard_agenda = WizardAtPycamp.select().where(
-            WizardAtPycamp.pycamp == pycamp & WizardAtPycamp.wizard == wizard
+            (WizardAtPycamp.pycamp == pycamp) & (WizardAtPycamp.wizard == wizard)
         ).order_by(WizardAtPycamp.init)
 
         await notify_scheduled_slots_to_wizard(update, context, pycamp, wizard, wizard_agenda)
@@ -203,6 +203,17 @@ async def schedule_wizards(update, context):
     persist_wizards_schedule_in_db(pycamp)
 
     await notify_schedule_to_wizards(update, context, pycamp)
+
+    agenda = WizardAtPycamp.select().where(WizardAtPycamp.pycamp == pycamp)
+    
+    msg = format_wizards_schedule(agenda)
+    
+    await context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text=msg,
+        parse_mode="MarkdownV2"
+    )
+
 
 
 def format_wizards_schedule(agenda):
