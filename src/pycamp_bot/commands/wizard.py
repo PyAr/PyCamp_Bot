@@ -23,15 +23,16 @@ def is_lunch_time_slot(slot):
 
 
 def is_after_first_lunch_slot(pycamp, slot):
-    return slot[0].day != pycamp.start.day or slot[0].hour >= LUNCH_TIME_END_HOUR
+    return slot[0].day != pycamp.init.day or slot[0].hour >= LUNCH_TIME_END_HOUR
             
 
-
 def is_before_last_lunch_slot(pycamp, slot):
+    """Must be False if slot starts after lunch the last day"""
     return slot[0].day != pycamp.end.day or slot[0].hour < LUNCH_TIME_START_HOUR
 
 
 def is_valid_wizard_slot(pycamp, slot):
+    """If True the slot is kept."""
     return (
         is_wizard_time_slot(slot)
         and not is_lunch_time_slot(slot)
@@ -61,7 +62,7 @@ def compute_wizards_slots(pycamp):
             (slot_start, slot_end)
         )
         current_period = slot_end
-
+    print(len(slots), slots)
     slots = clean_wizards_free_slots(pycamp, slots)
 
     return slots
