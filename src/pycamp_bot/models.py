@@ -10,7 +10,6 @@ db = pw.SqliteDatabase('pycamp_projects.db')
 
 
 class BaseModel(pw.Model):
-
     class Meta:
         database = db
 
@@ -138,7 +137,7 @@ class Slot(BaseModel):
     '''
     code = pw.CharField()  # For example A1 for first slot first day
     start = pw.DateTimeField()
-    current_wizard = pw.ForeignKeyField(Pycampista)
+    current_wizard = pw.ForeignKeyField(Pycampista, null=True)
 
     def get_end_time(self):
         return self.start + timedelta(minutes=DEFAULT_SLOT_PERIOD)
@@ -185,4 +184,5 @@ def models_db_connection():
         WizardAtPycamp,
         Project,
         Slot,
-        Vote])
+        Vote], safe=True)
+    db.close()

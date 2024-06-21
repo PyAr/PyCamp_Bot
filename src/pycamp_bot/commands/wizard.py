@@ -3,6 +3,7 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 
 from telegram.ext import CommandHandler
+from telegram.error import BadRequest
 from pycamp_bot.models import Pycampista, WizardAtPycamp
 from pycamp_bot.commands.auth import admin_needed
 from pycamp_bot.commands.manage_pycamp import get_active_pycamp
@@ -56,7 +57,7 @@ def compute_wizards_slots(pycamp):
     wizard_end = pycamp.end
     slots = []
     current_period = wizard_start
-    while current_period < wizard_end:
+    while current_period < wizard_end:  # TODO: check fields None
         slot_start = current_period
         slot_end = current_period + timedelta(minutes=pycamp.wizard_slot_duration)
         slots.append(
@@ -93,6 +94,7 @@ def define_wizards_schedule(pycamp):
         wizard_per_slot[slot] = wizard
         idx += 1
     return wizard_per_slot
+
 
 async def become_wizard(update, context):
     current_wizards = Pycampista.select().where(Pycampista.wizard is True)
@@ -172,7 +174,11 @@ async def notify_schedule_to_wizards(update, context, pycamp):
             (WizardAtPycamp.pycamp == pycamp) & (WizardAtPycamp.wizard == wizard)
         ).order_by(WizardAtPycamp.init)
 
-        await notify_scheduled_slots_to_wizard(update, context, pycamp, wizard, wizard_agenda)
+        try:
+            await notify_scheduled_slots_to_wizard(update, context, pycamp, wizard, wizard_agenda)
+            logger.debug("Notified wizard schedule to {}".format(wizard.username))
+        except BadRequest:
+            logger.warn("Coulnd't notify its wizzard schedule to {}".format(wizard.username))
 
 
 def persist_wizards_schedule_in_db(pycamp):
@@ -190,7 +196,6 @@ def persist_wizards_schedule_in_db(pycamp):
             init=start,
             end=end
         )
-        logger.debug("From {} to {} the wizard is {}".format(start, end, wizard.username))
 
 
 @admin_needed
@@ -201,6 +206,8 @@ async def schedule_wizards(update, context):
     logger.info("Deleted wizards schedule ({} records)".format(n))
 
     persist_wizards_schedule_in_db(pycamp)
+    logger.info("Wizards schedule persisted in the DB.")
+
 
     await notify_schedule_to_wizards(update, context, pycamp)
 
@@ -213,7 +220,6 @@ async def schedule_wizards(update, context):
         text=msg,
         parse_mode="MarkdownV2"
     )
-
 
 
 def format_wizards_schedule(agenda):
@@ -265,7 +271,7 @@ async def show_wizards_schedule(update, context):
     if not show_all:
         agenda = agenda.where(WizardAtPycamp.end > datetime.now())
     agenda = agenda.order_by(WizardAtPycamp.init)
-    
+
     msg = format_wizards_schedule(agenda)
     
     await context.bot.send_message(

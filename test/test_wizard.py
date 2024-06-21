@@ -96,3 +96,7 @@ class TestWizardScheduleSlots:
             print(start)
             if start.day == self.pycamp.end.day:
                 assert start >= lunch_time_end
+
+
+class TestDefineWizardsSchedule:
+    pass
