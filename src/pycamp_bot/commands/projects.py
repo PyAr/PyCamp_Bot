@@ -1,10 +1,11 @@
 import logging
 import peewee
 from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, filters
-from pycamp_bot.models import Pycampista, Project, Vote
+from pycamp_bot.models import Pycampista, Project, Slot, Vote
 from pycamp_bot.commands.base import msg_to_active_pycamp_chat
 from pycamp_bot.commands.manage_pycamp import active_needed, get_active_pycamp
 from pycamp_bot.commands.auth import admin_needed, get_admins_username
+from pycamp_bot.commands.schedule import DIAS
 
 
 current_projects = {}
@@ -254,6 +255,41 @@ async def show_projects(update, context):
     await update.message.reply_text(text)
 
 
+async def show_my_projects(update, context):
+    """Let people see what projects they have voted for"""
+
+    user_id = Pycampista.get(Pycampista.username == update.message.from_user.username)
+    votes = Vote.select(Project, Slot).join(Project).join(Slot).where((Vote.pycampista == user_id) & Vote.interest).order_by(Slot.code)
+
+    if votes:
+        text_chunks = []
+
+        prev_slot_day_code = None
+
+        for vote in votes:
+            slot_day_code = vote.project.slot.code[0]
+            slot_day_name = DIAS[slot_day_code]
+
+            if slot_day_code != prev_slot_day_code:
+                text_chunks.append(f'*{slot_day_name}*')
+
+            slot_start_time = str(vote.project.slot.start) + ':00'
+            project_text = "{}\n{}\nOwner: @{}".format(
+                slot_start_time,
+                vote.project.name,
+                vote.project.owner.username,
+            )
+            text_chunks.append(project_text)
+
+            prev_slot_day_code = slot_day_code
+
+        text = '\n\n'.join(text_chunks)
+    else:
+        text = "No votaste por ningún proyecto"
+
+    await update.message.reply_text(text, parse_mode='Markdown')
+
+
 def set_handlers(application):
     application.add_handler(load_project_handler)
     application.add_handler(
@@ -264,3 +300,6 @@ def set_handlers(application):
         CommandHandler('borrar_proyecto', delete_project))
     application.add_handler(
         CommandHandler('proyectos', show_projects))
+    application.add_handler(
+        CommandHandler('mis_proyectos', show_my_projects))
+
