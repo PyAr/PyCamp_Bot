@@ -144,6 +144,36 @@ async def summon_wizard(update, context):
             text="Tu magx asignadx es: @{}".format(wizard.username)
         )
 
+async def notify_scheduled_slots_to_wizard(update, context, pycamp, wizard, agenda):
+    per_day = defaultdict(list)
+    for entry in agenda:
+        k = entry.init.strftime("%a %d de %b")
+        per_day[k].append(entry)
+
+    msg = "Esta es tu agenda de mago para el PyCamp {}".format(pycamp.headquarters)
+    for day, items in per_day.items():
+        msg += "\nEl día _{}_:\n".format(day)
+        for i in items:
+            msg += "\t \\- {} a {}\n".format(
+                i.init.strftime("%H:%M"),
+                i.end.strftime("%H:%M"),
+            )
+
+    await context.bot.send_message(
+        chat_id=wizard.chat_id,
+        text=msg,
+        parse_mode="MarkdownV2"
+    )
+
+
+async def notify_schedule_to_wizards(update, context, pycamp):
+    for wizard in pycamp.get_wizards():
+        wizard_agenda = WizardAtPycamp.select().where(
+            WizardAtPycamp.pycamp == pycamp & WizardAtPycamp.wizard == wizard
+        ).order_by(WizardAtPycamp.init)
+
+        await notify_scheduled_slots_to_wizard(update, context, pycamp, wizard, wizard_agenda)
+
 
 def persist_wizards_schedule_in_db(pycamp):
     """
@@ -169,12 +199,7 @@ async def schedule_wizards(update, context):
 
     persist_wizards_schedule_in_db(pycamp)
 
-    # Mandar mensajes a los magos con su agenda propia
-    msg = "Lista la agenda de magos."
-    await context.bot.send_message(
-        chat_id=update.message.chat_id,
-        text=msg
-    )
+    notify_schedule_to_wizards(update, context, pycamp)
 
 
 async def show_wizards_schedule(update, context):
