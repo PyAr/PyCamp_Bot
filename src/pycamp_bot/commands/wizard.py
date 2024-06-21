@@ -49,8 +49,8 @@ def clean_wizards_free_slots(pycamp, slots):
 
 def compute_wizards_slots(pycamp):
     """
-    * Magos trabajan de 9 a 19, sacando almuerzo (13 a 14).
-    * Magos trabajan desde el mediodía del primer día, hasta el mediodía del último día.
+    * Magxs trabajan de 9 a 19, sacando almuerzo (13 a 14).
+    * Magxs trabajan desde el mediodía del primer día, hasta el mediodía del último día.
     Slots son [start; end)
     """
     wizard_start = pycamp.init
@@ -84,9 +84,9 @@ def define_wizards_schedule(pycamp):
         wizard = wizards_list[idx%n_wizards]
         n_iter = 0  # railguard
         while wizard.is_busy(slot):
-            logger.info('Mago {} con conflicto en el slot {}. Pruebo otro.'.format(wizard.username, slot))
+            logger.info('Magx {} con conflicto en el slot {}. Pruebo otro.'.format(wizard.username, slot))
             if n_iter == n_wizards:
-                logger.warning('Queda el mago {} con conflicto en el slot {}'.format(wizard, slot))
+                logger.warning('Queda el magx {} con conflicto en el slot {}'.format(wizard, slot))
                 break
             idx += 1
             wizard = wizards_list[idx%n_wizards]
@@ -114,6 +114,20 @@ async def become_wizard(update, context):
         chat_id=update.message.chat_id,
         text="¡Felicidades! Has sido registrado como magx."
     )
+
+
+async def list_wizards(update, context):
+    _, pycamp = get_active_pycamp()
+    msg = ""
+    for i, wizard in enumerate(pycamp.get_wizards()):
+        msg += "{}) @{}\n".format(i+1, wizard.username)
+    try:
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text=msg
+        )
+    except BadRequest as e:
+        logger.exception("Coulnd't deliver the Wizards list to {}".format(update.message.from_user.username))
 
 
 async def summon_wizard(update, context):
@@ -152,7 +166,7 @@ async def notify_scheduled_slots_to_wizard(update, context, pycamp, wizard, agen
         k = entry.init.strftime("%a %d de %b")
         per_day[k].append(entry)
 
-    msg = "Esta es tu agenda de mago para el PyCamp {}".format(pycamp.headquarters)
+    msg = "Esta es tu agenda de magx para el PyCamp {}".format(pycamp.headquarters)
     for day, items in per_day.items():
         msg += "\nEl día _{}_:\n".format(day)
         for i in items:
@@ -229,7 +243,7 @@ def format_wizards_schedule(agenda):
         k = entry.init.strftime("%a %d de %b")
         per_day[k].append(entry)
 
-    msg = "Agenda de magos:"
+    msg = "Agenda de magxs:"
     for day, items in per_day.items():
         msg += "\nEl día _{}_:\n".format(day)
         for i in items:
@@ -288,6 +302,8 @@ def set_handlers(application):
             CommandHandler('evocar_magx', summon_wizard))
     application.add_handler(
             CommandHandler('ser_magx', become_wizard))
+    application.add_handler(
+            CommandHandler('ver_magx', list_wizards))
     application.add_handler(
         CommandHandler('agendar_magx', schedule_wizards))
     application.add_handler(
