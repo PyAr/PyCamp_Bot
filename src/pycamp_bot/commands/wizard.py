@@ -63,7 +63,7 @@ def compute_wizards_slots(pycamp):
             (slot_start, slot_end)
         )
         current_period = slot_end
-    print(len(slots), slots)
+
     slots = clean_wizards_free_slots(pycamp, slots)
 
     return slots
@@ -197,21 +197,21 @@ def persist_wizards_schedule_in_db(pycamp):
 async def schedule_wizards(update, context):
     _, pycamp = get_active_pycamp()
 
+    n = pycamp.clear_wizards_schedule()
+    logger.info("Deleted wizards schedule ({} records)".format(n))
+
     persist_wizards_schedule_in_db(pycamp)
 
-    notify_schedule_to_wizards(update, context, pycamp)
+    await notify_schedule_to_wizards(update, context, pycamp)
 
 
-async def show_wizards_schedule(update, context):
-    _, pycamp = get_active_pycamp()
-
-    agenda = WizardAtPycamp.select().where(pycamp == pycamp).order_by(WizardAtPycamp.init)
+def format_wizards_schedule(agenda):
     per_day = defaultdict(list)
     for entry in agenda:
         k = entry.init.strftime("%a %d de %b")
         per_day[k].append(entry)
 
-    msg = "Esta es la agenda de magos para el PyCamp {}".format(pycamp.headquarters)
+    msg = "Agenda de magos:"
     for day, items in per_day.items():
         msg += "\nEl día _{}_:\n".format(day)
         for i in items:
@@ -220,7 +220,13 @@ async def show_wizards_schedule(update, context):
                 i.end.strftime("%H:%M"), 
                 "@" + i.wizard.username
             )
-    
+    return msg
+
+async def show_wizards_schedule(update, context):
+    _, pycamp = get_active_pycamp()
+
+    agenda = WizardAtPycamp.select().where(pycamp == pycamp).order_by(WizardAtPycamp.init)
+    msg = format_wizards_schedule(agenda)
     logger.debug(msg)
     
     await context.bot.send_message(

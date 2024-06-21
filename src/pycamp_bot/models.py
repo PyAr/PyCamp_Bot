@@ -106,6 +106,9 @@ class Pycamp(BaseModel):
         return wizard
 
 
+    def clear_wizards_schedule(self):
+        return WizardAtPycamp.delete().where(WizardAtPycamp.pycamp == self).execute()
+
 class PycampistaAtPycamp(BaseModel):
     '''
     Many to many relationship. Ona pycampista will attend many pycamps. A
