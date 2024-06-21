@@ -35,7 +35,7 @@ async def summon_wizard(update, context):
         wizard = random.choice(wizard_list)
         await context.bot.send_message(
             chat_id=wizard.chat_id,
-            text="PING PING PING MAGX! @{} te necesesita!".format(username)
+            text="PING PING PING MAGX! @{} te necesita!".format(username)
         )
         await context.bot.send_message(
             chat_id=update.message.chat_id,

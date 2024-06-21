@@ -164,7 +164,7 @@ async def check_day_tab(day, slots, cronograma, i):
 async def show_schedule(update, context):
     slots = Slot.select()
     projects = Project.select()
-    cronograma = "*Crónograma:* \n"
+    cronograma = "*Cronograma:* \n"
 
     for i, slot in enumerate(slots):
         day = DIAS[slot.code[0]]
