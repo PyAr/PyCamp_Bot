@@ -132,7 +132,13 @@ async def define_duration(update, context):
         return SET_DURATION_STATE
 
     _, pycamp = get_active_pycamp()
-    pycamp.end = pycamp.init + datetime.timedelta(days=duration - 1)
+    pycamp.end = pycamp.init + datetime.timedelta(
+        days=duration - 1, 
+        hours=23,
+        minutes=59, 
+        seconds=59,
+        milliseconds=99
+    )
     pycamp.save()
 
     msg = "Listo, el PyCamp '{}' está activo, desde el {} hasta el {}".format(
