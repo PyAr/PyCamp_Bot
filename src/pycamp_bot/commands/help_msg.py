@@ -7,6 +7,7 @@ Comandos de usuario:
 /pycamps: lista todos los pycamps.
 /cargar_proyecto: empieza la conversacion de carga de proyecto.
 /proyectos: te muestra la informacion de todos los proyectos y sus responsables.
+/mis_proyectos: te muestra día y horario de los proyectos que votaste.
 /ser_magx: te agrega la lista de Magx.
 /evocar_magx: pingea a la/el Magx de turno, informando que necesitas su\
     ayuda. Con un gran poder, viene una gran responsabilidad.
