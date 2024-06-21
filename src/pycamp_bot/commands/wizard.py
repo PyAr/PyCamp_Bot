@@ -234,19 +234,25 @@ def format_wizards_schedule(agenda):
             )
     return msg
 
-async def show_wizards_schedule(update, context):
+def aux_resolve_show_all(message):
     show_all = False
-    parameters = update.message.text.strip().split(' ', 1)
+    parameters = message.text.strip().split(' ', 1)
     if len(parameters) == 2:
         flag = parameters[1].strip().lower()
-        show_all = (flag == "completa")
+        show_all = (flag == "completa")  # Once here, the only parameter must be valid
         if not show_all:
-            await context.bot.send_message(
-                chat_id=update.message.chat_id,
-                text="El comando solo acepta un parámetro (opcional): 'completa'. ¿Probás de nuevo?",
-            )
-            return
+            # The parameter was something else...
+            raise ValueError("Wrong parameter")
     elif len(parameters) > 2:
+        # Too many parameters...
+        raise ValueError("Wrong parameter")
+    return show_all
+
+
+async def show_wizards_schedule(update, context):
+    try:
+        show_all = aux_resolve_show_all(update.message)
+    except ValueError:
         await context.bot.send_message(
             chat_id=update.message.chat_id,
             text="El comando solo acepta un parámetro (opcional): 'completa'. ¿Probás de nuevo?",
@@ -259,6 +265,7 @@ async def show_wizards_schedule(update, context):
     if not show_all:
         agenda = agenda.where(WizardAtPycamp.end > datetime.now())
     agenda = agenda.order_by(WizardAtPycamp.init)
+    
     msg = format_wizards_schedule(agenda)
     
     await context.bot.send_message(
