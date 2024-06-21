@@ -258,8 +258,8 @@ async def show_projects(update, context):
 async def show_my_projects(update, context):
     """Let people see what projects they have voted for"""
 
-    user_id = Pycampista.get(Pycampista.username == update.message.from_user.username)
-    votes = Vote.select(Project, Slot).join(Project).join(Slot).where((Vote.pycampista == user_id) & Vote.interest).order_by(Slot.code)
+    user = Pycampista.get(Pycampista.username == update.message.from_user.username)
+    votes = Vote.select(Project, Slot).join(Project).join(Slot).where((Vote.pycampista == user) & Vote.interest).order_by(Slot.code)
 
     if votes:
         text_chunks = []
@@ -273,13 +273,13 @@ async def show_my_projects(update, context):
             if slot_day_code != prev_slot_day_code:
                 text_chunks.append(f'*{slot_day_name}*')
 
-            slot_start_time = str(vote.project.slot.start) + ':00'
-            project_text = "{}\n{}\nOwner: @{}".format(
-                slot_start_time,
+            project_lines = [
+                f'{vote.project.slot.start}:00',
                 vote.project.name,
-                vote.project.owner.username,
-            )
-            text_chunks.append(project_text)
+                f'Owner: @{vote.project.owner.username}',
+            ]
+
+            text_chunks.append('\n'.join(project_lines))
 
             prev_slot_day_code = slot_day_code
 
