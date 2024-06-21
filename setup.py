@@ -15,6 +15,8 @@ setup(
         'munch==2.5.0',
         'python-telegram-bot==20.2',
         'peewee==3.16.0',
+        'pytest==8.2.2',
+        'freezegun==1.5.1',
     ],
     test_suite='tests'
 )
