@@ -30,6 +30,8 @@ pip install -e .
 
 y estas listo para trabajar.
 
+`pip install freezegun` para correr los tests.
+
 ### Python 3.12
 
 `pip install setuptools`
@@ -62,9 +64,8 @@ En este momento ya se puede hablar con el bot. ¿Qué le digo?
 
 * `/su <password>` para reclamar permisos de admin, reemplazando `<password>` por la contraseña que hayamos
 elegido en la envvar `PYCAMP_BOT_MASTER_KEY`
-* `/agregar_pycamp <pycamp_name>` para crear un pycamp en la deb
+* `/empezar_pycamp <pycamp_name>` inicia el flujo de creación de un pycamp. Lo carga en la db, pide fecha de inicio y duración. Lo deja activo.
 * `/activar_pycamp <pycamp_name>` activa un pycamp
-* `/empezar_pycamp` setea la fecha de inicio del pycamp activo
 * `/empezar_carga_proyectos` habilita la carga de los proyectos. En este punto los pycampistas pueden cargar sus proyectos,
 enviandole al bot el comando `/cargar_proyecto`
 * `/terminar_carga_proyectos` termina carga proyectos
@@ -76,8 +77,20 @@ Para generar el schedule:
 * `/cronogramear` te va a preguntar cuantos dias queres cronogramear y cuantos slots por dia tenes y hacer el cronograma.
 * `/cambiar_slot` toma un nombre de proyecto y un slot; y te cambia ese proyecto a ese slot.
 
+Para agendar los magos:
+
+1. Todos los candidatos tienen que haberse registrado con `/ser_magx`
+2. Tiene que estar creado el schedule de presentaciones de proyectos (`/cronogramear`)
+
+* `/agendar_magos` Asigna un mago por hora durante todo el PyCamp.
+    * De 9 a 13 y de 14 a 19.
+    * El primer día arranca después del almuerzo (14hs).
+    * El último día termina al almuerzo (13hs).
+
 ### Flujo pycampista
 
 * `/cargar_proyecto` carga un proyecto (si está habilitada la carga)
 * `/votar` envia opciones para votar (si está habilitada la votacion)
 * `/ver_cronograma` te muestra el cronograma!
+* `/ser_magx` te registra como mago.
+* `/evocar_magx` llama al mago de turno para pedirle ayuda.

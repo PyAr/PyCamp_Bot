@@ -1,5 +1,7 @@
-from datetime import datetime, timedelta
 import peewee as pw
+
+from datetime import datetime, timedelta
+from random import choice
 
 
 DEFAULT_SLOT_PERIOD = 60  # Minutos
@@ -87,6 +89,22 @@ class Pycamp(BaseModel):
     def get_wizards(self):
         return Pycampista.select().where(Pycampista.wizard == 1)
 
+    def get_current_wizard(self):
+        """Return the Pycampista instance that's the currently scheduled wizard."""
+        now = datetime.now()
+        current_wizards = WizardAtPycamp.select().where(  
+            (WizardAtPycamp.pycamp == self) & 
+            (WizardAtPycamp.init <= now) &
+            (WizardAtPycamp.end > now) 
+        )
+
+        wizard = None  # Default if n_wiz == 0
+        if current_wizards.count() >= 1:
+            # Ready for an improbable future where we'll have many concurrent wizards ;-)
+            wizard = choice(current_wizards).wizard
+        
+        return wizard
+
 
 class PycampistaAtPycamp(BaseModel):
     '''
@@ -104,8 +122,8 @@ class WizardAtPycamp(BaseModel):
     '''
     pycamp = pw.ForeignKeyField(Pycamp)
     wizard = pw.ForeignKeyField(Pycampista)
-    slot_ini = pw.DateTimeField()
-    slot_end = pw.DateTimeField()
+    init = pw.DateTimeField()
+    end = pw.DateTimeField()
 
 
 class Slot(BaseModel):

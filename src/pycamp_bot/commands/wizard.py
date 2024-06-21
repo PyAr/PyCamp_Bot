@@ -109,20 +109,31 @@ async def become_wizard(update, context):
 
     await context.bot.send_message(
         chat_id=update.message.chat_id,
-        text="Felicidades! Eres el Magx de turno"
+        text="¡Felicidades! Has sido registrado como magx."
     )
 
 
 async def summon_wizard(update, context):
-    username = update.message.from_user.username
-    wizard_list = list(Pycampista.select().where(Pycampista.wizard==True))
-    if len(wizard_list) == 0:
+    _, pycamp = get_active_pycamp()
+    wizard = pycamp.get_current_wizard()
+    if wizard is None:
         await context.bot.send_message(
             chat_id=update.message.chat_id,
-            text="No hay ningunx magx todavia"
+            text="No hay ningunx magx agendado a esta hora :-("
+        )
+        return
+
+    username = update.message.from_user.username
+    if username == wizard.username:
+        await context.bot.send_message(
+            chat_id=wizard.chat_id,
+            text="🧙"
+        )
+        await context.bot.send_message(
+            chat_id=wizard.chat_id,
+            text="Checkeá tu cabeza: si no ténes el sombrero de magx ¡deberías!\n(soltá la compu)"
         )
     else:
-        wizard = random.choice(wizard_list)
         await context.bot.send_message(
             chat_id=wizard.chat_id,
             text="PING PING PING MAGX! @{} te necesesita!".format(username)
@@ -133,11 +144,11 @@ async def summon_wizard(update, context):
         )
 
 
-@admin_needed
-async def schedule_wizards(update, context):
-    _, pycamp = get_active_pycamp()
-    logger.info(pycamp)
-
+def persist_wizards_schedule_in_db(pycamp):
+    """
+    Aux function to generate the wizards schedule and persist WizardAtPycamp instances in the DB.
+    
+    """
     schedule = define_wizards_schedule(pycamp)
 
     for slot, wizard in schedule.items():
@@ -145,10 +156,17 @@ async def schedule_wizards(update, context):
         WizardAtPycamp.create(
             pycamp=pycamp,
             wizard=wizard,
-            slot_ini=start,
-            slot_end=end
+            init=start,
+            end=end
         )
         logger.debug("From {} to {} the wizard is {}".format(start, end, wizard.username))
+
+
+@admin_needed
+async def schedule_wizards(update, context):
+    _, pycamp = get_active_pycamp()
+
+    persist_wizards_schedule_in_db(pycamp)
 
     # Mandar mensajes a los magos con su agenda propia
     msg = "Lista la agenda de magos."

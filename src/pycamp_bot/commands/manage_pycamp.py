@@ -169,10 +169,6 @@ load_start_pycamp = ConversationHandler(
 )
 
 
-
-
-
-
 @active_needed
 @admin_needed
 async def end_pycamp(update, context):
@@ -183,6 +179,7 @@ async def end_pycamp(update, context):
         date = datetime.datetime.now()
 
     is_active, pycamp = get_active_pycamp()
+    pycamp.active = False
     pycamp.end = date
     pycamp.save()
 
