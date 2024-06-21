@@ -1,5 +1,8 @@
+from datetime import datetime, timedelta
 import peewee as pw
 
+
+DEFAULT_SLOT_PERIOD = 60  # Minutos
 
 db = pw.SqliteDatabase('pycamp_projects.db')
 
@@ -37,10 +40,17 @@ class Pycampista(BaseModel):
         return rv_str
 
     def is_busy(self, moment):
-        import random
-        if random.random() > 0.5:
-            return True
+        """`moment` is a tuple (start, end) with two datetime objects."""
+        target_period_start, target_period_end = moment
+        project_presentation_slots = Slot.select().where(Slot.current_wizard == self)
+        for slot in project_presentation_slots:
+            # https://stackoverflow.com/a/13403827/1161156
+            latest_start = max(target_period_start, slot.start)
+            earliest_end = min(target_period_end, slot.get_end_time())
+            if latest_start <= earliest_end:  # Overlap
+                return True
         return False
+
 
 class Pycamp(BaseModel):
     '''
@@ -98,7 +108,6 @@ class WizardAtPycamp(BaseModel):
     slot_end = pw.DateTimeField()
 
 
-
 class Slot(BaseModel):
     '''
     Time slot representation
@@ -109,6 +118,9 @@ class Slot(BaseModel):
     code = pw.CharField()  # For example A1 for first slot first day
     start = pw.DateTimeField()
     current_wizard = pw.ForeignKeyField(Pycampista)
+
+    def get_end_time(self):
+        return self.start + timedelta(minutes=DEFAULT_SLOT_PERIOD)
 
 
 class Project(BaseModel):
