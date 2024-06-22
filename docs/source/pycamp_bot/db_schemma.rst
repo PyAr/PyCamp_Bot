@@ -1,5 +1,5 @@
-##########
-db_schemma
-##########
+#########
+db_schema
+#########
 
-.. automodule:: pycamp_bot.db_schemma
+.. automodule:: pycamp_bot.db_schema
