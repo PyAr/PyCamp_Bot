@@ -28,7 +28,6 @@ def is_admin(update, context):
 
 def admin_needed(f):
     async def wrap(*args, **kargs):
-        logger.info('Admin nedeed wrapper')
         update, context = args
         if is_admin(*args):
             return await f(*args)

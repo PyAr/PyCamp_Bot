@@ -1,11 +1,15 @@
 import peewee as pw
 
+from datetime import datetime, timedelta
+from random import choice
+
+
+DEFAULT_SLOT_PERIOD = 60  # Minutos
 
 db = pw.SqliteDatabase('pycamp_projects.db')
 
 
 class BaseModel(pw.Model):
-
     class Meta:
         database = db
 
@@ -36,6 +40,17 @@ class Pycampista(BaseModel):
         rv_str += 'Admin' if self.admin else 'Commoner'
         return rv_str
 
+    def is_busy(self, from_time, to_time):
+        """`from_time, to_time` are two datetime objects."""
+        project_presentation_slots = Slot.select().where(Slot.current_wizard == self)
+        for slot in project_presentation_slots:
+            # https://stackoverflow.com/a/13403827/1161156
+            latest_start = max(from_time, slot.start)
+            earliest_end = min(to_time, slot.get_end_time())
+            if latest_start <= earliest_end:  # Overlap
+                return True
+        return False
+
 
 class Pycamp(BaseModel):
     '''
@@ -45,6 +60,8 @@ class Pycamp(BaseModel):
     end: time of end
     vote_authorized: the vote is auth in this pycamp
     project_load_authorized: the project load is auth in this pycamp
+    active: boolean telling wheter this PyCamp instance is active (or an old one)
+    wizard_slot_duration: config to compute the schedule of mages
     '''
     headquarters = pw.CharField(unique=True)
     init = pw.DateTimeField(null=True)
@@ -52,6 +69,7 @@ class Pycamp(BaseModel):
     vote_authorized = pw.BooleanField(default=False, null=True)
     project_load_authorized = pw.BooleanField(default=False, null=True)
     active = pw.BooleanField(default=False, null=True)
+    wizard_slot_duration = pw.IntegerField(default=60, null=False)  # In minutes
 
     def __str__(self):
         rv_str = 'Pycamp:\n'
@@ -60,6 +78,36 @@ class Pycamp(BaseModel):
             rv_str += f'{attr}: {getattr(self, attr)}\n'
         return rv_str
 
+    def set_as_only_active(self):
+        active = Pycamp.select().where(Pycamp.active)
+        for p in active:
+            p.active = False
+        Pycamp.bulk_update(active, fields=[Pycamp.active])
+        self.active = True
+        self.save()
+
+    def get_wizards(self):
+        return Pycampista.select().where(Pycampista.wizard == 1)
+
+    def get_current_wizard(self):
+        """Return the Pycampista instance that's the currently scheduled wizard."""
+        now = datetime.now()
+        current_wizards = WizardAtPycamp.select().where(  
+            (WizardAtPycamp.pycamp == self) & 
+            (WizardAtPycamp.init <= now) &
+            (WizardAtPycamp.end > now) 
+        )
+
+        wizard = None  # Default if n_wiz == 0
+        if current_wizards.count() >= 1:
+            # Ready for an improbable future where we'll have many concurrent wizards ;-)
+            wizard = choice(current_wizards).wizard
+        
+        return wizard
+
+
+    def clear_wizards_schedule(self):
+        return WizardAtPycamp.delete().where(WizardAtPycamp.pycamp == self).execute()
 
 class PycampistaAtPycamp(BaseModel):
     '''
@@ -68,6 +116,17 @@ class PycampistaAtPycamp(BaseModel):
     '''
     pycamp = pw.ForeignKeyField(Pycamp)
     pycampista = pw.ForeignKeyField(Pycampista)
+
+
+class WizardAtPycamp(BaseModel):
+    '''
+    Many to many relationship. Ona pycampista will attend many pycamps. A
+    pycamps will have many pycampistas
+    '''
+    pycamp = pw.ForeignKeyField(Pycamp)
+    wizard = pw.ForeignKeyField(Pycampista)
+    init = pw.DateTimeField()
+    end = pw.DateTimeField()
 
 
 class Slot(BaseModel):
@@ -79,7 +138,10 @@ class Slot(BaseModel):
     '''
     code = pw.CharField()  # For example A1 for first slot first day
     start = pw.DateTimeField()
-    current_wizzard = pw.ForeignKeyField(Pycampista)
+    current_wizard = pw.ForeignKeyField(Pycampista, null=True)
+
+    def get_end_time(self):
+        return self.start + timedelta(minutes=DEFAULT_SLOT_PERIOD)
 
 
 class Project(BaseModel):
@@ -120,6 +182,8 @@ def models_db_connection():
         Pycamp,
         Pycampista,
         PycampistaAtPycamp,
+        WizardAtPycamp,
         Project,
         Slot,
-        Vote])
+        Vote], safe=True)
+    db.close()
