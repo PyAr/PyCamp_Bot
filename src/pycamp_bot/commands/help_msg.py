@@ -16,6 +16,7 @@ Comandos de usuario:
 /anunciar: te pide el nombre de un proyecto y pingea por privado a les \
     interesades avisando que esta por empezar (solo para admins u owners del proyecto).
 /su (passwrd): convierte al usuario en admin. Si sabe el password :P
+/mostrar_version: te muestra qué versión del bot está corriendo y otros detalles
 /admins: lista a todos los admins.
 /ayuda: esta ayuda.'''
 
