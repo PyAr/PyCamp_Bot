@@ -8,6 +8,7 @@ from pycamp_bot.models import Pycampista, WizardAtPycamp
 from pycamp_bot.commands.auth import admin_needed
 from pycamp_bot.commands.manage_pycamp import get_active_pycamp
 from pycamp_bot.logger import logger
+from pycamp_bot.utils import escape_markdown
 
 
 LUNCH_TIME_START_HOUR = 13
@@ -260,7 +261,7 @@ def format_wizards_schedule(agenda):
             msg += "\t \\- {} a {}:\t*{}* \n".format(
                 i.init.strftime("%H:%M"), 
                 i.end.strftime("%H:%M"), 
-                "@" + i.wizard.username
+                "@" + escape_markdown(i.wizard.username)
             )
     return msg
 

@@ -5,6 +5,7 @@ from pycamp_bot.models import Pycampista
 from pycamp_bot.models import PycampistaAtPycamp
 from pycamp_bot.commands.auth import admin_needed
 from pycamp_bot.logger import logger
+from pycamp_bot.utils import escape_markdown
 
 
 SET_DATE_STATE = "set_fate"
