@@ -4,6 +4,7 @@ from pycamp_bot.models import Project, Slot, Pycampista, Vote
 from pycamp_bot.commands.auth import admin_needed
 from pycamp_bot.scheduler.db_to_json import export_db_2_json
 from pycamp_bot.scheduler.schedule_calculator import export_scheduled_result
+from pycamp_bot.utils import escape_markdown
 
 
 DAY_SLOT_TIME = {
@@ -172,13 +173,13 @@ async def show_schedule(update, context):
 
         for project in projects:
             if project.slot_id == slot.id:
-                cronograma += f'*-* {slot.start}:00hs = *{(project.name).capitalize()}.*\n'
-                cronograma += f'A cargo de 👉🏼 {"@" + project.owner.username}\n'
+                cronograma += f'*-* {slot.start}:00hs = *{escape_markdown(project.name).capitalize()}.*\n'
+                cronograma += f'A cargo de 👉🏼 {"@" + escape_markdown(project.owner.username)}\n'
 
     await context.bot.send_message(
         chat_id=update.message.chat_id,
         text=cronograma,
-        parse_mode='Markdown'
+        parse_mode='MarkdownV2'
     )
 
 

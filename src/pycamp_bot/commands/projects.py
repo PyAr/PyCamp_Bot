@@ -6,6 +6,7 @@ from pycamp_bot.commands.base import msg_to_active_pycamp_chat
 from pycamp_bot.commands.manage_pycamp import active_needed, get_active_pycamp
 from pycamp_bot.commands.auth import admin_needed, get_admins_username
 from pycamp_bot.commands.schedule import DIAS
+from pycamp_bot.utils import escape_markdown
 
 
 current_projects = {}
@@ -287,8 +288,8 @@ async def show_my_projects(update, context):
 
             project_lines = [
                 f'{vote.project.slot.start}:00',
-                vote.project.name,
-                f'Owner: @{vote.project.owner.username}',
+                escape_markdown(vote.project.name),
+                f'Owner: @{escape_markdown(vote.project.owner.username)}',
             ]
 
             text_chunks.append('\n'.join(project_lines))
@@ -299,7 +300,7 @@ async def show_my_projects(update, context):
     else:
         text = "No votaste por ningún proyecto"
 
-    await update.message.reply_text(text, parse_mode='Markdown')
+    await update.message.reply_text(text, parse_mode='MarkdownV2')
 
 
 def set_handlers(application):
