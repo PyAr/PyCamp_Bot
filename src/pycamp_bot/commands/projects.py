@@ -288,7 +288,6 @@ async def show_participants(update, context):
     await update.message.reply_text(response)
 
     
-=======
 async def show_my_projects(update, context):
     """Let people see what projects they have voted for"""
 
