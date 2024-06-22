@@ -4,6 +4,7 @@ from pycamp_bot.models import Project, Pycampista, Vote
 from pycamp_bot.commands.auth import get_admins_username
 from pycamp_bot.logger import logger
 from pycamp_bot.commands.manage_pycamp import active_needed
+from pycamp_bot.utils import escape_markdown
 
 PROYECTO, LUGAR, MENSAJE = ["proyecto", "lugar", "mensaje"]
 
@@ -78,8 +79,8 @@ async def announce(update: Update, context: CallbackContext) -> str:
         if len(_projects) == 0:
             await context.bot.send_message(
                 chat_id=update.message.chat_id,
-                text=f"No existe el proyecto: *{state.p_name}*.",
-                parse_mode='Markdown'
+                text=f"No existe el proyecto: *{escape_markdown(state.p_name)}*.",
+                parse_mode='MarkdownV2'
             )
             return ConversationHandler.END
         elif not await should_be_able_to_announce(state.username, _projects[0]):
@@ -92,8 +93,8 @@ async def announce(update: Update, context: CallbackContext) -> str:
         else:
             await context.bot.send_message(
                 chat_id=update.message.chat_id,
-                text=f"Anunciando el proyecto: *{_projects[0].name.capitalize()}* !!!",
-                parse_mode='Markdown'
+                text=f"Anunciando el proyecto: *{escape_markdown(_projects[0].name).capitalize()}* !!!",
+                parse_mode='MarkdownV2'
             )
             state.owner = _projects[0].owner.username
             state.current_project = _projects[0]
@@ -184,20 +185,20 @@ async def message_project(update: Update, context: CallbackContext) -> str:
         try:
             await context.bot.send_message(
                 chat_id=chat_id,
-                text=f'''Está por empezar el proyecto *"{(state.p_name).capitalize()}"* a cargo de *@{state.owner}*.\n*¿Dónde?* 👉🏼 {state.lugar}''',
-                parse_mode='Markdown'
+                text=f'''Está por empezar el proyecto *"{escape_markdown(state.p_name).capitalize()}"* a cargo de *@{escape_markdown(state.owner)}*.\n*¿Dónde?* 👉🏼 {escape_markdown(state.lugar)}''',
+                parse_mode='MarkdownV2'
             )
             if update.message.from_user.username == state.owner:
                 await context.bot.send_message(
                     chat_id=chat_id,
-                    text=f'*Project Owner says:* **{state.mensaje}**',
-                    parse_mode='Markdown'
+                    text=f'*Project Owner says:* **{escape_markdown(state.mensaje)}**',
+                    parse_mode='MarkdownV2'
                 )
             else:
                 await context.bot.send_message(
                     chat_id=chat_id,
-                    text=f'Admin *@{update.message.from_user.username}* says: **{state.mensaje}**',
-                    parse_mode='Markdown'
+                    text=f'Admin *@{escape_markdown(update.message.from_user.username)}* says: **{escape_markdown(state.mensaje)}**',
+                    parse_mode='MarkdownV2'
                 )
         except Exception as e:
             logger.error(f"Error al enviar el mensaje: {e}")
