@@ -64,7 +64,7 @@ async def announce(update: Update, context: CallbackContext) -> str:
                 text="Ingresá el Nombre del Proyecto a anunciar."
             )
         else:
-            project_list = "\n".join(p.name.capitalize() for p in state.projects)
+            project_list = "\n".join(p.name for p in state.projects)
             await context.bot.send_message(
                 chat_id=update.message.chat_id,
                 text=f"""Ingresá el Nombre del Proyecto a anunciar.\n\nTienes los siguientes proyectos:\n{project_list}""",
@@ -93,7 +93,7 @@ async def announce(update: Update, context: CallbackContext) -> str:
         else:
             await context.bot.send_message(
                 chat_id=update.message.chat_id,
-                text=f"Anunciando el proyecto: *{escape_markdown(_projects[0].name).capitalize()}* !!!",
+                text=f"Anunciando el proyecto: *{escape_markdown(_projects[0].name)}* !!!",
                 parse_mode='MarkdownV2'
             )
             state.owner = _projects[0].owner.username
@@ -185,7 +185,7 @@ async def message_project(update: Update, context: CallbackContext) -> str:
         try:
             await context.bot.send_message(
                 chat_id=chat_id,
-                text=f'''Está por empezar el proyecto *"{escape_markdown(state.p_name).capitalize()}"* a cargo de *@{escape_markdown(state.owner)}*.\n*¿Dónde?* 👉🏼 {escape_markdown(state.lugar)}''',
+                text=f'''Está por empezar el proyecto *"{escape_markdown(state.p_name)}"* a cargo de *@{escape_markdown(state.owner)}*.\n*¿Dónde?* 👉🏼 {escape_markdown(state.lugar)}''',
                 parse_mode='MarkdownV2'
             )
             if update.message.from_user.username == state.owner:
