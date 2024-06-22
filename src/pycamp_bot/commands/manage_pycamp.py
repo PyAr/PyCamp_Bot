@@ -106,7 +106,7 @@ async def define_start_date(update, context):
     except ValueError:
         await context.bot.send_message(
             chat_id=update.message.chat_id,
-            text="mmm no entiendo esa fecha\. El formato esperado es `yyyy-mm-dd`\. ¿De nuevo?",
+            text="mmm no entiendo esa fecha\\. El formato esperado es `yyyy-mm-dd`\\. ¿De nuevo?",
             parse_mode="MarkdownV2"
         )
         return SET_DATE_STATE
