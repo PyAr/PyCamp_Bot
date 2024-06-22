@@ -232,7 +232,7 @@ async def delete_project(update, context):
 
 
 async def show_projects(update, context):
-    """Prevent people for keep uploading projects"""
+    """Show available projects"""
     projects = Project.select()
     text = []
     for project in projects:
@@ -256,6 +256,39 @@ async def show_projects(update, context):
     await update.message.reply_text(text)
 
 
+
+async def show_participants(update, context):
+    """Show participants for a project"""
+    
+    if len(update.message.text.split()) < 2:
+        await context.bot.send_message(
+                chat_id=update.message.chat_id,
+                text="No se indico el nombre del proyecto. Modo de uso: '/participantes <NOMBRE_PROYECTO>'"
+        )
+        return  
+    project_name = update.message.text.split()[1]
+    project = Project.select().where(Project.name == project_name)
+    if not project:
+        await context.bot.send_message(
+                chat_id=update.message.chat_id,
+                text="No se encontro el proyecto."
+        )
+        return
+
+    votes = Vote.select().where(
+            (Vote.project == project) & (Vote.interest))
+    participants = set()
+    for vote in votes:
+        participants.add(vote.pycampista.username)
+
+    response = f"Participantes:\n"
+    for participant in participants:
+        response = response + f"{participant} \n"
+
+    await update.message.reply_text(response)
+
+    
+=======
 async def show_my_projects(update, context):
     """Let people see what projects they have voted for"""
 
@@ -302,7 +335,6 @@ async def show_my_projects(update, context):
 
     await update.message.reply_text(text, parse_mode='MarkdownV2')
 
-
 def set_handlers(application):
     application.add_handler(load_project_handler)
     application.add_handler(
@@ -313,6 +345,8 @@ def set_handlers(application):
         CommandHandler('borrar_proyecto', delete_project))
     application.add_handler(
         CommandHandler('proyectos', show_projects))
+    application.add_handler(
+        CommandHandler('participantes', show_participants))
     application.add_handler(
         CommandHandler('mis_proyectos', show_my_projects))
 
