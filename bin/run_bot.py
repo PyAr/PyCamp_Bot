@@ -1,5 +1,8 @@
 import os
+
 from telegram.ext import Application, MessageHandler, filters
+import sentry_sdk
+
 from pycamp_bot.commands import auth
 from pycamp_bot.commands import voting
 from pycamp_bot.commands import manage_pycamp
@@ -11,6 +14,12 @@ from pycamp_bot.commands import schedule
 from pycamp_bot.commands import announcements
 from pycamp_bot.models import models_db_connection
 from pycamp_bot.logger import logger
+
+
+SENTRY_DATA_SOURCE_NAME_ENVVAR = 'SENTRY_DATA_SOURCE_NAME'
+if SENTRY_DATA_SOURCE_NAME_ENVVAR in os.environ:
+    sentry_sdk.init(dsn=os.environ[SENTRY_DATA_SOURCE_NAME_ENVVAR])
+
 
 async def unknown_command(update, context):
     text = "No reconozco el comando, para ver comandos válidos usá /ayuda"

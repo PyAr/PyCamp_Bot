@@ -9,6 +9,7 @@ dependencies = [
   "munch==4.0.0",
   "python-telegram-bot==21.3",
   "peewee==3.17.5",
+  "sentry-sdk==2.6.0",
 ]
 requires-python = "==3.10.*"
 authors = [
