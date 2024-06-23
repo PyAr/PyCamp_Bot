@@ -198,7 +198,7 @@ async def notify_schedule_to_wizards(update, context, pycamp):
             await notify_scheduled_slots_to_wizard(update, context, pycamp, wizard, wizard_agenda)
             logger.debug("Notified wizard schedule to {}".format(wizard.username))
         except BadRequest:
-            logger.warn("Coulnd't notify its wizzard schedule to {}".format(wizard.username))
+            logger.warn("Coulnd't notify its wizard schedule to {}".format(wizard.username))
 
 
 def persist_wizards_schedule_in_db(pycamp):

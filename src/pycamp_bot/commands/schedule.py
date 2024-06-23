@@ -109,7 +109,7 @@ async def create_slot(update, context):
         new_slot.start = starting_hour
 
         pycampista = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
-        new_slot.current_wizzard = pycampista
+        new_slot.current_wizard = pycampista
 
         new_slot.save()
         times.pop(0)
