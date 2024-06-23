@@ -1,8 +1,10 @@
+import os
 import subprocess
 import sys
 
 from telegram.ext import CommandHandler
 
+from pycamp_bot.constants import SENTRY_DATA_SOURCE_NAME_ENVVAR
 from pycamp_bot.utils import escape_markdown
 
 
@@ -28,6 +30,11 @@ async def show_version(update, context):
     for pip_line in pip_freeze.stdout.decode().splitlines():
         dependencies.append(escape_markdown(pip_line))
 
+    if SENTRY_DATA_SOURCE_NAME_ENVVAR in os.environ:
+        sentry_envvar_set = '🟢'
+    else:
+        sentry_envvar_set = '🔴'
+
     lines = [
         f'Commit deployado: `{commit}`',
         f'Fecha del commit \\(author date\\): `{escape_markdown(author_date)}`',
@@ -37,6 +44,7 @@ async def show_version(update, context):
         '```',
         *dependencies,
         '```',
+        f'Variable de entorno de Sentry definida: {sentry_envvar_set}',
     ]
 
     await update.message.reply_text('\n'.join(lines), parse_mode='MarkdownV2')
