@@ -173,7 +173,7 @@ async def show_schedule(update, context):
 
         for project in projects:
             if project.slot_id == slot.id:
-                cronograma += f'*-* {slot.start}:00hs = *{escape_markdown(project.name).capitalize()}.*\n'
+                cronograma += f'*-* {slot.start}:00hs = *{escape_markdown(project.name)}.*\n'
                 cronograma += f'A cargo de 👉🏼 {"@" + escape_markdown(project.owner.username)}\n'
 
     await context.bot.send_message(
