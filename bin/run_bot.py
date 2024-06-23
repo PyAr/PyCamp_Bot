@@ -9,6 +9,7 @@ from pycamp_bot.commands import base
 from pycamp_bot.commands import raffle
 from pycamp_bot.commands import schedule
 from pycamp_bot.commands import announcements
+from pycamp_bot.commands import devtools
 from pycamp_bot.models import models_db_connection
 from pycamp_bot.logger import logger
 
@@ -27,6 +28,7 @@ def set_handlers(application):
     raffle.set_handlers(application)
     schedule.set_handlers(application)
     announcements.set_handlers(application)
+    devtools.set_handlers(application)
     application.add_handler(MessageHandler(filters.COMMAND, unknown_command))
 
 
