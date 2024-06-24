@@ -17,3 +17,14 @@ authors = [
 ]
 description = "Bot de telegram para organizar pycamp"
 readme = "README.md"
+
+[project.optional-dependencies]
+dev = [
+  "flake8==7.1.0",
+  "freezegun==1.5.1",
+  "pytest==8.2.2",
+]
+doc = [
+  "sphinx==7.3.7",
+  "sphinx_rtd_theme==2.0.0",
+]
