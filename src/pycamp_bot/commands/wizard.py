@@ -54,6 +54,7 @@ def compute_wizards_slots(pycamp):
     """
     * Magxs trabajan de 9 a 19, sacando almuerzo (13 a 14).
     * Magxs trabajan desde el mediodía del primer día, hasta el mediodía del último día.
+
     Slots son [start; end)
     """
     wizard_start = pycamp.init
