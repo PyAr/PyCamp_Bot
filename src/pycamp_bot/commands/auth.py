@@ -2,6 +2,7 @@ import os
 from telegram.ext import CommandHandler
 from pycamp_bot.models import Pycampista
 from pycamp_bot.logger import logger
+from pycamp_bot.utils import escape_markdown
 
 
 def get_admins_username():
@@ -84,8 +85,11 @@ async def revoke_admin(update, context):
     user = Pycampista.select().where(Pycampista.username == fallen_admin)[0]
     user.admin = False
     user.save()
-    await context.bot.send_message(chat_id=chat_id,
-                     text='Un admin ha caido --{}--.'.format(fallen_admin))
+    await context.bot.send_message(
+        chat_id=chat_id,
+        text=f'Un admin ha caído ~{escape_markdown(fallen_admin)}~\\.',
+        parse_mode='MarkdownV2',
+    )
 
 
 async def list_admins(update, context):
