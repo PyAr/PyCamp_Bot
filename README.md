@@ -32,10 +32,6 @@ y estas listo para trabajar.
 
 `pip install freezegun` para correr los tests.
 
-### Python 3.12
-
-`pip install setuptools`
-
 ## Testeo
 
 Para correr el bot ejecutá (desde el virtualenv):
