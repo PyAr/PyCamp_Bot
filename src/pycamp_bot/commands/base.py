@@ -32,7 +32,7 @@ async def start(update, context):
 
 async def help(update, context):
     logger.info('Returning help message')
-    await context.bot.send_message(chat_id=update.message.chat_id, text=get_help(update, context), parse_mode='Markdown')
+    await context.bot.send_message(chat_id=update.message.chat_id, text=get_help(update, context), parse_mode='MarkdownV2')
 
 
 # async def error(update, context):
