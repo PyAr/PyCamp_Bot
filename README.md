@@ -30,9 +30,7 @@ pip install -e '.[dev]'
 
 y estas listo para trabajar.
 
-### Python 3.12
-
-`pip install setuptools`
+`pip install freezegun` para correr los tests.
 
 ## Testeo
 
