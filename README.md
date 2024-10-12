@@ -25,7 +25,7 @@ Despues instala el paquete en modo desarrollo en un virtualenv
 ~~~bash
 virtualenv -p python3 venv
 source venv/bin/activate
-pip install -e .
+pip install -e '.[dev]'
 ~~~
 
 y estas listo para trabajar.
