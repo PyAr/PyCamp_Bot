@@ -24,3 +24,7 @@ dev = [
   "freezegun==1.5.1",
   "pytest==8.2.2",
 ]
+doc = [
+  "sphinx==7.3.7",
+  "sphinx_rtd_theme==2.0.0",
+]
