@@ -13,11 +13,11 @@ from pycamp_bot.commands import raffle
 from pycamp_bot.commands import schedule
 from pycamp_bot.commands import announcements
 from pycamp_bot.commands import devtools
+from pycamp_bot.constants import SENTRY_DATA_SOURCE_NAME_ENVVAR
 from pycamp_bot.models import models_db_connection
 from pycamp_bot.logger import logger
 
 
-SENTRY_DATA_SOURCE_NAME_ENVVAR = 'SENTRY_DATA_SOURCE_NAME'
 if SENTRY_DATA_SOURCE_NAME_ENVVAR in os.environ:
     sentry_sdk.init(dsn=os.environ[SENTRY_DATA_SOURCE_NAME_ENVVAR])
 

@@ -9,7 +9,7 @@ dependencies = [
   "munch==4.0.0",
   "python-telegram-bot==21.3",
   "peewee==3.17.5",
-  "sentry-sdk==2.6.0",
+  "sentry-sdk==2.8.0",
 ]
 requires-python = "==3.10.*"
 authors = [
@@ -19,6 +19,11 @@ description = "Bot de telegram para organizar pycamp"
 readme = "README.md"
 
 [project.optional-dependencies]
+dev = [
+  "flake8==7.1.0",
+  "freezegun==1.5.1",
+  "pytest==8.2.2",
+]
 doc = [
   "sphinx==7.3.7",
   "sphinx_rtd_theme==2.0.0",
