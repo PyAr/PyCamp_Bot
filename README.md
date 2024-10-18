@@ -8,6 +8,7 @@ Puede encontrar una documentación mas detallada para programadores en [https://
 
 * TOKEN: Token del bot generado con BotFather.
 * PYCAMP_BOT_MASTER_KEY: Password para agregar nuevos admins.
+* SENTRY_DATA_SOURCE_NAME: ID de proyecto de Sentry para habilitar el monitoreo.
 
 ## Development
 
@@ -49,6 +50,7 @@ Primero es necesario setear las siguientes variables de entorno:
 
 * `TOKEN`: token del bot que se usará durante el pycamp (gestionar desde telegram con BotFather)
 * `PYCAMP_BOT_MASTER_KEY`: con alguna password secreta que se va a usar para acceder a comandos de superuser
+* `SENTRY_DATA_SOURCE_NAME`: ID del proyecto de Sentry "telegrambot" de la cuenta de PyAr
 
 Una vez creadas las variables de entorno, correr el bot con el comando `python bin/run_bot.py`
 
