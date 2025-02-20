@@ -11,6 +11,11 @@ from pycamp_bot.utils import escape_markdown
 
 current_projects = {}
 NOMBRE, DIFICULTAD, TOPIC = ["nombre", "dificultad", "topic"]
+DIFFICULTY_LEVEL_NAMES = {
+    1: 'inicial',
+    2: 'intermedio',
+    3: 'avanzado',
+}
 
 logger = logging.getLogger(__name__)
 
@@ -70,10 +75,10 @@ async def naming_project(update, context):
     )
     await context.bot.send_message(
         chat_id=update.message.chat_id,
-        text="""Cual es el nivel de dificultad?
-            1 = newbie friendly
-            2 = intermedio
-            3 = python avanzado"""
+        text=f"""Cual es el nivel de dificultad?
+            1 = {DIFFICULTY_LEVEL_NAMES[1]}
+            2 = {DIFFICULTY_LEVEL_NAMES[2]}
+            3 = {DIFFICULTY_LEVEL_NAMES[3]}"""
     )
     return DIFICULTAD
 
@@ -240,7 +245,7 @@ async def show_projects(update, context):
             project.name,
             project.owner.username,
             project.topic,
-            project.difficult_level
+            DIFFICULTY_LEVEL_NAMES[project.difficult_level]
         )
         participants_count = Vote.select().where(
             (Vote.project == project) & (Vote.interest)).count()
