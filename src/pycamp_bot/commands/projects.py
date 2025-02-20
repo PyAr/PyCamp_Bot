@@ -57,6 +57,13 @@ async def naming_project(update, context):
     username = update.message.from_user.username
     name = update.message.text
 
+    if name == '/cargar_proyecto':
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Hubo un problema de conectividad, volvé a ingresar el nombre"
+        )
+        return NOMBRE
+
     new_project = Project(name=name)
     current_projects[username] = new_project
 
