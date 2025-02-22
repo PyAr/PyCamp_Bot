@@ -153,6 +153,24 @@ async def project_topic(update, context):
     return CHECK_REPOSITORIO
 
 
+async def save_project(username, chat_id, context):
+    '''Save project to database'''
+    new_project = current_projects[username]
+
+    try:
+        new_project.save()
+    except peewee.IntegrityError:
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text="Ups ese proyecto ya fue cargado"
+        )
+    else:
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text="Tu proyecto ha sido cargado"
+        )
+
+
 async def ask_if_repository_exists(update, context):
     '''Dialog to ask if a repository exists'''
     callback_query = update.callback_query
@@ -171,24 +189,6 @@ async def ask_if_repository_exists(update, context):
         )
         await save_project(callback_query.from_user.username, chat.id, context)
         return ConversationHandler.END
-
-
-async def save_project(username, chat_id, context):
-    '''Save project to database'''
-    new_project = current_projects[username]
-
-    try:
-        new_project.save()
-    except peewee.IntegrityError:
-        await context.bot.send_message(
-            chat_id=chat_id,
-            text="Ups ese proyecto ya fue cargado"
-        )
-    else:
-        await context.bot.send_message(
-            chat_id=chat_id,
-            text="Tu proyecto ha sido cargado"
-        )
 
 
 async def project_repository(update, context):
@@ -253,7 +253,6 @@ async def ask_repository_name(update, context):
     return 2
 
 
-@active_needed
 async def add_repository(update, context):
     '''Dialog to set repository'''
     username = update.message.from_user.username
