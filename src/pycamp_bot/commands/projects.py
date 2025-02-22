@@ -1,6 +1,7 @@
 import logging
 import peewee
-from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, filters
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import CallbackQueryHandler, ConversationHandler, CommandHandler, MessageHandler, filters
 from pycamp_bot.models import Pycampista, Project, Slot, Vote
 from pycamp_bot.commands.base import msg_to_active_pycamp_chat
 from pycamp_bot.commands.manage_pycamp import active_needed, get_active_pycamp
@@ -10,7 +11,15 @@ from pycamp_bot.utils import escape_markdown
 
 
 current_projects = {}
-NOMBRE, DIFICULTAD, TOPIC = ["nombre", "dificultad", "topic"]
+
+NOMBRE = "nombre"
+DIFICULTAD = "dificultad"
+TOPIC = "topic"
+CHECK_REPOSITORIO = "check_repositorio"
+REPOSITORIO = "repositorio"
+
+REPO_EXISTS_PATTERN = 'repoexists'
+PROJECT_NAME_PATTERN = 'projectname'
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +66,11 @@ async def naming_project(update, context):
     username = update.message.from_user.username
     name = update.message.text
 
+    user = Pycampista.get_or_create(username=username, chat_id=update.message.chat_id)[0]
+
     new_project = Project(name=name)
+    new_project.owner = user
+
     current_projects[username] = new_project
 
     await context.bot.send_message(
@@ -118,26 +131,81 @@ async def project_topic(update, context):
     new_project = current_projects[username]
     new_project.topic = text
 
-    chat_id = update.message.chat_id
-    user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
+    await context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text="Excelente {}! La temática de tu proyecto es: {}.".format(username, text)
+    )
 
-    new_project.owner = user
+    keyboard = [
+        [
+            InlineKeyboardButton("Sí", callback_data=f"{REPO_EXISTS_PATTERN}:si"),
+            InlineKeyboardButton("No", callback_data=f"{REPO_EXISTS_PATTERN}:no"),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text="¿Existe un repositorio para tu proyecto?",
+        reply_markup=reply_markup,
+    )
+
+    return CHECK_REPOSITORIO
+
+
+async def ask_if_repository_exists(update, context):
+    '''Dialog to ask if a repository exists'''
+    callback_query = update.callback_query
+    chat = callback_query.message.chat
+
+    if callback_query.data.split(':')[1] == "si":
+        await context.bot.send_message(
+            chat_id=chat.id,
+            text="¿Cuál es la URL del repositorio?",
+        )
+        return REPOSITORIO
+    else:
+        await context.bot.send_message(
+            chat_id=chat.id,
+            text="Si creás un repositorio, podés agregarlo con /agregar_repositorio."
+        )
+        await save_project(callback_query.from_user.username, chat.id, context)
+        return ConversationHandler.END
+
+
+async def save_project(username, chat_id, context):
+    '''Save project to database'''
+    new_project = current_projects[username]
+
     try:
         new_project.save()
     except peewee.IntegrityError:
         await context.bot.send_message(
-            chat_id=update.message.chat_id,
+            chat_id=chat_id,
             text="Ups ese proyecto ya fue cargado"
         )
-        return ConversationHandler.END
+    else:
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text="Tu proyecto ha sido cargado"
+        )
+
+
+async def project_repository(update, context):
+    '''Dialog to set project repository'''
+    username = update.message.from_user.username
+    text = update.message.text
+
+    new_project = current_projects[username]
+    new_project.repository_url = text
 
     await context.bot.send_message(
         chat_id=update.message.chat_id,
-        text="Excelente {}! La temática de tu proyecto es: {}.".format(username, text))
-    await context.bot.send_message(
-        chat_id=update.message.chat_id,
-        text="Tu proyecto ha sido cargado"
+        text=f"El repositorio de tu proyecto es: {text}."
     )
+
+    await save_project(username, update.message.chat_id, context)
+
     return ConversationHandler.END
 
 
@@ -145,6 +213,61 @@ async def cancel(update, context):
     await context.bot.send_message(
         chat_id=update.message.chat_id,
         text="Has cancelado la carga del proyecto")
+    return ConversationHandler.END
+
+
+@active_needed
+async def ask_project_name(update, context):
+    '''Command to start the agregar_repositorio dialog'''
+    username = update.message.from_user.username
+
+    projects = Project.select().join(Pycampista).where(Pycampista.username == username)
+
+    keyboard = [
+        [InlineKeyboardButton(project.name, callback_data=f"{PROJECT_NAME_PATTERN}:{project.name}") for project in projects]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text="¿A qué proyecto querés agregar un repositorio?",
+        reply_markup=reply_markup,
+    )
+
+    return 1
+
+
+async def ask_repository_name(update, context):
+    '''Dialog to set project name'''
+    callback_query = update.callback_query
+    chat = callback_query.message.chat
+
+    username = callback_query.from_user.username
+
+    current_projects[username] = callback_query.data.split(':')[1]
+
+    await context.bot.send_message(
+        chat_id=chat.id,
+        text="¿Cuál es la URL del repositorio?",
+    )
+    return 2
+
+
+@active_needed
+async def add_repository(update, context):
+    '''Dialog to set repository'''
+    username = update.message.from_user.username
+    text = update.message.text
+
+    project = Project.select().where(Project.name == current_projects[username]).get()
+
+    project.repository_url = text
+    project.save()
+
+    await context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text=f'Repositorio "{text}" agregado al proyecto "{current_projects[username]}"',
+    )
     return ConversationHandler.END
 
 
@@ -186,7 +309,10 @@ load_project_handler = ConversationHandler(
     states={
         NOMBRE: [MessageHandler(filters.TEXT, naming_project)],
         DIFICULTAD: [MessageHandler(filters.TEXT, project_level)],
-        TOPIC: [MessageHandler(filters.TEXT, project_topic)]},
+        TOPIC: [MessageHandler(filters.TEXT, project_topic)],
+        CHECK_REPOSITORIO: [CallbackQueryHandler(ask_if_repository_exists, pattern=REPO_EXISTS_PATTERN)],
+        REPOSITORIO: [MessageHandler(filters.TEXT, project_repository)],
+    },
     fallbacks=[CommandHandler('cancel', cancel)])
 
 
@@ -236,11 +362,12 @@ async def show_projects(update, context):
     projects = Project.select()
     text = []
     for project in projects:
-        project_text = "{} \n Owner: {} \n Temática: {} \n Nivel: {}".format(
+        project_text = "{} \n Owner: {} \n Temática: {} \n Nivel: {} \n Repositorio: {}".format(
             project.name,
             project.owner.username,
             project.topic,
-            project.difficult_level
+            project.difficult_level,
+            project.repository_url,
         )
         participants_count = Vote.select().where(
             (Vote.project == project) & (Vote.interest)).count()
@@ -336,7 +463,18 @@ async def show_my_projects(update, context):
     await update.message.reply_text(text, parse_mode='MarkdownV2')
 
 def set_handlers(application):
+    add_repository_handler = ConversationHandler(
+        entry_points=[CommandHandler('agregar_repositorio', ask_project_name)],
+        states={
+            1: [CallbackQueryHandler(ask_repository_name, pattern=PROJECT_NAME_PATTERN)],
+            2: [MessageHandler(filters.TEXT, add_repository)],
+        },
+        fallbacks=[CommandHandler('cancel', cancel)],
+    )
+
     application.add_handler(load_project_handler)
+    application.add_handler(add_repository_handler)
+
     application.add_handler(
         CommandHandler('empezar_carga_proyectos', start_project_load))
     application.add_handler(

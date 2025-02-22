@@ -158,6 +158,7 @@ class Project(BaseModel):
     topic = pw.CharField(null=True)
     slot = pw.ForeignKeyField(Slot, null=True)
     owner = pw.ForeignKeyField(Pycampista)
+    repository_url = pw.CharField(null=True)
 
 
 class Vote(BaseModel):

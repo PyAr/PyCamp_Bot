@@ -9,6 +9,9 @@ from pycamp_bot.models import Pycampista, Project, Vote
 from pycamp_bot.logger import logger
 
 
+VOTE_PATTERN = 'vote'
+
+
 def vote_authorized(func):
     @functools.wraps(func)
     async def wrap(*args):
@@ -61,7 +64,7 @@ async def button(update, context):
 
     # Save vote in the database and confirm the chosen proyects.
 
-    if query.data == "si":
+    if query.data.split(':')[1] == "si":
         result = f"✅ Sumade a {project_name}!"
         new_vote.interest = True
     else:
@@ -96,8 +99,8 @@ async def vote(update, context):
 
     # ask user for each project in the database
     for project in Project.select():
-        keyboard = [[InlineKeyboardButton("Me Sumo!", callback_data="si"),
-                    InlineKeyboardButton("Paso", callback_data="no")]]
+        keyboard = [[InlineKeyboardButton("Me Sumo!", callback_data=f"{VOTE_PATTERN}:si"),
+                    InlineKeyboardButton("Paso", callback_data=f"{VOTE_PATTERN}:no")]]
 
         reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -129,7 +132,7 @@ async def vote_count(update, context):
 
 def set_handlers(application):
     application.add_handler(
-        CallbackQueryHandler(button))
+        CallbackQueryHandler(button, pattern=VOTE_PATTERN))
     application.add_handler(
         CommandHandler('empezar_votacion_proyectos', start_voting))
     application.add_handler(

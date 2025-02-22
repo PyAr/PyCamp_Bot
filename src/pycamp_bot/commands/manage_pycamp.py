@@ -152,6 +152,7 @@ async def define_duration(update, context):
         chat_id=update.message.chat_id,
         text=msg
     )
+    return ConversationHandler.END
 
 
 async def cancel(update, context):
