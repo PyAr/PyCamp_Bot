@@ -223,9 +223,9 @@ async def ask_project_name(update, context):
 
     projects = Project.select().join(Pycampista).where(Pycampista.username == username)
 
-    keyboard = [
-        [InlineKeyboardButton(project.name, callback_data=f"{PROJECT_NAME_PATTERN}:{project.name}") for project in projects]
-    ]
+    keyboard = []
+    for project in projects:
+        keyboard.append([InlineKeyboardButton(project.name, callback_data=f"{PROJECT_NAME_PATTERN}:{project.name}")])
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     await context.bot.send_message(
