@@ -223,6 +223,13 @@ async def ask_project_name(update, context):
 
     projects = Project.select().join(Pycampista).where(Pycampista.username == username)
 
+    if not projects:
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text="No cargaste ningún proyecto",
+        )
+        return ConversationHandler.END
+
     keyboard = []
     for project in projects:
         keyboard.append([InlineKeyboardButton(project.name, callback_data=f"{PROJECT_NAME_PATTERN}:{project.name}")])
