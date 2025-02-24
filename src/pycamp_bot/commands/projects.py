@@ -373,7 +373,7 @@ async def show_projects(update, context):
             project.owner.username,
             project.topic,
             project.difficult_level,
-            project.repository_url,
+            project.repository_url or '(ninguno)',
         )
         participants_count = Vote.select().where(
             (Vote.project == project) & (Vote.interest)).count()
