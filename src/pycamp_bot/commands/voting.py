@@ -132,7 +132,7 @@ async def vote_count(update, context):
 
 def set_handlers(application):
     application.add_handler(
-        CallbackQueryHandler(button, pattern=VOTE_PATTERN))
+        CallbackQueryHandler(button, pattern=f'^{VOTE_PATTERN}:'))
     application.add_handler(
         CommandHandler('empezar_votacion_proyectos', start_voting))
     application.add_handler(
