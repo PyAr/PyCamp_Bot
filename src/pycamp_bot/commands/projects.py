@@ -316,7 +316,7 @@ load_project_handler = ConversationHandler(
         NOMBRE: [MessageHandler(filters.TEXT, naming_project)],
         DIFICULTAD: [MessageHandler(filters.TEXT, project_level)],
         TOPIC: [MessageHandler(filters.TEXT, project_topic)],
-        CHECK_REPOSITORIO: [CallbackQueryHandler(ask_if_repository_exists, pattern=f'^{REPO_EXISTS_PATTERN}:')],
+        CHECK_REPOSITORIO: [CallbackQueryHandler(ask_if_repository_exists, pattern=f'{REPO_EXISTS_PATTERN}:')],
         REPOSITORIO: [MessageHandler(filters.TEXT, project_repository)],
     },
     fallbacks=[CommandHandler('cancel', cancel)])
@@ -472,7 +472,7 @@ def set_handlers(application):
     add_repository_handler = ConversationHandler(
         entry_points=[CommandHandler('agregar_repositorio', ask_project_name)],
         states={
-            1: [CallbackQueryHandler(ask_repository_name, pattern=f'^{PROJECT_NAME_PATTERN}:')],
+            1: [CallbackQueryHandler(ask_repository_name, pattern=f'{PROJECT_NAME_PATTERN}:')],
             2: [MessageHandler(filters.TEXT, add_repository)],
         },
         fallbacks=[CommandHandler('cancel', cancel)],
