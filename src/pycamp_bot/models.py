@@ -152,6 +152,7 @@ class Project(BaseModel):
     topic: string comma separated with the pertinences
     slot: ForeignKey with the slot asigned
     owner: ForeignKey with the pycamp user asigned
+    repository_url: URL of the repository of the project
     '''
     name = pw.CharField(unique=True)
     difficult_level = pw.IntegerField(default=1)
