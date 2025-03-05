@@ -1,14 +1,15 @@
 import logging
+import textwrap
+
 import peewee
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import CallbackQueryHandler, ConversationHandler, CommandHandler, MessageHandler, filters
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, LinkPreviewOptions
+from telegram.ext import CallbackQueryHandler, CommandHandler, ConversationHandler, MessageHandler, filters
 from pycamp_bot.models import Pycampista, Project, Slot, Vote
 from pycamp_bot.commands.base import msg_to_active_pycamp_chat
 from pycamp_bot.commands.manage_pycamp import active_needed, get_active_pycamp
 from pycamp_bot.commands.auth import admin_needed, get_admins_username
 from pycamp_bot.commands.schedule import DIAS
 from pycamp_bot.utils import escape_markdown
-
 
 current_projects = {}
 
@@ -17,9 +18,12 @@ DIFICULTAD = "dificultad"
 TOPIC = "topic"
 CHECK_REPOSITORIO = "check_repositorio"
 REPOSITORIO = "repositorio"
+CHECK_GRUPO = "check_grupo"
+GRUPO = "grupo"
 
 REPO_EXISTS_PATTERN = 'repoexists'
 PROJECT_NAME_PATTERN = 'projectname'
+GROUP_EXISTS_PATTERN = 'groupexists'
 
 logger = logging.getLogger(__name__)
 
@@ -47,15 +51,11 @@ async def load_project(update, context):
     logger.info("Adding project")
     username = update.message.from_user.username
 
-    logger.info("Load autorized. Starting dialog")
-    await context.bot.send_message(
-        chat_id=update.message.chat_id,
-        text="Usuario: " + username
-    )
+    logger.info("Load authorized. Starting dialog")
 
     await context.bot.send_message(
         chat_id=update.message.chat_id,
-        text="Ingresá el Nombre del Proyecto a proponer",
+        text="¿Cuál es el nombre del proyecto?",
     )
     return NOMBRE
 
@@ -75,18 +75,13 @@ async def naming_project(update, context):
 
     await context.bot.send_message(
         chat_id=update.message.chat_id,
-        text="Estamos cargando tu proyecto: {}!".format(username)
-    )
-    await context.bot.send_message(
-        chat_id=update.message.chat_id,
-        text="Tu proyecto se llama: {}".format(name)
-    )
-    await context.bot.send_message(
-        chat_id=update.message.chat_id,
-        text="""Cual es el nivel de dificultad?
-            1 = newbie friendly
-            2 = intermedio
-            3 = python avanzado"""
+        text=textwrap.dedent("""
+            ¿Cuál es el nivel de dificultad del proyecto?
+
+            1: newbie friendly
+            2: intermedio
+            3: python avanzado"""
+        )
     )
     return DIFICULTAD
 
@@ -102,17 +97,16 @@ async def project_level(update, context):
 
         await context.bot.send_message(
             chat_id=update.message.chat_id,
-            text="Ok! Tu proyecto es nivel: {}".format(text)
-        )
-        await context.bot.send_message(
-            chat_id=update.message.chat_id,
-            text="""Ahora necesitamos que nos digas la temática de tu proyecto.
-            Algunos ejemplos pueden ser:
-            - flask
-            - django
-            - telegram
-            - inteligencia artificial
-            - recreativo"""
+            text=textwrap.dedent("""
+                ¿Cuál es la temática del proyecto?
+
+                Ejemplos:
+                - flask
+                - django
+                - telegram
+                - inteligencia artificial
+                - recreativo"""
+            )
         )
         return TOPIC
     else:
@@ -131,11 +125,6 @@ async def project_topic(update, context):
     new_project = current_projects[username]
     new_project.topic = text
 
-    await context.bot.send_message(
-        chat_id=update.message.chat_id,
-        text="Excelente {}! La temática de tu proyecto es: {}.".format(username, text)
-    )
-
     keyboard = [
         [
             InlineKeyboardButton("Sí", callback_data=f"{REPO_EXISTS_PATTERN}:si"),
@@ -146,7 +135,7 @@ async def project_topic(update, context):
 
     await context.bot.send_message(
         chat_id=update.message.chat_id,
-        text="¿Existe un repositorio para tu proyecto?",
+        text="¿El proyecto tiene un repositorio?",
         reply_markup=reply_markup,
     )
 
@@ -167,8 +156,23 @@ async def save_project(username, chat_id, context):
     else:
         await context.bot.send_message(
             chat_id=chat_id,
-            text="Tu proyecto ha sido cargado"
+            text="Proyecto cargado"
         )
+
+
+async def present_group_inline_keyboard(chat_id, context):
+    keyboard = [
+        [
+            InlineKeyboardButton("Sí", callback_data=f"{GROUP_EXISTS_PATTERN}:si"),
+            InlineKeyboardButton("No", callback_data=f"{GROUP_EXISTS_PATTERN}:no"),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await context.bot.send_message(
+        chat_id=chat_id,
+        text="¿Tu proyecto tiene un grupo de Telegram?",
+        reply_markup=reply_markup,
+    )
 
 
 async def ask_if_repository_exists(update, context):
@@ -179,13 +183,38 @@ async def ask_if_repository_exists(update, context):
     if callback_query.data.split(':')[1] == "si":
         await context.bot.send_message(
             chat_id=chat.id,
-            text="¿Cuál es la URL del repositorio?",
+            text="¿Cuál es la URL del repositorio del proyecto?",
         )
         return REPOSITORIO
     else:
         await context.bot.send_message(
             chat_id=chat.id,
             text="Si creás un repositorio, podés agregarlo con /agregar_repositorio."
+        )
+
+        await present_group_inline_keyboard(
+            chat_id=chat.id,
+            context=context,
+        )
+
+        return CHECK_GRUPO
+
+
+async def ask_if_group_exists(update, context):
+    '''Dialog to ask if a group exists'''
+    callback_query = update.callback_query
+    chat = callback_query.message.chat
+
+    if callback_query.data.split(':')[1] == "si":
+        await context.bot.send_message(
+            chat_id=chat.id,
+            text="¿Cuál es la URL del grupo del proyecto?",
+        )
+        return GRUPO
+    else:
+        await context.bot.send_message(
+            chat_id=chat.id,
+            text="Si creás un grupo, podés agregarlo con /agregar_grupo."
         )
         await save_project(callback_query.from_user.username, chat.id, context)
         return ConversationHandler.END
@@ -199,13 +228,23 @@ async def project_repository(update, context):
     new_project = current_projects[username]
     new_project.repository_url = text
 
-    await context.bot.send_message(
+    await present_group_inline_keyboard(
         chat_id=update.message.chat_id,
-        text=f"El repositorio de tu proyecto es: {text}."
+        context=context,
     )
 
-    await save_project(username, update.message.chat_id, context)
+    return CHECK_GRUPO
 
+
+async def project_group(update, context):
+    '''Dialog to set project group'''
+    username = update.message.from_user.username
+    text = update.message.text
+
+    new_project = current_projects[username]
+    new_project.group_url = text
+
+    await save_project(username, update.message.chat_id, context)
     return ConversationHandler.END
 
 
@@ -218,7 +257,7 @@ async def cancel(update, context):
 
 @active_needed
 async def ask_project_name(update, context):
-    '''Command to start the agregar_repositorio dialog'''
+    '''Command to start the agregar_repositorio/agregar_grupo dialogs'''
     username = update.message.from_user.username
 
     projects = Project.select().join(Pycampista).where(Pycampista.username == username)
@@ -237,14 +276,14 @@ async def ask_project_name(update, context):
 
     await context.bot.send_message(
         chat_id=update.message.chat_id,
-        text="¿A qué proyecto querés agregar un repositorio?",
+        text="¿Qué proyecto querés modificar?",
         reply_markup=reply_markup,
     )
 
     return 1
 
 
-async def ask_repository_name(update, context):
+async def ask_repository_url(update, context):
     '''Dialog to set project name'''
     callback_query = update.callback_query
     chat = callback_query.message.chat
@@ -256,6 +295,22 @@ async def ask_repository_name(update, context):
     await context.bot.send_message(
         chat_id=chat.id,
         text="¿Cuál es la URL del repositorio?",
+    )
+    return 2
+
+
+async def ask_group_url(update, context):
+    '''Dialog to set project name'''
+    callback_query = update.callback_query
+    chat = callback_query.message.chat
+
+    username = callback_query.from_user.username
+
+    current_projects[username] = callback_query.data.split(':')[1]
+
+    await context.bot.send_message(
+        chat_id=chat.id,
+        text="¿Cuál es la URL del grupo?",
     )
     return 2
 
@@ -272,7 +327,24 @@ async def add_repository(update, context):
 
     await context.bot.send_message(
         chat_id=update.message.chat_id,
-        text=f'Repositorio "{text}" agregado al proyecto "{current_projects[username]}"',
+        text=f'Repositorio agregado',
+    )
+    return ConversationHandler.END
+
+
+async def add_group(update, context):
+    '''Dialog to set group'''
+    username = update.message.from_user.username
+    text = update.message.text
+
+    project = Project.select().where(Project.name == current_projects[username]).get()
+
+    project.group_url = text
+    project.save()
+
+    await context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text=f'Grupo agregado',
     )
     return ConversationHandler.END
 
@@ -287,7 +359,7 @@ async def start_project_load(update, context):
         pycamp.project_load_authorized = True
         pycamp.save()
 
-        await update.message.reply_text("Autorizadx \nCarga de proyectos Abierta")
+        await update.message.reply_text("Carga de proyectos Abierta")
         await msg_to_active_pycamp_chat(context.bot, "Carga de proyectos Abierta")
     else:
         await update.message.reply_text("La carga de proyectos ya estaba abierta")
@@ -318,6 +390,8 @@ load_project_handler = ConversationHandler(
         TOPIC: [MessageHandler(filters.TEXT, project_topic)],
         CHECK_REPOSITORIO: [CallbackQueryHandler(ask_if_repository_exists, pattern=f'{REPO_EXISTS_PATTERN}:')],
         REPOSITORIO: [MessageHandler(filters.TEXT, project_repository)],
+        CHECK_GRUPO: [CallbackQueryHandler(ask_if_group_exists, pattern=f'{GROUP_EXISTS_PATTERN}:')],
+        GRUPO: [MessageHandler(filters.TEXT, project_group)],
     },
     fallbacks=[CommandHandler('cancel', cancel)])
 
@@ -368,12 +442,13 @@ async def show_projects(update, context):
     projects = Project.select()
     text = []
     for project in projects:
-        project_text = "{} \n Owner: {} \n Temática: {} \n Nivel: {} \n Repositorio: {}".format(
+        project_text = "{}\n Owner: @{}\n Temática: {}\n Nivel: {}\n Repositorio: {}\n Grupo de Telegram: {}".format(
             project.name,
             project.owner.username,
             project.topic,
             project.difficult_level,
             project.repository_url or '(ninguno)',
+            project.group_url or '(ninguno)',
         )
         participants_count = Vote.select().where(
             (Vote.project == project) & (Vote.interest)).count()
@@ -386,7 +461,7 @@ async def show_projects(update, context):
     else:
         text = "Todavía no hay ningún proyecto cargado"
 
-    await update.message.reply_text(text)
+    await update.message.reply_text(text, link_preview_options=LinkPreviewOptions(is_disabled=True))
 
 
 
@@ -470,16 +545,33 @@ async def show_my_projects(update, context):
 
 def set_handlers(application):
     add_repository_handler = ConversationHandler(
-        entry_points=[CommandHandler('agregar_repositorio', ask_project_name)],
+        entry_points=[
+            CommandHandler('agregar_repositorio', ask_project_name),
+        ],
         states={
-            1: [CallbackQueryHandler(ask_repository_name, pattern=f'{PROJECT_NAME_PATTERN}:')],
+            1: [CallbackQueryHandler(ask_repository_url, pattern=f'{PROJECT_NAME_PATTERN}:')],
             2: [MessageHandler(filters.TEXT, add_repository)],
         },
-        fallbacks=[CommandHandler('cancel', cancel)],
+        fallbacks=[
+            CommandHandler('cancel', cancel),
+        ],
+    )
+    add_group_handler = ConversationHandler(
+        entry_points=[
+            CommandHandler('agregar_grupo', ask_project_name),
+        ],
+        states={
+            1: [CallbackQueryHandler(ask_group_url, pattern=f'{PROJECT_NAME_PATTERN}:')],
+            2: [MessageHandler(filters.TEXT, add_group)],
+        },
+        fallbacks=[
+            CommandHandler('cancel', cancel),
+        ],
     )
 
     application.add_handler(load_project_handler)
     application.add_handler(add_repository_handler)
+    application.add_handler(add_group_handler)
 
     application.add_handler(
         CommandHandler('empezar_carga_proyectos', start_project_load))
