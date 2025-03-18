@@ -21,6 +21,12 @@ REPOSITORIO = "repositorio"
 CHECK_GRUPO = "check_grupo"
 GRUPO = "grupo"
 
+DIFFICULTY_LEVEL_NAMES = {
+    1: 'inicial',
+    2: 'intermedio',
+    3: 'avanzado',
+}
+
 REPO_EXISTS_PATTERN = 'repoexists'
 PROJECT_NAME_PATTERN = 'projectname'
 GROUP_EXISTS_PATTERN = 'groupexists'
@@ -78,9 +84,9 @@ async def naming_project(update, context):
         text=textwrap.dedent("""
             ¿Cuál es el nivel de dificultad del proyecto?
 
-            1: newbie friendly
-            2: intermedio
-            3: python avanzado"""
+            1: {DIFFICULTY_LEVEL_NAMES[1]}
+            2: {DIFFICULTY_LEVEL_NAMES[2]}
+            3: {DIFFICULTY_LEVEL_NAMES[3]}"""
         )
     )
     return DIFICULTAD
@@ -446,7 +452,7 @@ async def show_projects(update, context):
             project.name,
             project.owner.username,
             project.topic,
-            project.difficult_level,
+            DIFFICULTY_LEVEL_NAMES[project.difficult_level]
             project.repository_url or '(ninguno)',
             project.group_url or '(ninguno)',
         )
