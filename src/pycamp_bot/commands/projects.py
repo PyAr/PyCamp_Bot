@@ -458,7 +458,7 @@ async def show_projects(update, context):
             project.name,
             project.owner.username,
             project.topic,
-            DIFFICULTY_LEVEL_NAMES[project.difficult_level]
+            DIFFICULTY_LEVEL_NAMES[project.difficult_level],
             project.repository_url or '(ninguno)',
             project.group_url or '(ninguno)',
         )
