@@ -2,13 +2,16 @@ from telegram.ext import CommandHandler
 from pycamp_bot.commands.help_msg import get_help
 from pycamp_bot.logger import logger
 
+import os
+
 
 async def msg_to_active_pycamp_chat(bot, text):
-    chat_id = -1001404878013  # Prueba
-    await bot.send_message(
-        chat_id=chat_id,
-        text=text
-        )
+    if 'TEST_CHAT_ID' in os.environ:
+        chat_id = -1001404878013  # Prueba
+        await bot.send_message(
+            chat_id=os.environ['TEST_CHAT_ID'],
+            text=text
+            )
 
 
 async def start(update, context):
