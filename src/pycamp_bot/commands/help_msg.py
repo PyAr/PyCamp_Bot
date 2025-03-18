@@ -49,7 +49,6 @@ HELP_MESSAGE_ADMIN = '''
 Be AWARE, you have sudo\\.\\.\\.
 
 Pycamp:
-/agregar\\_pycamp \\(pycamp\\): Agrega un pycamp\\.
 /activar\\_pycamp \\(pycamp\\): Setea un pycamp como activo \\(si ya hay uno activo lo \
 desactiva\\)\\.
 /empezar\\_carga\\_proyectos: Habilita la carga de proyectos en el pycamp activo\\.
