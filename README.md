@@ -31,8 +31,6 @@ pip install -e '.[dev]'
 
 y estas listo para trabajar.
 
-`pip install freezegun` para correr los tests.
-
 ## Testeo
 
 Para correr el bot ejecutá (con el virtual environment activado):
