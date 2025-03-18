@@ -72,6 +72,12 @@ async def naming_project(update, context):
     username = update.message.from_user.username
     name = update.message.text
 
+    if name == '/cargar_proyecto':
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text="Hubo un problema de conectividad, volvé a ingresar el nombre"
+        )
+        return NOMBRE
     user = Pycampista.get_or_create(username=username, chat_id=update.message.chat_id)[0]
 
     new_project = Project(name=name)
