@@ -8,6 +8,7 @@ Puede encontrar una documentación mas detallada para programadores en [https://
 
 * TOKEN: Token del bot generado con BotFather.
 * PYCAMP_BOT_MASTER_KEY: Password para agregar nuevos admins.
+* SENTRY_DATA_SOURCE_NAME: ID de proyecto de Sentry para habilitar el monitoreo.
 
 ## Development
 
@@ -20,21 +21,19 @@ Esto lo podes hacer hablandole a @BotFather que es el "Bot padre de todos los bo
 Una vez creado el bot, deberías tener un TOKEN\_PERSONAL (BotFather te lo da en el mismo proceso de
 creación).
 
-Despues instala el paquete en modo desarrollo en un virtualenv
+Despues instala el paquete en modo desarrollo en un virtual environment
 
 ~~~bash
-virtualenv -p python3 venv
+python3 -m venv venv
 source venv/bin/activate
 pip install -e '.[dev]'
 ~~~
 
 y estas listo para trabajar.
 
-`pip install freezegun` para correr los tests.
-
 ## Testeo
 
-Para correr el bot ejecutá (desde el virtualenv):
+Para correr el bot ejecutá (con el virtual environment activado):
 
 ~~~bash
 TOKEN='TOKEN_PERSONAL' PYCAMP_BOT_MASTER_KEY='KEY' python bin/run_bot.py
@@ -49,6 +48,7 @@ Primero es necesario setear las siguientes variables de entorno:
 
 * `TOKEN`: token del bot que se usará durante el pycamp (gestionar desde telegram con BotFather)
 * `PYCAMP_BOT_MASTER_KEY`: con alguna password secreta que se va a usar para acceder a comandos de superuser
+* `SENTRY_DATA_SOURCE_NAME`: ID del proyecto de Sentry "telegrambot" de la cuenta de PyAr
 
 Una vez creadas las variables de entorno, correr el bot con el comando `python bin/run_bot.py`
 

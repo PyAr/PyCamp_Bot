@@ -7,9 +7,9 @@ name = "PyCamp_Bot"
 version = "3.0"
 dependencies = [
   "munch==4.0.0",
-  "python-telegram-bot==21.3",
-  "peewee==3.17.5",
-  "sentry-sdk==2.8.0",
+  "python-telegram-bot==21.10",
+  "peewee==3.17.9",
+  "sentry-sdk==2.22.0",
 ]
 requires-python = "==3.10.*"
 authors = [
@@ -20,9 +20,9 @@ readme = "README.md"
 
 [project.optional-dependencies]
 dev = [
-  "flake8==7.1.0",
+  "flake8==7.1.2",
   "freezegun==1.5.1",
-  "pytest==8.2.2",
+  "pytest==8.3.4",
 ]
 doc = [
   "sphinx==7.3.7",

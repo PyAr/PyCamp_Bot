@@ -152,12 +152,16 @@ class Project(BaseModel):
     topic: string comma separated with the pertinences
     slot: ForeignKey with the slot asigned
     owner: ForeignKey with the pycamp user asigned
+    repository_url: URL of the repository of the project
+    group_url: URL of the Telegram group of the project
     '''
     name = pw.CharField(unique=True)
     difficult_level = pw.IntegerField(default=1)
     topic = pw.CharField(null=True)
     slot = pw.ForeignKeyField(Slot, null=True)
     owner = pw.ForeignKeyField(Pycampista)
+    repository_url = pw.CharField(null=True)
+    group_url = pw.CharField(null=True)
 
 
 class Vote(BaseModel):
