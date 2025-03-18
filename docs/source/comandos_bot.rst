@@ -9,7 +9,6 @@ Comandos de Administrador
 -------------------------
 
 - ``/su <password>``: Reclama permisos de admin, la contraseña es la usada en la variable de entorno ``PYCAMP_BOT_MASTER_KEY``.
-- ``/agregar_pycamp <pycamp_name>``: Crea el PyCamp en la DB.
 - ``/activar_pycamp <pycamp_name>``: Activa un Pycamp.
 - ``/empezar_pycamp``: Setea la fecha de inicio del pycamp activo.
 - ``/empezar_carga_proyectos``: Habilita la carga de los proyectos. En este punto los pycampistas pueden cargar sus proyectos, enviandole al bot el comando ``/cargar_proyecto``.
