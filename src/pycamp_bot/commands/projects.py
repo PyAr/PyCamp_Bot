@@ -87,7 +87,7 @@ async def naming_project(update, context):
 
     await context.bot.send_message(
         chat_id=update.message.chat_id,
-        text=textwrap.dedent("""
+        text=textwrap.dedent(f"""
             ¿Cuál es el nivel de dificultad del proyecto?
 
             1: {DIFFICULTY_LEVEL_NAMES[1]}
