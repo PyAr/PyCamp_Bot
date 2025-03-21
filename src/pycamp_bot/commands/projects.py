@@ -452,9 +452,17 @@ async def delete_project(update, context):
 async def show_projects(update, context):
     """Show available projects"""
     projects = Project.select()
+    PROJECT_FIELDS = [
+        '*{}*',
+        'Owner: @{}',
+        'Temática: {}',
+        'Nivel: {}',
+        'Repositorio: {}',
+        'Grupo de Telegram: {}',
+    ]
     text = []
     for project in projects:
-        project_text = "*{}*\n Owner: @{}\n Temática: {}\n Nivel: {}\n Repositorio: {}\n Grupo de Telegram: {}".format(
+        project_text = '\n'.join(PROJECT_FIELDS).format(
             escape_markdown(project.name),
             escape_markdown(project.owner.username),
             escape_markdown(project.topic),
