@@ -453,7 +453,7 @@ async def show_projects(update, context):
     """Show available projects"""
     projects = Project.select()
     if not projects:
-        text = "Todavía no hay ningún proyecto cargado"
+        msg_text = "Todavía no hay ningún proyecto cargado"
         await update.message.reply_text(msg_text, link_preview_options=LinkPreviewOptions(is_disabled=True))
 
     msg_text = ""
