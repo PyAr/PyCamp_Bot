@@ -452,7 +452,11 @@ async def delete_project(update, context):
 async def show_projects(update, context):
     """Show available projects"""
     projects = Project.select()
-    text = []
+    if not projects:
+        text = "Todavía no hay ningún proyecto cargado"
+        await update.message.reply_text(msg_text, link_preview_options=LinkPreviewOptions(is_disabled=True))
+
+    msg_text = ""
     for project in projects:
         project_text = "{}\n Owner: @{}\n Temática: {}\n Nivel: {}\n Repositorio: {}\n Grupo de Telegram: {}".format(
             project.name,
@@ -466,15 +470,15 @@ async def show_projects(update, context):
             (Vote.project == project) & (Vote.interest)).count()
         if participants_count > 0:
             project_text += "\n Interesades: {}".format(participants_count)
-        text.append(project_text)
 
-    if text:
-        text = "\n\n".join(text)
-    else:
-        text = "Todavía no hay ningún proyecto cargado"
+        if len(msg_text) + len(project_text) > 4096:
+            await update.message.reply_text(msg_text, link_preview_options=LinkPreviewOptions(is_disabled=True))
+            msg_text = ""
 
-    await update.message.reply_text(text, link_preview_options=LinkPreviewOptions(is_disabled=True))
+        msg_text += "\n\n" + project_text
 
+    if msg_text:
+        await update.message.reply_text(msg_text, link_preview_options=LinkPreviewOptions(is_disabled=True))
 
 
 async def show_participants(update, context):
