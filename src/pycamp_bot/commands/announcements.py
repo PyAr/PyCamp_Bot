@@ -70,35 +70,35 @@ async def announce(update: Update, context: CallbackContext) -> str:
                 text=f"""Ingresá el Nombre del Proyecto a anunciar.\n\nTienes los siguientes proyectos:\n{project_list}""",
             )
 
-    if len(parameters) > 2:
-        print('-Handle correct commands-')
-        project_name = (" ").join(parameters[1:])
-        state.p_name = project_name
-        _projects = Project.select().join(Pycampista).where(Project.name == state.p_name)
+    # if len(parameters) > 2:
+    #     print('-Handle correct commands-')
+    #     project_name = (" ").join(parameters[1:])
+    #     state.p_name = project_name
+    #     _projects = Project.select().join(Pycampista).where(Project.name == state.p_name)
 
-        if len(_projects) == 0:
-            await context.bot.send_message(
-                chat_id=update.message.chat_id,
-                text=f"No existe el proyecto: *{escape_markdown(state.p_name)}*.",
-                parse_mode='MarkdownV2'
-            )
-            return ConversationHandler.END
-        elif not await should_be_able_to_announce(state.username, _projects[0]):
-            await context.bot.send_message(
-                chat_id=update.message.chat_id,
-                text=ERROR_MESSAGES["no_admin"],
-            )
-            logger.warn(f"Solicitud de anuncio no autorizada.")
-            return ConversationHandler.END
-        else:
-            await context.bot.send_message(
-                chat_id=update.message.chat_id,
-                text=f"Anunciando el proyecto: *{escape_markdown(_projects[0].name)}* !!!",
-                parse_mode='MarkdownV2'
-            )
-            state.owner = _projects[0].owner.username
-            state.current_project = _projects[0]
-        return await get_project(update, context)
+    #     if len(_projects) == 0:
+    #         await context.bot.send_message(
+    #             chat_id=update.message.chat_id,
+    #             text=f"No existe el proyecto: *{escape_markdown(state.p_name)}*.",
+    #             parse_mode='MarkdownV2'
+    #         )
+    #         return ConversationHandler.END
+    #     elif not await should_be_able_to_announce(state.username, _projects[0]):
+    #         await context.bot.send_message(
+    #             chat_id=update.message.chat_id,
+    #             text=ERROR_MESSAGES["no_admin"],
+    #         )
+    #         logger.warn(f"Solicitud de anuncio no autorizada.")
+    #         return ConversationHandler.END
+    #     else:
+    #         await context.bot.send_message(
+    #             chat_id=update.message.chat_id,
+    #             text=f"Anunciando el proyecto: *{escape_markdown(_projects[0].name)}* !!!",
+    #             parse_mode='MarkdownV2'
+    #         )
+    #         state.owner = _projects[0].owner.username
+    #         state.current_project = _projects[0]
+    #     return await get_project(update, context)
     return PROYECTO
 
 
@@ -185,7 +185,7 @@ async def message_project(update: Update, context: CallbackContext) -> str:
         try:
             await context.bot.send_message(
                 chat_id=chat_id,
-                text=f'''Está por empezar el proyecto *"{escape_markdown(state.p_name)}"* a cargo de *@{escape_markdown(state.owner)}*.\n*¿Dónde?* 👉🏼 {escape_markdown(state.lugar)}''',
+                text=f'''Está por empezar el proyecto *"{escape_markdown(state.p_name)}"* a cargo de *@{escape_markdown(state.owner)}*\.\n*¿Dónde?* 👉🏼 {escape_markdown(state.lugar)}''',
                 parse_mode='MarkdownV2'
             )
             if update.message.from_user.username == state.owner:
