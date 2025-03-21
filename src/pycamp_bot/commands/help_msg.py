@@ -8,6 +8,8 @@ Comandos de usuario:
 /cargar\\_proyecto: empieza la conversacion de carga de proyecto\\.
 /proyectos: te muestra la informacion de todos los proyectos y sus responsables\\.
 /mis\\_proyectos: te muestra día y horario de los proyectos que votaste\\.
+/agregar\\_repositorio: para cargar o modificar la URL del repositorio de un proyecto\\.
+/agregar\\_grupo: para cargar o modificar la URL del grupo de Telegram de un proyecto\\.
 /ser\\_magx: te agrega la lista de Magx\\.
 /evocar\\_magx: pingea a la/el Magx de turno, informando que necesitas su\
     ayuda\\. Con un gran poder, viene una gran responsabilidad\\.
