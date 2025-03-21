@@ -454,13 +454,13 @@ async def show_projects(update, context):
     projects = Project.select()
     text = []
     for project in projects:
-        project_text = "{}\n Owner: @{}\n Temática: {}\n Nivel: {}\n Repositorio: {}\n Grupo de Telegram: {}".format(
-            project.name,
-            project.owner.username,
-            project.topic,
+        project_text = "*{}*\n Owner: @{}\n Temática: {}\n Nivel: {}\n Repositorio: {}\n Grupo de Telegram: {}".format(
+            escape_markdown(project.name),
+            escape_markdown(project.owner.username),
+            escape_markdown(project.topic),
             DIFFICULTY_LEVEL_NAMES[project.difficult_level],
-            project.repository_url or '(ninguno)',
-            project.group_url or '(ninguno)',
+            escape_markdown(project.repository_url or '(ninguno)'),
+            escape_markdown(project.group_url or '(ninguno)'),
         )
         participants_count = Vote.select().where(
             (Vote.project == project) & (Vote.interest)).count()
@@ -473,7 +473,11 @@ async def show_projects(update, context):
     else:
         text = "Todavía no hay ningún proyecto cargado"
 
-    await update.message.reply_text(text, link_preview_options=LinkPreviewOptions(is_disabled=True))
+    await update.message.reply_text(
+        text,
+        parse_mode='MarkdownV2',
+        link_preview_options=LinkPreviewOptions(is_disabled=True),
+    )
 
 
 
