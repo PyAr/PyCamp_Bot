@@ -498,8 +498,8 @@ async def show_participants(update, context):
                 text="No se indico el nombre del proyecto. Modo de uso: '/participantes <NOMBRE_PROYECTO>'"
         )
         return  
-    project_name = update.message.text.split().lower()
-    project_name = ' '.join(project_name[1:])
+    project_name = update.message.text.split()
+    project_name = (' '.join(project_name[1:])).lower()
     project = Project.select().where(Project.name == project_name)
     if not project:
         await context.bot.send_message(
