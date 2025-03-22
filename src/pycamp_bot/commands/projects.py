@@ -516,7 +516,7 @@ async def show_participants(update, context):
 
     response = f"Participantes:\n"
     for participant in participants:
-        response = response + f"{participant} \n"
+        response = response + f"@{participant} \n"
 
     await update.message.reply_text(response)
 
