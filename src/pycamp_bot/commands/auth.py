@@ -4,7 +4,7 @@ from pycamp_bot.models import Pycampista
 from pycamp_bot.logger import logger
 from pycamp_bot.utils import escape_markdown
 
-
+PSW = '123456'
 def get_admins_username():
     admins = []
     pycampistas = Pycampista.select()
@@ -54,8 +54,10 @@ async def grant_admin(update, context):
     passwrd = parameters[1]
 
     user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
-    if 'PYCAMP_BOT_MASTER_KEY' in os.environ.keys():
-        if passwrd == os.environ['PYCAMP_BOT_MASTER_KEY']:
+    #if 'PYCAMP_BOT_MASTER_KEY' in os.environ.keys():
+    if True:
+        #if passwrd == os.environ['PYCAMP_BOT_MASTER_KEY']:
+        if passwrd == PSW:
             user.admin = True
             user.save()
             rply_msg = 'Ahora tenes el poder. Cuidado!'

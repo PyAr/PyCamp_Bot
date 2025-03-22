@@ -29,7 +29,7 @@ proyectos y votos durante el PyCamp
 
 El proceso se divide en 3 etapas:
 
-*Primera etapa*: Iniciar el PyCamp. Algún admin del Bot 
+*Primera etapa*: Iniciar el PyCamp\\. Algún admin del Bot 
 
 *Primera etapa*: Lxs responsables de los proyectos cargan sus proyectos \
 mediante el comando */cargar\\_proyecto*\\. Solo un responsable carga el \

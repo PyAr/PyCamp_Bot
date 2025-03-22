@@ -37,12 +37,14 @@ def set_handlers(application):
     raffle.set_handlers(application)
     schedule.set_handlers(application)
     announcements.set_handlers(application)
-    devtools.set_handlers(application)
+    #devtools.set_handlers(application)
     application.add_handler(MessageHandler(filters.COMMAND, unknown_command))
 
 
 if __name__ == '__main__':
     logger.info('Starting PyCamp Bot')
+    # escribo environ para pruebas por no poder pasar kargs en consola windows
+    os.environ['TOKEN'] = '5265755654:AAGhJKGgIoaKAjxnq9pn113ec9CURGVGG2k'
 
     if 'TOKEN' in os.environ.keys():
         models_db_connection()

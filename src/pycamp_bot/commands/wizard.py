@@ -151,14 +151,20 @@ async def summon_wizard(update, context, pycamp=None):
             text="Checkeá tu cabeza: si no ténes el sombrero de magx ¡deberías!\n(soltá la compu)"
         )
     else:
-        await context.bot.send_message(
-            chat_id=wizard.chat_id,
-            text="PING PING PING MAGX! @{} te necesita!".format(username)
-        )
-        await context.bot.send_message(
-            chat_id=update.message.chat_id,
+        try:
+            await context.bot.send_message(
+                chat_id=wizard.chat_id,
+                text="PING PING PING MAGX! @{} te necesita!".format(username)
+            )
             text="Tu magx asignadx es: @{}".format(wizard.username)
-        )
+        except BadRequest:
+            text="No se pudo notificar al magx asignadx: @{} Andá a buscarlo...".format(wizard.username)
+            logger.warn("Coulnd't notify the wizard {}".format(wizard.username))
+        finally:
+            await context.bot.send_message(
+                chat_id=update.message.chat_id,
+                text=text
+            )
 
 async def notify_scheduled_slots_to_wizard(update, context, pycamp, wizard, agenda):
     per_day = defaultdict(list)

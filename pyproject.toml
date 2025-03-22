@@ -11,8 +11,7 @@ dependencies = [
   "peewee==3.17.9",
   "sentry-sdk==2.22.0",
 ]
-# Update for your working env. Works with 3.10, 3.11, 3.12
-requires-python = "==3.12.*"
+requires-python = "==3.11.*"
 authors = [
   {name = "Pyar", email = "pyar@pyar.com"},
 ]
