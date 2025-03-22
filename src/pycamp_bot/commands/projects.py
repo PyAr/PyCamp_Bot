@@ -457,28 +457,36 @@ async def show_projects(update, context):
         await update.message.reply_text(msg_text, link_preview_options=LinkPreviewOptions(is_disabled=True))
 
     msg_text = ""
+    PROJECT_FIELDS = [
+        '*{}*',
+        'Owner: @{}',
+        'Temática: {}',
+        'Nivel: {}',
+        'Repositorio: {}',
+        'Grupo de Telegram: {}',
+    ]
     for project in projects:
-        project_text = "{}\n Owner: @{}\n Temática: {}\n Nivel: {}\n Repositorio: {}\n Grupo de Telegram: {}".format(
-            project.name,
-            project.owner.username,
-            project.topic,
+        project_text = '\n'.join(PROJECT_FIELDS).format(
+            escape_markdown(project.name),
+            escape_markdown(project.owner.username),
+            escape_markdown(project.topic),
             DIFFICULTY_LEVEL_NAMES[project.difficult_level],
-            project.repository_url or '(ninguno)',
-            project.group_url or '(ninguno)',
+            escape_markdown(project.repository_url or '(ninguno)'),
+            escape_markdown(project.group_url or '(ninguno)'),
         )
         participants_count = Vote.select().where(
             (Vote.project == project) & (Vote.interest)).count()
         if participants_count > 0:
-            project_text += "\n Interesades: {}".format(participants_count)
+            project_text += "\nInteresades: {}".format(participants_count)
 
         if len(msg_text) + len(project_text) > 4096:
-            await update.message.reply_text(msg_text, link_preview_options=LinkPreviewOptions(is_disabled=True))
+            await update.message.reply_text(msg_text, link_preview_options=LinkPreviewOptions(is_disabled=True), parse_mode='MarkdownV2')
             msg_text = ""
 
         msg_text += "\n\n" + project_text
 
     if msg_text:
-        await update.message.reply_text(msg_text, link_preview_options=LinkPreviewOptions(is_disabled=True))
+        await update.message.reply_text(msg_text, link_preview_options=LinkPreviewOptions(is_disabled=True), parse_mode='MarkdownV2')
 
 
 async def show_participants(update, context):
