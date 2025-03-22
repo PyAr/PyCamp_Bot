@@ -156,29 +156,29 @@ async def make_schedule(update, context):
 async def check_day_tab(day, slots, cronograma, i):
     try:
         if day != DIAS[slots[i-1].code[0]]:
-            cronograma += f'\n*{day}:*\n'
+            cronograma.append('')
+            cronograma.append(f'*{day}:*')
     except Exception as e:
         print("ERROR       ", e)
-    return cronograma
 
 
 async def show_schedule(update, context):
     slots = Slot.select()
     projects = Project.select()
-    cronograma = ''
+    cronograma = []
 
     for i, slot in enumerate(slots):
         day = DIAS[slot.code[0]]
-        cronograma = await check_day_tab(day, slots, cronograma, i)
+        await check_day_tab(day, slots, cronograma, i)
 
         for project in projects:
             if project.slot_id == slot.id:
-                cronograma += f'{slot.start}:00 *{escape_markdown(project.name)}*\n'
-                cronograma += f'Owner: @{escape_markdown(project.owner.username)}\n'
+                cronograma.append(f'{slot.start}:00 *{escape_markdown(project.name)}*')
+                cronograma.append(f'Owner: @{escape_markdown(project.owner.username)}')
 
     await context.bot.send_message(
         chat_id=update.message.chat_id,
-        text=cronograma,
+        text='\n'.join(cronograma),
         parse_mode='MarkdownV2'
     )
 
