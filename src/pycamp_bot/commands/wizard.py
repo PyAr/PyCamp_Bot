@@ -8,7 +8,7 @@ from pycamp_bot.models import Pycampista, WizardAtPycamp
 from pycamp_bot.commands.auth import admin_needed
 from pycamp_bot.commands.manage_pycamp import get_active_pycamp
 from pycamp_bot.logger import logger
-from pycamp_bot.utils import escape_markdown
+from pycamp_bot.utils import escape_markdown, active_pycamp_needed
 
 
 LUNCH_TIME_START_HOUR = 13
@@ -80,7 +80,7 @@ def define_wizards_schedule(pycamp):
 
     """
     all_wizards = pycamp.get_wizards()
-    if all_wizards.count() == 0:
+    if len(all_wizards) == 0:
         return {}
     
     wizard_per_slot = {}
@@ -103,19 +103,12 @@ def define_wizards_schedule(pycamp):
     return wizard_per_slot
 
 
-async def become_wizard(update, context):
-    current_wizards = Pycampista.select().where(Pycampista.wizard is True)
-
-    for w in current_wizards:
-        w.current = False
-        w.save()
-
+@active_pycamp_needed
+async def become_wizard(update, context, pycamp=None):
     username = update.message.from_user.username
     chat_id = update.message.chat_id
 
-    user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
-    user.wizard = True
-    user.save()
+    pycamp.add_wizard(username, chat_id)
 
     await context.bot.send_message(
         chat_id=update.message.chat_id,
@@ -123,8 +116,8 @@ async def become_wizard(update, context):
     )
 
 
-async def list_wizards(update, context):
-    _, pycamp = get_active_pycamp()
+@active_pycamp_needed
+async def list_wizards(update, context, pycamp=None):
     msg = ""
     for i, wizard in enumerate(pycamp.get_wizards()):
         msg += "{}) @{}\n".format(i+1, wizard.username)
@@ -137,8 +130,8 @@ async def list_wizards(update, context):
         logger.exception("Coulnd't deliver the Wizards list to {}".format(update.message.from_user.username))
 
 
-async def summon_wizard(update, context):
-    _, pycamp = get_active_pycamp()
+@active_pycamp_needed
+async def summon_wizard(update, context, pycamp=None):
     wizard = pycamp.get_current_wizard()
     if wizard is None:
         await context.bot.send_message(
@@ -220,9 +213,8 @@ def persist_wizards_schedule_in_db(pycamp):
 
 
 @admin_needed
-async def schedule_wizards(update, context):
-    _, pycamp = get_active_pycamp()
-
+@active_pycamp_needed
+async def schedule_wizards(update, context, pycamp=None):
     n = pycamp.clear_wizards_schedule()
     logger.info("Deleted wizards schedule ({} records)".format(n))
 
@@ -281,7 +273,8 @@ def aux_resolve_show_all(message):
     return show_all
 
 
-async def show_wizards_schedule(update, context):
+@active_pycamp_needed
+async def show_wizards_schedule(update, context, pycamp=None):
     try:
         show_all = aux_resolve_show_all(update.message)
     except ValueError:
@@ -290,8 +283,6 @@ async def show_wizards_schedule(update, context):
             text="El comando solo acepta un parámetro (opcional): 'completa'. ¿Probás de nuevo?",
         )
         return
-    
-    _, pycamp = get_active_pycamp()
 
     agenda = WizardAtPycamp.select().where(WizardAtPycamp.pycamp == pycamp)
     if not show_all:
