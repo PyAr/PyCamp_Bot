@@ -89,13 +89,24 @@ class Pycamp(BaseModel):
         self.active = True
         self.save()
 
+    def add_wizard(self, username, chat_id):
+        pycampista = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
+        pycampista.wizard = True
+        pycampista.save()
+        PycampistaAtPycamp.get_or_create(pycamp=self, pycampista=pycampista)
+        return pycampista
+
     def get_wizards(self):
-        return Pycampista.select().where(Pycampista.wizard == 1)
+        pac = PycampistaAtPycamp.select().join(Pycampista).where(
+            (PycampistaAtPycamp.pycamp == self) &
+            (PycampistaAtPycamp.pycampista.wizard == True)
+        )
+        return [p.pycampista for p in pac]
 
     def get_current_wizard(self):
         """Return the Pycampista instance that's the currently scheduled wizard."""
         now = datetime.now()
-        current_wizards = WizardAtPycamp.select().where(  
+        current_wizards = WizardAtPycamp.select().where(
             (WizardAtPycamp.pycamp == self) & 
             (WizardAtPycamp.init <= now) &
             (WizardAtPycamp.end > now) 
