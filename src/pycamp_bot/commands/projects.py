@@ -283,7 +283,7 @@ async def ask_project_name(update, context):
 
     keyboard = []
     for project in projects:
-        keyboard.append([InlineKeyboardButton(project.name, callback_data=f"{PROJECT_NAME_PATTERN}:{project.name}")])
+        keyboard.append([InlineKeyboardButton(project.name, callback_data=f"{PROJECT_NAME_PATTERN}:{project.id}")])
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     await context.bot.send_message(
@@ -332,7 +332,7 @@ async def add_repository(update, context):
     username = update.message.from_user.username
     text = update.message.text
 
-    project = Project.select().where(Project.name == current_projects[username]).get()
+    project = Project.select().where(Project.id == current_projects[username]).get()
 
     project.repository_url = text
     project.save()
@@ -349,7 +349,7 @@ async def add_group(update, context):
     username = update.message.from_user.username
     text = update.message.text
 
-    project = Project.select().where(Project.name == current_projects[username]).get()
+    project = Project.select().where(Project.id == current_projects[username]).get()
 
     project.group_url = text
     project.save()
