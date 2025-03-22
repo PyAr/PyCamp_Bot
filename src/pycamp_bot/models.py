@@ -109,7 +109,7 @@ class Pycamp(BaseModel):
 
     def get_current_wizard(self):
         """Return the Pycampista instance that's the currently scheduled wizard."""
-        now = datetime.datetime.now(ZoneInfo("America/Los_Angeles"))
+        now = datetime.datetime.now(ZoneInfo("America/Argentina/Cordoba"))
         logger.info("Request wizard at user time: %s", str(now))
         current_wizards = WizardAtPycamp.select().where(
             (WizardAtPycamp.pycamp == self) & 
