@@ -24,24 +24,26 @@ Comandos de usuario:
 '''
 
 HELP_MESSAGE = '''
-Este bot facilita la carga, administración y procesamiento de \
+Este bot facilita la carga, administración y procesamiento de magues, \
 proyectos y votos durante el PyCamp
 
 El proceso se divide en 3 etapas:
 
-*Primera etapa*: Lxs responsables de los proyectos cargan sus proyectos \
+*Primera etapa*: Iniciar el PyCamp\\. Algún admin del Bot 
+
+*Segunda etapa*: Lxs responsables de los proyectos cargan sus proyectos \
 mediante el comando */cargar\\_proyecto*\\. Solo un responsable carga el \
 proyecto, y luego si hay otrxs responsables adicionales, pueden \
 agregarse con el comando */ownear*\\.
 
-*Segunda etapa*: Mediante el comando */elegir\\_proyectos* todxs lxs participantes \
+*Tercera etapa*: Mediante el comando */elegir\\_proyectos* todxs lxs participantes \
 seleccionan los proyectos que se expongan\\. Esto se puede hacer a medida que \
 se expone, o al haber finalizado todas las exposiciones\\. Si no se está \
 segurx de un proyecto, conviene no seleccionar nada, ya que luego podés \
 volver a ejecutar el comando y darle que si aquellas cosas que no tocaste\\. NO \
 SE PUEDE CAMBIAR TU RESPUESTA UNA VEZ HECHO\\.
 
-*Tercera etapa*: Lxs admins mergean los proyectos que se haya decidido \
+*Cuarta etapa*: Lxs admins mergean los proyectos que se haya decidido \
 mergear durante las exposiciones \\(Por tematica similar, u otros \
 motivos\\), y luego se procesan los datos para obtener el cronograma \
 final\\.
@@ -53,6 +55,7 @@ Be AWARE, you have sudo\\.\\.\\.
 Pycamp:
 /activar\\_pycamp \\(pycamp\\): Setea un pycamp como activo \\(si ya hay uno activo lo \
 desactiva\\)\\.
+
 /empezar\\_carga\\_proyectos: Habilita la carga de proyectos en el pycamp activo\\.
 /terminar\\_carga\\_proyectos: Deshabilita la carga de proyectos en el pycamp activo\\.
 /empezar\\_seleccion\\_proyectos: Habilita la seleccion sobre los proyectos del pycamp activo\\.
@@ -65,6 +68,14 @@ Por default usa datetime\\.now\\(\\)
     y genera el cronograma\\.
 /cambiar\\_slot: Toma el nombre de un proyecto y el nuevo slot \
     y lo cambia en el cronograma\\.
+
+**Gestión de magxs**
+
+/ser\\_magx Tienen que ejecutar los candidatos, al inicio del PyCamp\\.
+/agendar\\_magx Genera una agenda de magxs para todo el evento\\.
+/ver\\_agenda\\_magx Para conocer la agenda magos de todo el evento\\.
+/ver\\_magx Para conocer el magx actual\\.
+/evocar\\_magx Para llamar al mago actual\\.
 
 Pycampista:
 /degradar \\(username\\): Le saca los permisos de admin a un usuario\\.

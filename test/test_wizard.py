@@ -22,7 +22,7 @@ def teardown_module(module):
     # database here. But for tests this is probably not necessary.
 
 
-class TestWizardScheduleSlots:
+class BaseForOtherWizardsTests:
 
     def init_pycamp(self):
         self.pycamp = Pycamp.create(
@@ -31,6 +31,8 @@ class TestWizardScheduleSlots:
             end=datetime(2024,6,24),
         )
 
+
+class TestWizardScheduleSlots(BaseForOtherWizardsTests):
     @use_test_database
     def test_correct_number_of_slots_in_one_day(self):
         p = Pycamp.create(
@@ -95,14 +97,7 @@ class TestWizardScheduleSlots:
                 assert start >= lunch_time_end
 
 
-class TestDefineWizardsSchedule:
-
-    def init_pycamp(self):
-        self.pycamp = Pycamp.create(
-            headquarters="Narnia",
-            init=datetime(2024,6,20),
-            end=datetime(2024,6,24),
-        )
+class TestDefineWizardsSchedule(BaseForOtherWizardsTests):
 
     # If no wizards, returns {}
     @use_test_database
@@ -164,3 +159,41 @@ class TestDefineWizardsSchedule:
         assert all(
             (isinstance(s, Pycampista) and s.wizard) for s in sched.values()
         )
+
+class TestListWizards(BaseForOtherWizardsTests):
+
+    @use_test_database
+    def test_wizard_registration(self):
+        self.init_pycamp()
+        w = self.pycamp.add_wizard("Gandalf", 123)
+        wizards = self.pycamp.get_wizards()
+        assert len(wizards) == 1
+        assert w.username == wizards[0].username
+
+
+    @use_test_database
+    def test_wizard_registration_works_in_one_pycamp_only(self):
+        self.init_pycamp()
+        self.pycamp.add_wizard("Gandalf", 123)
+        
+        other_pycamp = Pycamp.create(
+            headquarters="Mordor",
+            init=datetime(2025,3,22),
+            end=datetime(2025,3,24),
+        )
+        w = other_pycamp.add_wizard("Merlin", 456)
+        #import ipdb; ipdb.set_trace()
+        results = other_pycamp.get_wizards()
+        assert len(results) == 1
+        assert w.username == results[0].username
+
+
+    # @use_test_database
+    # def test_no_active_pycamp_then_fail(self):
+    #     self.init_pycamp()
+    #     agregarle un mago
+        
+    #     creo OTRO Pycamp
+    #     agregarle otro mago
+
+    #     pedir listado: check está el OTRO mago solamente

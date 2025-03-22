@@ -11,7 +11,7 @@ dependencies = [
   "peewee==3.17.9",
   "sentry-sdk==2.22.0",
 ]
-requires-python = "==3.10.*"
+requires-python = "==3.11.*"
 authors = [
   {name = "Pyar", email = "pyar@pyar.com"},
 ]

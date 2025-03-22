@@ -42,7 +42,7 @@ class TestPycampGetCurrentWizard:
             init=datetime(2024,6,20),
             end=datetime(2024,6,23),
         )
-        pycamper = Pycampista.create(username="pepe", wizard=True)
+        pycamper = p.add_wizard("pepe", 123)
         wizard.persist_wizards_schedule_in_db(p)
 
         assert p.get_current_wizard() == pycamper
