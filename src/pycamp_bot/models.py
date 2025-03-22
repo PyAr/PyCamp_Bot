@@ -45,6 +45,9 @@ class Pycampista(BaseModel):
         project_presentation_slots = Slot.select().where(Slot.current_wizard == self)
         for slot in project_presentation_slots:
             # https://stackoverflow.com/a/13403827/1161156
+            # Fix-patch for int tipe
+            if isinstance(slot.start, int):
+                slot.start = from_time.replace(hour=slot.start)
             latest_start = max(from_time, slot.start)
             earliest_end = min(to_time, slot.get_end_time())
             if latest_start <= earliest_end:  # Overlap
