@@ -4,7 +4,7 @@ from pycamp_bot.models import Project, Slot, Pycampista, Vote
 from pycamp_bot.commands.auth import admin_needed
 from pycamp_bot.scheduler.db_to_json import export_db_2_json
 from pycamp_bot.scheduler.schedule_calculator import export_scheduled_result
-from pycamp_bot.utils import escape_markdown
+from pycamp_bot.utils import escape_markdown, get_slot_weekday_name
 
 
 DAY_SLOT_TIME = {
@@ -12,17 +12,6 @@ DAY_SLOT_TIME = {
     'slot':[], # Guarda la cantidad de slots del dia iterado ej [5] (se sobreescribe)
     'time':[], # Guarda la hora a la que empieza el dia iterado [15] (se sobreescribe)
 }
-
-
-DIAS = {
-    'A':'Jueves',
-    'B':'Viernes',
-    'C':'Sabado',
-    'D':'Domingo',
-    'E':'Lunes',
-    'F':'Martes',
-    'G':'Miercoles',
-    }
 
 
 async def cancel(update, context):
@@ -153,13 +142,15 @@ async def make_schedule(update, context):
     )
 
 
-async def check_day_tab(day, slots, cronograma, i):
-    try:
-        if day != DIAS[slots[i-1].code[0]]:
-            cronograma.append('')
-            cronograma.append(f'*{day}:*')
-    except Exception as e:
-        print("ERROR       ", e)
+async def check_day_tab(slot, prev_slot, cronograma):
+    def append_day_name():
+        cronograma.append(f'*{get_slot_weekday_name(slot.code[0])}:*')
+
+    if prev_slot is None:
+        append_day_name()
+    elif slot.code[0] != prev_slot.code[0]:
+        cronograma.append('')
+        append_day_name()
 
 
 async def show_schedule(update, context):
@@ -167,14 +158,17 @@ async def show_schedule(update, context):
     projects = Project.select()
     cronograma = []
 
+    prev_slot = None
+
     for i, slot in enumerate(slots):
-        day = DIAS[slot.code[0]]
-        await check_day_tab(day, slots, cronograma, i)
+        await check_day_tab(slot, prev_slot, cronograma)
 
         for project in projects:
             if project.slot_id == slot.id:
                 cronograma.append(f'{slot.start}:00 *{escape_markdown(project.name)}*')
                 cronograma.append(f'Owner: @{escape_markdown(project.owner.username)}')
+
+        prev_slot = slot
 
     await context.bot.send_message(
         chat_id=update.message.chat_id,
