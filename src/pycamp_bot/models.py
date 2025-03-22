@@ -1,6 +1,10 @@
 import peewee as pw
 
 from datetime import datetime, timedelta
+import datetime
+from zoneinfo import ZoneInfo
+from pycamp_bot.logger import logger
+
 from random import choice
 
 
@@ -105,7 +109,8 @@ class Pycamp(BaseModel):
 
     def get_current_wizard(self):
         """Return the Pycampista instance that's the currently scheduled wizard."""
-        now = datetime.now()
+        now = datetime.datetime.now(ZoneInfo("America/Los_Angeles"))
+        logger.info("Request wizard at user time: %s", str(now))
         current_wizards = WizardAtPycamp.select().where(
             (WizardAtPycamp.pycamp == self) & 
             (WizardAtPycamp.init <= now) &
