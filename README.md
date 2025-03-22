@@ -58,10 +58,14 @@ En este momento ya se puede hablar con el bot. ¿Qué le digo?
 
 ### Flujo admin
 
-* `/su <password>` para reclamar permisos de admin, reemplazando `<password>` por la contraseña que hayamos
-elegido en la envvar `PYCAMP_BOT_MASTER_KEY`
+#### Inicialización (requerida al comienzo de cada PyCamp)
+
+* `/su <password>` para reclamar permisos de admin, reemplazando `<password>` por la contraseña que hayamos elegido en la envvar `PYCAMP_BOT_MASTER_KEY`
 * `/empezar_pycamp <pycamp_name>` inicia el flujo de creación de un pycamp. Lo carga en la db, pide fecha de inicio y duración. Lo deja activo.
-* `/activar_pycamp <pycamp_name>` activa un pycamp
+    * `/activar_pycamp <pycamp_name>` activa un pycamp, en caso que haga falta.
+
+#### Flujo de Proyectos
+
 * `/empezar_carga_proyectos` habilita la carga de los proyectos. En este punto los pycampistas pueden cargar sus proyectos,
 enviandole al bot el comando `/cargar_proyecto`
 * `/terminar_carga_proyectos` termina carga proyectos
@@ -73,10 +77,9 @@ Para generar el schedule:
 * `/cronogramear` te va a preguntar cuantos dias queres cronogramear y cuantos slots por dia tenes y hacer el cronograma.
 * `/cambiar_slot` toma un nombre de proyecto y un slot; y te cambia ese proyecto a ese slot.
 
-Para agendar los magos:
+#### Flujo de magia
 
-1. Todos los candidatos tienen que haberse registrado con `/ser_magx`
-2. Tiene que estar creado el schedule de presentaciones de proyectos (`/cronogramear`)
+Para agendar los magos todos los candidatos tienen que haberse registrado con `/ser_magx`
 
 * `/agendar_magx` Asigna un mago por hora durante todo el PyCamp.
     * De 9 a 13 y de 14 a 19.
@@ -92,3 +95,4 @@ Para agendar los magos:
 * `/ver_magx` Lista los magos registrados.
 * `/evocar_magx` llama al mago de turno para pedirle ayuda.
 * `/ver_agenda_magx completa` te muestra la agenda de magos del PyCamp. El parámetro `completa` es opcional, si se omite solo muestra los turnos pendientes.
+
