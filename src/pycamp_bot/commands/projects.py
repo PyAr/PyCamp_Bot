@@ -8,8 +8,7 @@ from pycamp_bot.models import Pycampista, Project, Slot, Vote
 from pycamp_bot.commands.base import msg_to_active_pycamp_chat
 from pycamp_bot.commands.manage_pycamp import active_needed, get_active_pycamp
 from pycamp_bot.commands.auth import admin_needed, get_admins_username
-from pycamp_bot.commands.schedule import DIAS
-from pycamp_bot.utils import escape_markdown
+from pycamp_bot.utils import escape_markdown, get_slot_weekday_name
 
 current_projects = {}
 
@@ -546,7 +545,7 @@ async def show_my_projects(update, context):
 
         for vote in votes:
             slot_day_code = vote.project.slot.code[0]
-            slot_day_name = DIAS[slot_day_code]
+            slot_day_name = get_slot_weekday_name(slot_day_code)
 
             if slot_day_code != prev_slot_day_code:
                 text_chunks.append(f'*{slot_day_name}*')
