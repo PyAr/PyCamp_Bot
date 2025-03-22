@@ -5,13 +5,13 @@ from functools import wraps
 from peewee import SqliteDatabase
 from telegram import Bot
 
-from pycamp_bot.models import Pycampista, Slot, Pycamp, WizardAtPycamp
+from pycamp_bot.models import Pycampista, Slot, Pycamp, WizardAtPycamp, PycampistaAtPycamp
 
 
 # use an in-memory SQLite for tests.
 test_db = SqliteDatabase(':memory:')
 
-MODELS = [Pycampista, Slot, Pycamp, WizardAtPycamp]
+MODELS = [Pycampista, Slot, Pycamp, WizardAtPycamp, PycampistaAtPycamp]
 
 
 def use_test_database(fn):
