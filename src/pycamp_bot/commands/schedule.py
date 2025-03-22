@@ -165,7 +165,7 @@ async def check_day_tab(day, slots, cronograma, i):
 async def show_schedule(update, context):
     slots = Slot.select()
     projects = Project.select()
-    cronograma = "*Cronograma:* \n"
+    cronograma = ''
 
     for i, slot in enumerate(slots):
         day = DIAS[slot.code[0]]
@@ -173,8 +173,8 @@ async def show_schedule(update, context):
 
         for project in projects:
             if project.slot_id == slot.id:
-                cronograma += f'*-* {slot.start}:00hs = *{escape_markdown(project.name)}.*\n'
-                cronograma += f'A cargo de 👉🏼 {"@" + escape_markdown(project.owner.username)}\n'
+                cronograma += f'{slot.start}:00 *{escape_markdown(project.name)}*\n'
+                cronograma += f'Owner: @{escape_markdown(project.owner.username)}\n'
 
     await context.bot.send_message(
         chat_id=update.message.chat_id,
