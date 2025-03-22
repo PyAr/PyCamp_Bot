@@ -31,19 +31,19 @@ El proceso se divide en 3 etapas:
 
 *Primera etapa*: Iniciar el PyCamp\\. Algún admin del Bot 
 
-*Primera etapa*: Lxs responsables de los proyectos cargan sus proyectos \
+*Segunda etapa*: Lxs responsables de los proyectos cargan sus proyectos \
 mediante el comando */cargar\\_proyecto*\\. Solo un responsable carga el \
 proyecto, y luego si hay otrxs responsables adicionales, pueden \
 agregarse con el comando */ownear*\\.
 
-*Segunda etapa*: Mediante el comando */elegir\\_proyectos* todxs lxs participantes \
+*Tercera etapa*: Mediante el comando */elegir\\_proyectos* todxs lxs participantes \
 seleccionan los proyectos que se expongan\\. Esto se puede hacer a medida que \
 se expone, o al haber finalizado todas las exposiciones\\. Si no se está \
 segurx de un proyecto, conviene no seleccionar nada, ya que luego podés \
 volver a ejecutar el comando y darle que si aquellas cosas que no tocaste\\. NO \
 SE PUEDE CAMBIAR TU RESPUESTA UNA VEZ HECHO\\.
 
-*Tercera etapa*: Lxs admins mergean los proyectos que se haya decidido \
+*Cuarta etapa*: Lxs admins mergean los proyectos que se haya decidido \
 mergear durante las exposiciones \\(Por tematica similar, u otros \
 motivos\\), y luego se procesan los datos para obtener el cronograma \
 final\\.
