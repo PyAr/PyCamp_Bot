@@ -34,7 +34,7 @@ class TestPycampGetCurrentWizard:
         )
 
     @use_test_database
-    @freeze_time("2024-06-21 11:30:00")
+    @freeze_time("2024-06-21 15:30:00")
     def test_returns_correct_wizard_within_its_turno(self):
         """Integration test using persist_wizards_schedule_in_db."""
         p = Pycamp.create(
@@ -59,18 +59,16 @@ class TestPycampGetCurrentWizard:
         assert p.get_current_wizard() is None
 
     @use_test_database
-    @freeze_time("2024-06-20 10:30:00")
+    @freeze_time("2024-06-21 15:30:00")
     def test_many_scheduled_wizard_then_return_one_of_them(self):
         p = Pycamp.create(
-            headquarters="Narnia"
-        )
-        # Wizard exists, scheduled in the same time slot.
-        gandalf = Pycampista.create(username="gandalf", wizard=True)
-        merlin = Pycampista.create(username="merlin", wizard=True)
-        ini = datetime(2024,6,20,10,0,0)
-        end = datetime(2024,6,20,11,0,0)
-        WizardAtPycamp.create(pycamp=p, wizard=gandalf, init=ini, end=end)
-        WizardAtPycamp.create(pycamp=p, wizard=merlin, init=ini, end=end)
-
+            headquarters="Narnia",
+            init=datetime(2024,6,20),
+            end=datetime(2024,6,23),
+        )        
+        w1 = p.add_wizard("gandalf", 123)
+        w2 = p.add_wizard("merlin", 456 )
+        wizard.persist_wizards_schedule_in_db(p)
         w = p.get_current_wizard()
-        assert w == gandalf or w == merlin
+        
+        assert w == w1 or w == w2
