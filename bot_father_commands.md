@@ -1,17 +1,20 @@
 voy_al_pycamp - (pycamp_name) avisá que vas al pycamp! si no especificas un pycamp por default es el que esta activo.
+pycampistas - te da informacion de los pycampistas.
 pycamps -  lista todos los pycamps.
 cargar_proyecto -  empieza la conversacion de carga de proyecto.
 proyectos -  te muestra la informacion de todos los proyectos y sus responsables.
 mis_proyectos - te muestra tus proyectos cargados
 participantes - (project_name) dado un proyecto te muestra sus interesadxs 
 borrar_proyecto - borra un proyecto
+rifar - Te devuelve un PyCampista random.
 ver_magx - muestra la lista de Magxs
 ser_magx -  te agrega la lista de Magx.
 evocar_magx -  pingea a lael Magx de turno, informando que necesitas su ayuda. Con un gran poder, viene una gran responsabilidad.
 ver_agenda_magx - te muestra la agenda de los magos.
 votar -  te muestra los proyectos presentados para que digas cuales te gustan.
 cronograma -  te muestra el cronograma del PyCamp.
-anunciar - (project_name) *admin* te pide el nombre de un proyecto y pingea por privado a les interesades avisando que esta por empezar (solo para admins u owners del proyecto).
+contar_votos - te da la cantidad de gente que voto.
+anunciar - *admin* pingea por privado a les interesades avisando que esta por empezar (solo para admins u owners del proyecto).
 su - (passwrd) convierte al usuario en admin. Si sabe el password  :P
 admins -  lista a todos los admins.
 agregar_pycamp - (pycamp) *admin* Agrega un pycamp.

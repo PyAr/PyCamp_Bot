@@ -231,7 +231,7 @@ async def list_pycampistas(update, context):
         text.append(str(pap.pycampista))
 
     text = "\n\n".join(text)
-    await update.message.reply_text(text)
+    await update.message.reply_text(text + len(pycampistas_at_pycamp))
 
 
 def set_handlers(application):
