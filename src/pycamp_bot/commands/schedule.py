@@ -117,7 +117,7 @@ async def create_slot(update, context):
             chat_id=update.message.chat_id,
             text="Genial! Slots Asignados"
         )
-        make_schedule(update, context)
+        await make_schedule(update, context)
         return ConversationHandler.END
 
 
