@@ -107,3 +107,6 @@ ENV/
 
 # vscode
 .vscode
+
+# claude code
+.claude/settings.local.json
