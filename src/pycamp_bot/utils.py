@@ -29,7 +29,7 @@ def get_slot_weekday_name(slot_day_code):
     # Convert slot day code to a zero-based code, to use it as an
     # offset to get the weekday name of the slot
     offset = ord(slot_day_code) - ord('A')
-    day_name = ISO_WEEKDAY_NAMES[pycamp_start_weekday + offset]
+    day_name = ISO_WEEKDAY_NAMES[(pycamp_start_weekday + offset) % 7]
 
     return day_name
 def active_pycamp_needed(f):
