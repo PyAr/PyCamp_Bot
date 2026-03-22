@@ -1,7 +1,14 @@
 import string
-from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, filters
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import (
+    CallbackQueryHandler,
+    ConversationHandler,
+    CommandHandler,
+    MessageHandler,
+    filters,
+)
 from pycamp_bot.models import Project, Slot, Pycampista, Vote
-from pycamp_bot.commands.auth import admin_needed
+from pycamp_bot.commands.auth import admin_needed, get_admins_username
 from pycamp_bot.scheduler.db_to_json import export_db_2_json
 from pycamp_bot.scheduler.schedule_calculator import export_scheduled_result
 from pycamp_bot.utils import escape_markdown, get_slot_weekday_name
@@ -177,6 +184,56 @@ async def show_schedule(update, context):
     )
 
 
+BORRAR_CRONO_PATTERN = "borrarcronograma"
+
+
+@admin_needed
+async def borrar_cronograma(update, context):
+    if not Slot.select().exists():
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text="No hay cronograma para borrar."
+        )
+        return
+    keyboard = [
+        [
+            InlineKeyboardButton("Sí", callback_data=f"{BORRAR_CRONO_PATTERN}:si"),
+            InlineKeyboardButton("No", callback_data=f"{BORRAR_CRONO_PATTERN}:no"),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text="¿Borrar el cronograma? Se quitarán todos los slots y asignaciones.",
+        reply_markup=reply_markup,
+    )
+
+
+async def borrar_cronograma_confirm(update, context):
+    callback_query = update.callback_query
+    await callback_query.answer()
+    chat_id = callback_query.message.chat_id
+    username = callback_query.from_user.username
+    if username not in get_admins_username():
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text="No estas Autorizadx para hacer esta acción",
+        )
+        return
+    if callback_query.data.split(":")[1] == "no":
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text="Operación cancelada.",
+        )
+        return
+    Project.update(slot=None).execute()
+    Slot.delete().execute()
+    await context.bot.send_message(
+        chat_id=chat_id,
+        text="Cronograma borrado. Podés volver a usar /cronogramear.",
+    )
+
+
 @admin_needed
 async def change_slot(update, context):
     projects = Project.select()
@@ -225,5 +282,12 @@ load_schedule_handler = ConversationHandler(
 
 def set_handlers(application):
     application.add_handler(CommandHandler('cronograma', show_schedule))
+    application.add_handler(CommandHandler('borrar_cronograma', borrar_cronograma))
+    application.add_handler(
+        CallbackQueryHandler(
+            borrar_cronograma_confirm,
+            pattern=f"{BORRAR_CRONO_PATTERN}:",
+        )
+    )
     application.add_handler(CommandHandler('cambiar_slot', change_slot))
     application.add_handler(load_schedule_handler)

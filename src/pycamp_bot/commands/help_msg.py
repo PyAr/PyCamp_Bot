@@ -68,6 +68,7 @@ Por default usa datetime\\.now\\(\\)
     y genera el cronograma\\.
 /cambiar\\_slot: Toma el nombre de un proyecto y el nuevo slot \
     y lo cambia en el cronograma\\.
+/borrar\\_cronograma: Borra el cronograma actual para poder volver a usar /cronogramear\\.
 
 **Gestión de magxs**
 

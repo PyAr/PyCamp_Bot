@@ -26,6 +26,7 @@ terminar_votacion_proyectos - *admin* Deshabilita la seleccion sobre los proyect
 empezar_pycamp - *admin* Setea el tiempo de inicio del pycamp activo.Por default usa datetime.now()
 terminar_pycamp - *admin* Setea el timepo de fin del pycamp activo.Por default usa datetime.now()
 cronogramear - *admin* Te pregunta cuantos dias y que slot tiene tu pycamp y genera el cronograma.
+borrar_cronograma - *admin* Borra el cronograma actual para poder volver a usar cronogramear.
 agendar_magx - *admin* Cronogramea los magxs en los slots el PyCamp
 cambiar_slot - (project_name, new_slot)*admin* Toma el nombre de un proyecto y el nuevo slot y lo cambia en el cronograma.
 degradar - (username)  *admin* Le saca los permisos de admin a un usuario.

@@ -45,6 +45,7 @@ Listo, ahora podemos empezar con la magia.
 ### 🗓 Armando el cronograma
 
 - `/cronogramear` ⏳ Creá el cronograma con los días y slots que quieras.
+- `/borrar_cronograma` 🗑️ Borrá el cronograma para poder armarlo de nuevo.
 - `/cambiar_slot <proyecto> <slot>` ✏️ Mové un proyecto de horario.
 
 ### 🎩 Agendando lxs magxs
