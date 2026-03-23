@@ -7,7 +7,10 @@ def export_db_2_json():
 
     result = {"projects": {}, "responsable_available_slots": {}}
 
-    available_slots = [slot.code for slot in Slot.select()]
+    # Slots de comida no participan del optimizador de proyectos
+    available_slots = [
+        s.code for s in Slot.select().where(Slot.meal_type.is_null(True))
+    ]
 
     result["available_slots"] = available_slots
     all_responsables = []

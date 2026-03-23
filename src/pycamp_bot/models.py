@@ -154,13 +154,23 @@ class Slot(BaseModel):
     code: String that represent the slot in the form A1, where the letter
     represents the day and the number the position of the slot that day.
     start: Time of start of the slot
+    meal_type: If set (Desayuno, Almuerzo, Merienda, Cena), slot is reserved
+    for meals and excluded from the project scheduler.
     '''
     code = pw.CharField()  # For example A1 for first slot first day
     start = pw.DateTimeField()
     current_wizard = pw.ForeignKeyField(Pycampista, null=True)
+    meal_type = pw.CharField(null=True)
 
     def get_end_time(self):
         return self.start + timedelta(minutes=DEFAULT_SLOT_PERIOD)
+
+    def start_hour_display(self):
+        """Hora de inicio para UI; `start` puede ser int (legacy) o datetime."""
+        s = self.start
+        if isinstance(s, int):
+            return s
+        return s.hour
 
 
 class Project(BaseModel):
@@ -209,4 +219,13 @@ def models_db_connection():
         Project,
         Slot,
         Vote], safe=True)
+    # Migraciones ligeras en instalaciones existentes (create_tables no altera tablas viejas)
+    try:
+        cols = {row[1] for row in db.execute_sql('PRAGMA table_info(slot)')}
+        if 'meal_type' not in cols:
+            db.execute_sql(
+                'ALTER TABLE slot ADD COLUMN meal_type VARCHAR(255) NULL'
+            )
+    except Exception as e:
+        logger.warning('Migración meal_type en slot: %s', e)
     db.close()
