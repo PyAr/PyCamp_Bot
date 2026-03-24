@@ -17,12 +17,24 @@ DAY_SLOT_TIME = {
 COMIDAS = ['Desayuno', 'Almuerzo', 'Merienda', 'Cena']
 
 
+def _slot_sort_key(slot):
+    """
+    Ordena los slots por día y número de slot.
+    Ej: A1, A2, A10, B1, B2, B3, etc.
+    """
+    code = slot.code
+    letra_dia = code[0]
+    if len(code) == 1:
+        return (letra_dia, 0)
+    numero = int(code[1:])
+    return (letra_dia, numero)
+
+
 def _slots_ordered_query():
-    """Orden A1…A9,A10 sin orden lexicográfico incorrecto."""
-    return sorted(
-        Slot.select(),
-        key=lambda s: (s.code[0], int(s.code[1:])) if len(s.code) > 1 else (s.code[0], 0),
-    )
+    """Ordena los slots por día y número de slot.
+    Ej: A1, A2, A10, B1, B2, B3, etc.
+    """
+    return sorted(Slot.select(), key=_slot_sort_key)
 
 
 async def cancel(update, context):
