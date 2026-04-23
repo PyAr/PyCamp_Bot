@@ -2,6 +2,7 @@ import logging
 import textwrap
 
 import peewee
+from peewee import JOIN
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, LinkPreviewOptions
 from telegram.ext import CallbackQueryHandler, CommandHandler, ConversationHandler, MessageHandler, filters
 from pycamp_bot.models import Pycampista, Project, Slot, Vote
@@ -528,9 +529,9 @@ async def show_my_projects(update, context):
     )
     votes = (
         Vote
-        .select(Project, Slot)
+        .select(Vote, Project, Slot)
         .join(Project)
-        .join(Slot)
+        .join(Slot, join_type=JOIN.LEFT_OUTER)
         .where(
             (Vote.pycampista == user) &
             Vote.interest
@@ -544,17 +545,28 @@ async def show_my_projects(update, context):
         prev_slot_day_code = None
 
         for vote in votes:
-            slot_day_code = vote.project.slot.code[0]
-            slot_day_name = get_slot_weekday_name(slot_day_code)
+            slot = vote.project.slot
+            if slot is None:
+                slot_day_code = None
+                slot_day_name = "Sin asignar"
+            else:
+                slot_day_code = slot.code[0]
+                slot_day_name = get_slot_weekday_name(slot_day_code)
 
             if slot_day_code != prev_slot_day_code:
                 text_chunks.append(f'*{slot_day_name}*')
 
-            project_lines = [
-                f'{vote.project.slot.start}:00',
-                escape_markdown(vote.project.name),
-                f'Owner: @{escape_markdown(vote.project.owner.username)}',
-            ]
+            if slot is None:
+                project_lines = [
+                    escape_markdown(vote.project.name),
+                    f'Owner: @{escape_markdown(vote.project.owner.username)}',
+                ]
+            else:
+                project_lines = [
+                    f'{slot.start}:00',
+                    escape_markdown(vote.project.name),
+                    f'Owner: @{escape_markdown(vote.project.owner.username)}',
+                ]
 
             text_chunks.append('\n'.join(project_lines))
 

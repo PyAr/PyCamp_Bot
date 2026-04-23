@@ -50,7 +50,7 @@ async def announce(update: Update, context: CallbackContext) -> str:
                 chat_id=update.message.chat_id,
                 text=ERROR_MESSAGES["no_admin"],
             )
-            logger.warn(f"Pycampista {state.username} no contiene proyectos creados.")
+            logger.warning(f"Pycampista {state.username} no contiene proyectos creados.")
             return ConversationHandler.END
         else:
             state.projects = Project.select()

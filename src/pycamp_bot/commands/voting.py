@@ -47,10 +47,10 @@ async def start_voting(update, context):
 async def button(update, context):
     '''Save user vote in the database'''
     query = update.callback_query
-    username = query.message['chat']['username']
+    username = query.from_user.username
     chat_id = query.message.chat_id
     user = Pycampista.get_or_create(username=username, chat_id=chat_id)[0]
-    project_name = query.message['text']
+    project_name = query.message.text
 
     # Get project from the database
     project = Project.get(Project.name == project_name)
@@ -95,7 +95,11 @@ async def vote(update, context):
 
     # if there is not project in the database, create a new project
     if not Project.select().exists():
-        Project.create(name='PROYECTO DE PRUEBA')
+        user = Pycampista.get_or_create(
+            username=update.message.from_user.username,
+            chat_id=str(update.message.chat_id),
+        )[0]
+        Project.create(name='PROYECTO DE PRUEBA', owner=user)
 
     # ask user for each project in the database
     for project in Project.select():
@@ -121,6 +125,8 @@ async def end_voting(update, context):
     await update.message.reply_text("Selección cerrada")
     await msg_to_active_pycamp_chat(context.bot, "La selección de proyectos ha finalizado.")
 
+
+@admin_needed
 async def vote_count(update, context):
     votes = [vote.pycampista_id for vote in Vote.select()]
     vote_count = len(set(votes))

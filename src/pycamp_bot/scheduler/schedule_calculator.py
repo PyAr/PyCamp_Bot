@@ -128,7 +128,8 @@ class PyCampScheduleProblem:
             # were at the begining
             vote_quantity = sum([len(self.data.projects[project].votes)
                                  for project in slot_projects])
-            most_voted_cost += (slot_number * vote_quantity) / self.total_participants
+            denom = max(1, self.total_participants)
+            most_voted_cost += (slot_number * vote_quantity) / denom
 
         for project, slot in state:
             project_data = self.data.projects[project]
@@ -221,6 +222,8 @@ def hill_climbing(problem, initial_state):
 
     while True:
         neighboors = [(n, problem.value(n)) for n in problem.neighboors(current_state)]
+        if not neighboors:
+            return current_state
         best_neighbour, best_value = max(neighboors, key=itemgetter(1))
 
         if best_value > current_value:

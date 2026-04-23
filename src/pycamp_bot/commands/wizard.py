@@ -240,7 +240,7 @@ async def schedule_wizards(update, context, pycamp=None):
             parse_mode="MarkdownV2"
         )  
     except BadRequest as e:
-        m = "Coulnd't return the Wizards list to the admin. ".format(update.message.from_user.username)
+        m = "Couldn't return the Wizards list to the admin ({}).".format(update.message.from_user.username)
         if len(msg) >= MSG_MAX_LEN:
             m += "The message is too long. Check the data in the DB ;-)"
         logger.exception(m)

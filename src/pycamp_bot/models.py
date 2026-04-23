@@ -86,10 +86,11 @@ class Pycamp(BaseModel):
         return rv_str
 
     def set_as_only_active(self):
-        active = Pycamp.select().where(Pycamp.active)
+        active = list(Pycamp.select().where(Pycamp.active))
         for p in active:
             p.active = False
-        Pycamp.bulk_update(active, fields=[Pycamp.active])
+        if active:
+            Pycamp.bulk_update(active, fields=[Pycamp.active])
         self.active = True
         self.save()
 
