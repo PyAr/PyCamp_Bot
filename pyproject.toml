@@ -23,6 +23,7 @@ dev = [
   "flake8==7.1.2",
   "freezegun==1.5.1",
   "pytest==8.3.4",
+  "pytest-cov==6.0.0",
 ]
 doc = [
   "sphinx==7.3.7",
