@@ -1,98 +1,171 @@
 # Este es el bot del Pycamp
 
-## Documentación del módulo
+Bot de Telegram para organizar y gestionar PyCamps: carga de proyectos, votación, cronogramas y asignación de magos.
 
-Puede encontrar una documentación mas detallada para programadores en [https://pyar.github.io/PyCamp_Bot](https://pyar.github.io/PyCamp_Bot)
+---
 
-## Variables de entorno
+## 📚 Documentación
 
-* TOKEN: Token del bot generado con BotFather.
-* PYCAMP_BOT_MASTER_KEY: Password para agregar nuevos admins.
-* SENTRY_DATA_SOURCE_NAME: ID de proyecto de Sentry para habilitar el monitoreo.
+Encontrá documentación más detallada para programadores en [https://pyar.github.io/PyCamp_Bot](https://pyar.github.io/PyCamp_Bot)
 
-## Development
+---
 
-Si queres contribuir en este proyecto lo primero que vas a necesitar es crearte un bot para hacer
-las pruebas.
+## 🚀 Desarrollo
 
-Esto lo podes hacer hablandole a @BotFather que es el "Bot padre de todos los bots" de telegram.
-Él te a a guiar para que puedas hacer tu propio bot.
+### 1️⃣ Crear tu bot de prueba
 
-Una vez creado el bot, deberías tener un TOKEN\_PERSONAL (BotFather te lo da en el mismo proceso de
-creación).
+Para contribuir necesitás tu propio bot de Telegram:
 
-Despues instala el paquete en modo desarrollo en un virtual environment
+1. Hablale a [@BotFather](https://t.me/BotFather) en Telegram
+2. Seguí las instrucciones para crear tu bot
+3. Guardá el **TOKEN** que te da (lo vas a necesitar)
 
-~~~bash
+### 2️⃣ Instalar dependencias
+
+```bash
 python3 -m venv venv
 source venv/bin/activate
 pip install -e '.[dev]'
-~~~
+```
 
-y estas listo para trabajar.
+### 3️⃣ Ejecutar el bot
 
-## Testeo
+#### Opción 1: Variables inline (más rápido para probar)
 
-Para correr el bot ejecutá (con el virtual environment activado):
+```bash
+TOKEN='TU_TOKEN_AQUI' PYCAMP_BOT_MASTER_KEY='TU_CLAVE' python bin/run_bot.py
+```
 
-~~~bash
-TOKEN='TOKEN_PERSONAL' PYCAMP_BOT_MASTER_KEY='KEY' python bin/run_bot.py
-~~~
+#### Opción 2: Con archivo .env (recomendado)
 
-Y listo! Tu bot está corriendo en tu máquina, esperando que alguien le escriba por telegram.
-Podés probarlo mandandole un `/start`
+1. Crear el archivo de configuración:
+   ```bash
+   cp .env.example .env
+   ```
 
-## ¿Cómo usar el bot en un nuevo pycamp?
+2. Editar `.env` con tus valores:
+   ```
+   TOKEN=tu_token_aqui
+   PYCAMP_BOT_MASTER_KEY=tu_clave_secreta
+   SENTRY_DATA_SOURCE_NAME=tu_sentry_dsn  # Opcional
+   ```
 
-Primero es necesario setear las siguientes variables de entorno:
+3. Ejecutar:
+   ```bash
+   python bin/run_bot.py
+   ```
 
-* `TOKEN`: token del bot que se usará durante el pycamp (gestionar desde telegram con BotFather)
-* `PYCAMP_BOT_MASTER_KEY`: con alguna password secreta que se va a usar para acceder a comandos de superuser
-* `SENTRY_DATA_SOURCE_NAME`: ID del proyecto de Sentry "telegrambot" de la cuenta de PyAr
+#### Opción 3: Con Docker
 
-Una vez creadas las variables de entorno, correr el bot con el comando `python bin/run_bot.py`
+```bash
+make    # Construye la imagen (si no existe) y ejecuta el bot
+```
 
-En este momento ya se puede hablar con el bot. ¿Qué le digo?
+**¡Listo!** Tu bot está corriendo. Probalo mandándole `/start` por Telegram.
 
-* `/start` para chequear que esté andando bien
+---
 
-### Flujo admin
+## 🧪 Testing
 
-#### Inicialización (requerida al comienzo de cada PyCamp)
+### Opción 1: Local en tu máquina
 
-* `/su <password>` para reclamar permisos de admin, reemplazando `<password>` por la contraseña que hayamos elegido en la envvar `PYCAMP_BOT_MASTER_KEY`
-* `/empezar_pycamp <pycamp_name>` inicia el flujo de creación de un pycamp. Lo carga en la db, pide fecha de inicio y duración. Lo deja activo.
-    * `/activar_pycamp <pycamp_name>` activa un pycamp, en caso que haga falta.
+Ejecutar todos los tests:
 
-#### Flujo de Proyectos
+```bash
+pytest
+```
 
-* `/empezar_carga_proyectos` habilita la carga de los proyectos. En este punto los pycampistas pueden cargar sus proyectos,
-enviandole al bot el comando `/cargar_proyecto`
-* `/terminar_carga_proyectos` termina carga proyectos
-* `/empezar_votacion_proyectos`  activa la votacion (a partir de ahora los pycampistas pueden votar con `/votar`)
-* `/terminar_votacion_proyectos` termina la votacion
+Ejecutar un test específico:
 
-Para generar el schedule:
+```bash
+pytest test/test_wizard.py
+```
 
-* `/cronogramear` te va a preguntar cuantos dias queres cronogramear y cuantos slots por dia tenes y hacer el cronograma.
-* `/cambiar_slot` toma un nombre de proyecto y un slot; y te cambia ese proyecto a ese slot.
+Con variables de entorno inline:
 
-#### Flujo de magia
+```bash
+TOKEN='TOKEN_TEST' PYCAMP_BOT_MASTER_KEY='KEY_TEST' pytest
+```
 
-Para agendar los magos todos los candidatos tienen que haberse registrado con `/ser_magx`
+### Opción 2: Con Docker
 
-* `/agendar_magx` Asigna un mago por hora durante todo el PyCamp.
-    * De 9 a 13 y de 14 a 19.
-    * El primer día arranca después del almuerzo (14hs).
-    * El último día termina al almuerzo (13hs).
+```bash
+make test
+```
 
-### Flujo pycampista
+---
 
-* `/cargar_proyecto` carga un proyecto (si está habilitada la carga)
-* `/votar` envia opciones para votar (si está habilitada la votacion)
-* `/ver_cronograma` te muestra el cronograma!
-* `/ser_magx` te registra como mago.
-* `/ver_magx` Lista los magos registrados.
-* `/evocar_magx` llama al mago de turno para pedirle ayuda.
-* `/ver_agenda_magx completa` te muestra la agenda de magos del PyCamp. El parámetro `completa` es opcional, si se omite solo muestra los turnos pendientes.
+## 🔧 Variables de entorno
+
+| Variable | Descripción | Requerida |
+|----------|-------------|-----------|
+| `TOKEN` | Token del bot generado con BotFather | ✅ Sí |
+| `PYCAMP_BOT_MASTER_KEY` | Password para comandos de admin | ✅ Sí |
+| `SENTRY_DATA_SOURCE_NAME` | ID de proyecto de Sentry para monitoreo | ❌ No |
+
+---
+
+## 🎯 ¿Cómo usar el bot en un nuevo PyCamp?
+
+### Preparación inicial
+
+1. Configurar las variables de entorno (ver tabla arriba)
+2. Ejecutar el bot: `python bin/run_bot.py`
+3. Verificar que funciona enviándole `/start`
+
+---
+
+## 👥 Comandos del bot
+
+### 🔐 Para Admins
+
+#### Inicialización (al comienzo de cada PyCamp)
+
+| Comando | Descripción |
+|---------|-------------|
+| `/su <password>` | Reclamar permisos de admin con la clave de `PYCAMP_BOT_MASTER_KEY` |
+| `/empezar_pycamp <nombre>` | Crear el PyCamp (pide fecha de inicio y duración) |
+| `/activar_pycamp <nombre>` | Activar un PyCamp específico (si hace falta) |
+
+#### Gestión de Proyectos
+
+| Comando | Descripción |
+|---------|-------------|
+| `/empezar_carga_proyectos` | Habilitar la carga de proyectos |
+| `/terminar_carga_proyectos` | Cerrar la carga de proyectos |
+| `/empezar_votacion_proyectos` | Activar la votación |
+| `/terminar_votacion_proyectos` | Cerrar la votación |
+| `/cronogramear` | Generar el cronograma (pide días y slots) |
+| `/cambiar_slot <proyecto> <slot>` | Mover un proyecto de horario |
+
+#### Gestión de Magxs
+
+| Comando | Descripción |
+|---------|-------------|
+| `/agendar_magx` | Asignar magos automáticamente (9-13 y 14-19hs) |
+
+> **Nota:** Los magos deben registrarse primero con `/ser_magx`
+
+---
+
+### 🙋 Para Pycampistas
+
+#### Proyectos
+
+| Comando | Descripción |
+|---------|-------------|
+| `/cargar_proyecto` | Cargar tu proyecto (si la carga está habilitada) |
+| `/votar` | Votar proyectos de tu interés |
+| `/ver_cronograma` | Ver el cronograma del evento |
+
+#### Sistema de Magxs
+
+| Comando | Descripción |
+|---------|-------------|
+| `/ser_magx` | Registrarte como mago |
+| `/ver_magx` | Ver la lista de magos registrados |
+| `/evocar_magx` | Llamar al mago de turno para pedir ayuda |
+| `/ver_agenda_magx [completa]` | Ver la agenda de magos (usa `completa` para ver todos los turnos) |
+
+---
 
